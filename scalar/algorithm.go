@@ -27,15 +27,27 @@ type Objective func([]*Scalar) *Scalar
 
 /* -------------------------------------------------------------------------- */
 
+func setConstant(variables []*Scalar) {
+    for _, v := range variables {
+      v.Constant()
+    }
+}
+
+func setVariable(variables []*Scalar) {
+    for _, v := range variables {
+      v.Variable()
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
 func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
 
   var s *Scalar
 
   for {
     // initialize all variables as constants
-    for _, v := range variables {
-      v.Constant()
-    }
+    setConstant(variables)
     // compute partial derivatives and update variables
     for _, v := range variables {
       v.Variable()
@@ -47,9 +59,7 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
       v.Constant()
     }
     // compute total derivative
-    for _, v := range variables {
-      v.Variable()
-    }
+    setVariable(variables)
     s = f(variables)
     // evaluate stop criterion
     if (math.Abs(s.Derivative()) < epsilon) {
