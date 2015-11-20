@@ -44,8 +44,24 @@ func Sin(a *Scalar) *Scalar {
   return &Scalar{math.Sin(a.Value()), a.Derivative()*math.Cos(a.Value())}
 }
 
+func Sinh(a *Scalar) *Scalar {
+  return &Scalar{math.Sinh(a.Value()), a.Derivative()*math.Cosh(a.Value())}
+}
+
 func Cos(a *Scalar) *Scalar {
   return &Scalar{math.Cos(a.Value()), -a.Derivative()*math.Sin(a.Value())}
+}
+
+func Cosh(a *Scalar) *Scalar {
+  return &Scalar{math.Cosh(a.Value()), a.Derivative()*math.Sinh(a.Value())}
+}
+
+func Tan(a *Scalar) *Scalar {
+  return &Scalar{math.Tan(a.Value()), a.Derivative()*(1.0+math.Pow(math.Tan(a.Value()), 2))}
+}
+
+func Tanh(a *Scalar) *Scalar {
+  return &Scalar{math.Tanh(a.Value()), a.Derivative()*(1.0-math.Pow(math.Tanh(a.Value()), 2))}
 }
 
 func Exp(a *Scalar) *Scalar {

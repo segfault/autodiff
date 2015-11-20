@@ -42,17 +42,14 @@ func (a *Scalar) Derivative() float64 {
   return a.derivative
 }
 
-func (a *Scalar) Variable() {
+func (a *Scalar) Variable() *Scalar {
   a.derivative = 1
+  return a
 }
 
-func (a *Scalar) Constant() {
+func (a *Scalar) Constant() *Scalar {
   a.derivative = 0
-}
-
-func (a *Scalar) Assign(v float64) {
-  a.value      = v
-  a.derivative = 0
+  return a
 }
 
 func (a Scalar) String() string {
