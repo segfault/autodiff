@@ -50,7 +50,8 @@ func gradientDescent(x, y []*Scalar, l *Line) *Line {
   f := func(v []*Scalar) *Scalar {
     return sumOfSquares(x, y, l)
   }
-  GradientDescent(f, variables, step, epsilon)
+//  GradientDescent(f, variables, step, epsilon)
+  Rprop(f, variables, step, epsilon, 0.2)
 
   return l
 }
@@ -70,11 +71,9 @@ func regression() {
   }
 
   l := NewLine(NewScalar(-1.23), NewScalar(1));
-
-  l = gradientDescent(x, y, l)
+  l  = gradientDescent(x, y, l)
 
   fmt.Println("slope: ", l.Slope().Value(), "b: ", l.Intercept().Value())
-
 }
 
 func main() {

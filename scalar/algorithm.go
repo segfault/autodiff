@@ -112,7 +112,11 @@ func Rprop(f Objective, variables []*Scalar, step_init, epsilon, eta float64) {
     }
     // update variables
     for i, _ := range variables {
-      *variables[i] = *Sub(variables[i], NewScalar(step[i]*s.Derivative()))
+      if gradient_new[i] > 0.0 {
+        *variables[i] = *Sub(variables[i], NewScalar(step[i]))
+      } else {
+        *variables[i] = *Add(variables[i], NewScalar(step[i]))
+      }
     }
     // compute total derivative
     setVariable(variables)
