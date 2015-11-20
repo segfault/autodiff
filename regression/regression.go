@@ -4,7 +4,7 @@ package main
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
-//import   "math"
+import   "math/rand"
 import . "github.com/pbenner/autodiff/scalar"
 import . "github.com/pbenner/autodiff/regression/line"
 
@@ -14,18 +14,19 @@ import . "github.com/pbenner/autodiff/regression/line"
 func sumOfSquares(x, y []*Scalar, l *Line) *Scalar {
 
   s := NewScalar(0)
+  n := NewScalar(float64(len(x)))
 
   for i,_ := range x {
     s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), 2))
   }
-  return s
+  return Div(s, n)
 }
 
 func gradientDescent(x, y []*Scalar, l *Line) *Line {
 
   // gradient step size
-  const epsilon = 0.000001
-  const step    = 0.01
+  const epsilon = 0.00001
+  const step    = 0.1
 
   // get a list of the variables
   variables := []*Scalar{l.Slope(), l.Intercept()}
@@ -41,20 +42,17 @@ func gradientDescent(x, y []*Scalar, l *Line) *Line {
 
 func regression() {
 
-  x := []*Scalar{
-    NewScalar(1),
-    NewScalar(2),
-    NewScalar(3),
-    NewScalar(4),
-    NewScalar(5),
-    NewScalar(6)}
-  y := []*Scalar{
-    NewScalar(1),
-    NewScalar(2),
-    NewScalar(3),
-    NewScalar(4),
-    NewScalar(5),
-    NewScalar(6)}
+  const n = 1000
+  x := make([]*Scalar, n)
+  y := make([]*Scalar, n)
+
+  // random number generator
+  r := rand.New(rand.NewSource(42))
+
+  for i := 0; i < n; i++ {
+    x[i] = NewScalar(r.NormFloat64() + 0)
+    y[i] = NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
+  }
 
   l := NewLine(NewScalar(-1.23), NewScalar(1));
 

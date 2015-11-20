@@ -4,6 +4,7 @@ package scalar
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
+import "math"
 
 /* -------------------------------------------------------------------------- */
 
@@ -35,7 +36,7 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
       v.Reset()
     }
     // evaluate stop criterion
-    if (s.Value() < epsilon) {
+    if (math.Abs(s.Derivative()) < epsilon) {
       break;
     }
   }
