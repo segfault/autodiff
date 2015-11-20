@@ -42,11 +42,11 @@ func (a *Scalar) Derivative() float64 {
   return a.derivative
 }
 
-func (a *Scalar) Differentiate() {
+func (a *Scalar) Variable() {
   a.derivative = 1
 }
 
-func (a *Scalar) Reset() {
+func (a *Scalar) Constant() {
   a.derivative = 0
 }
 

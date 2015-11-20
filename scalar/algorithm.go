@@ -32,24 +32,25 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
   var s *Scalar
 
   for {
+    // initialize all variables as constants
+    for _, v := range variables {
+      v.Constant()
+    }
     // compute partial derivatives and update variables
     for _, v := range variables {
-      v.Differentiate()
+      v.Variable()
       s = f(variables)
 
       // update variable
       *v = *Sub(v, NewScalar(step*s.Derivative()))
       // reset derivative
-      v.Reset()
+      v.Constant()
     }
     // compute total derivative
     for _, v := range variables {
-      v.Differentiate()
+      v.Variable()
     }
     s = f(variables)
-    for _, v := range variables {
-      v.Reset()
-    }
     // evaluate stop criterion
     if (math.Abs(s.Derivative()) < epsilon) {
       break;
