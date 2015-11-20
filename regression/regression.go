@@ -4,7 +4,7 @@ package main
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
-import   "math"
+//import   "math"
 import . "github.com/pbenner/autodiff/scalar"
 import . "github.com/pbenner/autodiff/regression/line"
 
@@ -24,35 +24,18 @@ func sumOfSquares(x, y []*Scalar, l *Line) *Scalar {
 func gradientDescent(x, y []*Scalar, l *Line) *Line {
 
   // gradient step size
-  const epsilon = 0.01
-  // sum of squares
-  s := NewScalar(0.0)
+  const epsilon = 0.000001
+  const step    = 0.01
 
-  for {
-    // differentiate the slope
-    l.Slope().Differentiate()
-    l.Intercept().Reset()
-    s = sumOfSquares(x, y, l)
-    l.SetSlope(
-      Sub(l.Slope(), NewScalar(epsilon*s.Derivative())))
+  // get a list of the variables
+  variables := []*Scalar{l.Slope(), l.Intercept()}
 
-    // differentiate the intercept
-    l.Slope().Reset()
-    l.Intercept().Differentiate()
-    s = sumOfSquares(x, y, l)
-    l.SetIntercept(
-      Sub(l.Intercept(), NewScalar(epsilon*s.Derivative())))
-
-    // compute total derivative
-    l.Slope().Differentiate()
-    l.Intercept().Differentiate()
-    s = sumOfSquares(x, y, l)
-    fmt.Println(s.String())
-
-    if (math.Abs(s.Derivative()) < epsilon) {
-      break
-    }
+  // create the objective function
+  f := func(v []*Scalar) *Scalar {
+    return sumOfSquares(x, y, l)
   }
+  GradientDescent(f, variables, step, epsilon)
+
   return l
 }
 
