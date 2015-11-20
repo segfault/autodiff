@@ -70,6 +70,11 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
 
 /* -------------------------------------------------------------------------- */
 
+/* Resilient Backpropagation:
+ * M. Riedmiller und H. Braun: Rprop - A Fast Adaptive Learning Algorithm.
+ * Proceedings of the International Symposium on Computer and Information Science VII, 1992
+ */
+
 func Rprop(f Objective, variables []*Scalar, step_init, epsilon, eta float64) {
 
   var s *Scalar
