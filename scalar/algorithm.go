@@ -67,3 +67,59 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+func Rprop(f Objective, variables []*Scalar, step_init, epsilon, eta float64) {
+
+  var s *Scalar
+  // step size for each variable
+  step := make([]float64, len(variables))
+  // gradients
+  gradient_new := make([]float64, len(variables))
+  gradient_old := make([]float64, len(variables))
+  // initialize values
+  for i, _ := range variables {
+    step[i]         = step_init
+    gradient_new[i] = 1
+    gradient_old[i] = 1
+  }
+
+  for {
+    for i, _ := range variables {
+      gradient_old[i] = gradient_new[i]
+    }
+    // initialize all variables as constants
+    setConstant(variables)
+    // compute partial derivatives and update variables
+    for i, _ := range variables {
+      // differentiate with respect to the ith variable
+      variables[i].Variable()
+      s = f(variables)
+      // save derivative
+      gradient_new[i] = s.Derivative()
+      // set variable back to constant
+      variables[i].Constant()
+    }
+    // update step size
+    for i, _ := range variables {
+      if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
+          (gradient_old[i] > 0 && gradient_new[i] > 0)) {
+        step[i] *= 1.0 + eta
+      } else {
+        step[i] *= 1.0 - eta
+      }
+    }
+    // update variables
+    for i, _ := range variables {
+      *variables[i] = *Sub(variables[i], NewScalar(step[i]*s.Derivative()))
+    }
+    // compute total derivative
+    setVariable(variables)
+    s = f(variables)
+    // evaluate stop criterion
+    if (math.Abs(s.Derivative()) < epsilon) {
+      break;
+    }
+  }
+}
