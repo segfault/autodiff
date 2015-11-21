@@ -49,6 +49,14 @@ func MakeMatrix(n, m int) Matrix {
   return Matrix{MakeVector(n*m), n, m, false}
 }
 
+func IdentityMatrix(n int) Matrix {
+  matrix := MakeMatrix(n, n)
+  for i := 0; i < n; i++ {
+    matrix.Set(i, i, 1)
+  }
+  return matrix
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (matrix Matrix) index(i, j int) int {
