@@ -42,3 +42,12 @@ func TestMatrix(t *testing.T) {
     t.Error("Matrix transpose failed!")
   }
 }
+
+func TestMatrixTrace(t *testing.T) {
+
+  m1 := NewMatrix([]float64{1,2,3,4}, 2, 2)
+
+  if Trace(m1).Value() != 5 {
+    t.Error("Wrong matrix trace!")
+  }
+}

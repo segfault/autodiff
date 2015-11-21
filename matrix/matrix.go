@@ -18,8 +18,7 @@ package matrix
 
 /* -------------------------------------------------------------------------- */
 
-import .     "github.com/pbenner/autodiff/scalar"
-//import gonum "github.com/gonum/matrix"
+import . "github.com/pbenner/autodiff/scalar"
 
 /* -------------------------------------------------------------------------- */
 
@@ -69,10 +68,36 @@ func (matrix Matrix) At(i, j int) float64 {
   return matrix.values[k].Value()
 }
 
+func (matrix Matrix) ScalarAt(i, j int) Scalar {
+  var k int
+  if matrix.t {
+    k = j*matrix.n + i
+  } else {
+    k = i*matrix.m + j
+  }
+  if k >= len(matrix.values) {
+    panic("At(): Index out of bounds!")
+  }
+  return matrix.values[k]
+}
+
 func (matrix Matrix) T() Matrix {
   return Matrix{
     values:  matrix.values,
     n     :  matrix.m,
     m     :  matrix.n,
     t     : !matrix.t}
+}
+
+/* -------------------------------------------------------------------------- */
+
+func Trace(matrix Matrix) Scalar {
+  t := NewScalar(0.0)
+  if matrix.n != matrix.m {
+    panic("Not a square matrix!")
+  }
+  for i := 0; i < matrix.n; i++ {
+    t = Add(t, matrix.ScalarAt(i,i))
+  }
+  return t
 }
