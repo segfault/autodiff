@@ -77,3 +77,35 @@ func (v Vector) String() string {
 
   return buffer.String()
 }
+
+/* -------------------------------------------------------------------------- */
+
+func VAdd(a, b Vector) Vector {
+  if len(a) != len(b) {
+    panic("Vector dimensions do not match!")
+  }
+  r := MakeVector(len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Add(a[i], b[i])
+  }
+  return r
+}
+
+func VSub(a, b Vector) Vector {
+  if len(a) != len(b) {
+    panic("Vector dimensions do not match!")
+  }
+  r := MakeVector(len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Sub(a[i], b[i])
+  }
+  return r
+}
+
+func VNorm(a Vector) Scalar {
+  r := NewScalar(0.0)
+  for i := 0; i < len(a); i++ {
+    r = Add(r, Pow(a[i], 2))
+  }
+  return r
+}

@@ -61,6 +61,30 @@ func TestMatrixMul(t *testing.T) {
   }
 }
 
+func TestMatrixMxV(t *testing.T) {
+
+  m1 := NewMatrix(2, 2, []float64{1,2,3,4})
+  v1 := NewVector([]float64{1, 2})
+  v2 := MxV(m1, v1)
+  v3 := NewVector([]float64{5, 11})
+
+  if VNorm(VSub(v2, v3)).Value() > 1e-8  {
+    t.Error("Matrix/Vector multiplication failed!")
+  }
+}
+
+func TestMatrixVxM(t *testing.T) {
+
+  m1 := NewMatrix(2, 2, []float64{1,2,3,4})
+  v1 := NewVector([]float64{1, 2})
+  v2 := VxM(v1, m1)
+  v3 := NewVector([]float64{7, 10})
+
+  if VNorm(VSub(v2, v3)).Value() > 1e-8  {
+    t.Error("Matrix/Vector multiplication failed!")
+  }
+}
+
 func TestMatrixInverse(t *testing.T) {
 
   m1 := NewMatrix(2, 2, []float64{1,2,3,4})

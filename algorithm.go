@@ -132,3 +132,9 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+
+func Newton(f Objective, variables Vector, step_init, epsilon, eta float64) {
+
+}

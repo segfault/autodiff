@@ -164,6 +164,32 @@ func MMul(a, b Matrix) Matrix {
   return r
 }
 
+func MxV(a Matrix, b Vector) Vector {
+  if a.m != len(b) {
+    panic("Matrix/Vector dimensions do not match!")
+  }
+  r := MakeVector(a.n)
+  for i := 0; i < len(r); i++ {
+    for n := 0; n < a.m; n++ {
+      r[i] = Add(r[i], Mul(a.ScalarAt(i, n), b[n]))
+    }
+  }
+  return r
+}
+
+func VxM(a Vector, b Matrix) Vector {
+  if len(a) != b.n {
+    panic("Matrix/Vector dimensions do not match!")
+  }
+  r := MakeVector(b.m)
+  for i := 0; i < len(r); i++ {
+    for n := 0; n < b.n; n++ {
+      r[i] = Add(r[i], Mul(a[n], b.ScalarAt(n, i)))
+    }
+  }
+  return r
+}
+
 func MTrace(matrix Matrix) Scalar {
   t := NewScalar(0.0)
   if matrix.n != matrix.m {
