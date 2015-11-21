@@ -28,13 +28,13 @@ import . "github.com/pbenner/autodiff/regression/line"
 
 /* -------------------------------------------------------------------------- */
 
-func sumOfSquares(x, y Vector, l *Line) *Scalar {
+func sumOfSquares(x, y Vector, l *Line) Scalar {
 
   s := NewScalar(0)
   n := NewScalar(float64(len(x)))
 
   for i,_ := range x {
-    s = Add(s, Pow(Sub(l.Eval(&x[i]), &y[i]), 2))
+    s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), 2))
   }
   return Div(s, n)
 }
@@ -47,13 +47,13 @@ func gradientDescent(x, y Vector, l *Line) *Line {
 
   // get a vector of variables
   variables := MakeVector(2)
-  variables[0] = *l.Slope()
-  variables[1] = *l.Intercept()
+  variables[0] = l.Slope()
+  variables[1] = l.Intercept()
 
   // create the objective function
-  f := func(v Vector) *Scalar {
-    l.SetSlope    (&v[0])
-    l.SetIntercept(&v[1])
+  f := func(v Vector) Scalar {
+    l.SetSlope    (v[0])
+    l.SetIntercept(v[1])
     return sumOfSquares(x, y, l)
   }
 //  GradientDescent(f, variables, step, epsilon)
@@ -62,7 +62,7 @@ func gradientDescent(x, y Vector, l *Line) *Line {
   return l
 }
 
-func regression() {
+func main() {
 
   const n = 1000
   x := MakeVector(n)
@@ -72,18 +72,12 @@ func regression() {
   r := rand.New(rand.NewSource(42))
 
   for i := 0; i < n; i++ {
-    x[i] = *NewScalar(r.NormFloat64() + 0)
-    y[i] = *NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
+    x[i] = NewScalar(r.NormFloat64() + 0)
+    y[i] = NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
   }
 
   l := NewLine(NewScalar(-1.23), NewScalar(1));
   l  = gradientDescent(x, y, l)
 
-  fmt.Println("slope: ", l.Slope().Value(), "b: ", l.Intercept().Value())
-}
-
-func main() {
-
-  regression()
-
+  fmt.Println("slope: ", l.Slope().Value(), "intercept: ", l.Intercept().Value())
 }

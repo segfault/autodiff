@@ -26,7 +26,7 @@ import . "github.com/pbenner/autodiff/matrix"
 
 /* -------------------------------------------------------------------------- */
 
-type Objective func(Vector) *Scalar
+type Objective func(Vector) Scalar
 
 /* -------------------------------------------------------------------------- */
 
@@ -46,7 +46,7 @@ func setVariable(variables Vector) {
 
 func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
 
-  var s *Scalar
+  var s Scalar
 
   for {
     // initialize all variables as constants
@@ -57,7 +57,7 @@ func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
       s = f(variables)
 
       // update variable
-      variables[i] = *Sub(&variables[i], NewScalar(step*s.Derivative()))
+      variables[i] = Sub(variables[i], NewScalar(step*s.Derivative()))
       // reset derivative
       variables[i].Constant()
     }
@@ -80,7 +80,7 @@ func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
 
 func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
 
-  var s *Scalar
+  var s Scalar
   // step size for each variable
   step := make([]float64, len(variables))
   // gradients
@@ -121,9 +121,9 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
     // update variables
     for i, _ := range variables {
       if gradient_new[i] > 0.0 {
-        variables[i] = *Sub(&variables[i], NewScalar(step[i]))
+        variables[i] = Sub(variables[i], NewScalar(step[i]))
       } else {
-        variables[i] = *Add(&variables[i], NewScalar(step[i]))
+        variables[i] = Add(variables[i], NewScalar(step[i]))
       }
     }
     // compute total derivative

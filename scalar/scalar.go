@@ -27,8 +27,8 @@ type Scalar struct {
   derivative float64
 }
 
-func NewScalar(v float64) *Scalar {
-  s := new(Scalar)
+func NewScalar(v float64) Scalar {
+  s := Scalar{}
   s.value      = v
   s.derivative = 0
   return s
@@ -36,11 +36,11 @@ func NewScalar(v float64) *Scalar {
 
 /* -------------------------------------------------------------------------- */
 
-func (a *Scalar) Value() float64 {
+func (a Scalar) Value() float64 {
   return a.value
 }
 
-func (a *Scalar) Derivative() float64 {
+func (a Scalar) Derivative() float64 {
   return a.derivative
 }
 
