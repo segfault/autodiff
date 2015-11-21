@@ -64,7 +64,7 @@ func TestMatrixMul(t *testing.T) {
 func TestMatrixInverse(t *testing.T) {
 
   m1 := NewMatrix(2, 2, []float64{1,2,3,4})
-  m2 := Inverse(m1)
+  m2 := MInverse(m1)
   m3 := NewMatrix(2, 2, []float64{-2, 1, 1.5, -0.5})
 
   if MNorm(MSub(m2, m3)).Value() > 1e-8 {

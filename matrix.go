@@ -183,7 +183,7 @@ func MNorm(matrix Matrix) Scalar {
   return s
 }
 
-func Inverse(matrix Matrix) Matrix {
+func MInverse(matrix Matrix) Matrix {
   if matrix.n != matrix.m {
     panic("Not a square matrix!")
   }
