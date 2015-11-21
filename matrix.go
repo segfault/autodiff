@@ -14,12 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package matrix
-
-/* -------------------------------------------------------------------------- */
-
-import . "github.com/pbenner/autodiff/algorithm"
-import . "github.com/pbenner/autodiff/scalar"
+package autodiff
 
 /* -------------------------------------------------------------------------- */
 
@@ -169,7 +164,7 @@ func MMul(a, b Matrix) Matrix {
   return r
 }
 
-func Trace(matrix Matrix) Scalar {
+func MTrace(matrix Matrix) Scalar {
   t := NewScalar(0.0)
   if matrix.n != matrix.m {
     panic("Not a square matrix!")
@@ -180,7 +175,7 @@ func Trace(matrix Matrix) Scalar {
   return t
 }
 
-func Norm(matrix Matrix) Scalar {
+func MNorm(matrix Matrix) Scalar {
   s := NewScalar(0.0)
   for _, v := range matrix.values {
     s = Add(s, Pow(v, 2.0))
@@ -196,8 +191,9 @@ func Inverse(matrix Matrix) Matrix {
   r := matrix.Clone()
   // objective function
   f := func(variables Vector) Scalar {
-    return Norm(MSub(MMul(matrix, r), I))
+    s := MNorm(MSub(MMul(matrix, r), I))
+    return s
   }
-  Rprop(f, matrix.values, 0.01, 0.00001, 0.1)
+  Rprop(f, r.values, 0.01, 1e-12, 0.1)
   return r
 }

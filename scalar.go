@@ -14,51 +14,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package test
+package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import   "testing"
-//import . "github.com/pbenner/autodiff/scalar"
-import . "github.com/pbenner/autodiff/matrix"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
-func TestVector(t *testing.T) {
-
-  v := NewVector([]float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
-  }
+type Scalar struct {
+  value      float64
+  derivative float64
 }
 
-func TestMatrix(t *testing.T) {
-
-  m1 := NewMatrix(2, 3, []float64{1,2,3,4,5,6})
-  m2 := m1.T()
-
-  if m1.At(1,2) != m2.At(2,1) {
-    t.Error("Matrix transpose failed!")
-  }
+func NewScalar(v float64) Scalar {
+  s := Scalar{}
+  s.value      = v
+  s.derivative = 0
+  return s
 }
 
-func TestMatrixTrace(t *testing.T) {
-
-  m1 := NewMatrix(2, 2, []float64{1,2,3,4})
-
-  if Trace(m1).Value() != 5 {
-    t.Error("Wrong matrix trace!")
-  }
+func NewConstant(v float64) Scalar {
+  s := Scalar{}
+  s.value      = v
+  s.derivative = 0
+  return s
 }
 
-func TestMatrixMul(t *testing.T) {
+func NewVariable(v float64) Scalar {
+  s := Scalar{}
+  s.value      = v
+  s.derivative = 1
+  return s
+}
 
-  m1 := NewMatrix(2, 3, []float64{1,2,3,4,5,6})
-  m2 := m1.T()
-  m3 := MMul(m1, m2)
+/* -------------------------------------------------------------------------- */
 
-  if m3.At(0,0) != 14 {
-    t.Error("Matrix multiplication failed!")
-  }
+func (a Scalar) Value() float64 {
+  return a.value
+}
+
+func (a Scalar) Derivative() float64 {
+  return a.derivative
+}
+
+func (a *Scalar) Variable() *Scalar {
+  a.derivative = 1
+  return a
+}
+
+func (a *Scalar) Constant() *Scalar {
+  a.derivative = 0
+  return a
+}
+
+func (a *Scalar) String() string {
+  return fmt.Sprintf("<%f,%f>", a.Value(), a.Derivative())
 }

@@ -14,60 +14,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package scalar
+package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+import "bytes"
 
 /* -------------------------------------------------------------------------- */
 
-type Scalar struct {
-  value      float64
-  derivative float64
+type Vector []Scalar
+
+func NewVector(w []float64) Vector {
+  v := make(Vector, len(w))
+
+  for i, _ := range w {
+    v[i] = NewScalar(w[i])
+  }
+  return v
 }
 
-func NewScalar(v float64) Scalar {
-  s := Scalar{}
-  s.value      = v
-  s.derivative = 0
-  return s
-}
-
-func NewConstant(v float64) Scalar {
-  s := Scalar{}
-  s.value      = v
-  s.derivative = 0
-  return s
-}
-
-func NewVariable(v float64) Scalar {
-  s := Scalar{}
-  s.value      = v
-  s.derivative = 1
-  return s
+func MakeVector(n int) Vector {
+  return make(Vector, n)
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (a Scalar) Value() float64 {
-  return a.value
+func (v Vector) Clone() Vector {
+  result := make(Vector, len(v))
+  copy(result, v)
+  return result
 }
 
-func (a Scalar) Derivative() float64 {
-  return a.derivative
+func (v Vector) Value(i int) float64 {
+  return v[i].Value()
 }
 
-func (a *Scalar) Variable() *Scalar {
-  a.derivative = 1
-  return a
+func (v Vector) Derivative(i int) float64 {
+  return v[i].Derivative()
 }
 
-func (a *Scalar) Constant() *Scalar {
-  a.derivative = 0
-  return a
+func (v Vector) Variable(i int) Vector {
+  v[i].Variable()
+  return v
 }
 
-func (a *Scalar) String() string {
-  return fmt.Sprintf("<%f,%f>", a.Value(), a.Derivative())
+func (v Vector) Constant(i int) Vector {
+  v[i].Constant()
+  return v
+}
+
+func (v Vector) String() string {
+  var buffer bytes.Buffer
+
+  buffer.WriteString("[")
+  for i, _ := range v {
+    if i != 0 {
+      buffer.WriteString(", ")
+    }
+    buffer.WriteString(v[i].String())
+  }
+  buffer.WriteString("]")
+
+  return buffer.String()
 }

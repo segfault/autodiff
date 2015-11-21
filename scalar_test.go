@@ -14,14 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package test
+package autodiff
 
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
 import   "math"
 import   "testing"
-import . "github.com/pbenner/autodiff/scalar"
 
 /* -------------------------------------------------------------------------- */
 

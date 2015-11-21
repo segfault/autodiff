@@ -20,9 +20,7 @@ package main
 
 import   "fmt"
 import   "math/rand"
-import . "github.com/pbenner/autodiff/scalar"
-import . "github.com/pbenner/autodiff/matrix"
-import . "github.com/pbenner/autodiff/algorithm"
+import . "github.com/pbenner/autodiff"
 import . "github.com/pbenner/autodiff/regression/line"
 
 

@@ -14,15 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package scalar
+package autodiff
 
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
 import "math"
-
-import . "github.com/pbenner/autodiff/scalar"
-import . "github.com/pbenner/autodiff/matrix"
 
 /* -------------------------------------------------------------------------- */
 
