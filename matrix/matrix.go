@@ -29,7 +29,7 @@ type Matrix struct {
   t      bool
 }
 
-func NewMatrix(values []float64, n, m int) Matrix {
+func NewMatrix(n, m int, values []float64) Matrix {
   tmp := MakeVector(n*m)
   if len(values) == 1 {
     for i := 0; i < n*m; i++ {
@@ -51,17 +51,22 @@ func MakeMatrix(n, m int) Matrix {
 
 /* -------------------------------------------------------------------------- */
 
-func (matrix Matrix) Dims() (int, int) {
-  return matrix.n, matrix.m
-}
-
-func (matrix Matrix) At(i, j int) float64 {
+func (matrix Matrix) index(i, j int) int {
   var k int
   if matrix.t {
     k = j*matrix.n + i
   } else {
     k = i*matrix.m + j
   }
+  return k
+}
+
+func (matrix Matrix) Dims() (int, int) {
+  return matrix.n, matrix.m
+}
+
+func (matrix Matrix) At(i, j int) float64 {
+  k := matrix.index(i, j)
   if k >= len(matrix.values) {
     panic("At(): Index out of bounds!")
   }
@@ -69,16 +74,27 @@ func (matrix Matrix) At(i, j int) float64 {
 }
 
 func (matrix Matrix) ScalarAt(i, j int) Scalar {
-  var k int
-  if matrix.t {
-    k = j*matrix.n + i
-  } else {
-    k = i*matrix.m + j
-  }
+  k := matrix.index(i, j)
   if k >= len(matrix.values) {
     panic("At(): Index out of bounds!")
   }
   return matrix.values[k]
+}
+
+func (matrix Matrix) Set(i, j int, v float64) {
+  k := matrix.index(i, j)
+  if k >= len(matrix.values) {
+    panic("At(): Index out of bounds!")
+  }
+  matrix.values[k] = NewScalar(v)
+}
+
+func (matrix Matrix) ScalarSet(i, j int, s Scalar) {
+  k := matrix.index(i, j)
+  if k >= len(matrix.values) {
+    panic("At(): Index out of bounds!")
+  }
+  matrix.values[k] = s
 }
 
 func (matrix Matrix) T() Matrix {
@@ -90,6 +106,21 @@ func (matrix Matrix) T() Matrix {
 }
 
 /* -------------------------------------------------------------------------- */
+
+func MMul(a, b Matrix) Matrix {
+  if a.m != b.n {
+    panic("Matrix dimensions do not match!")
+  }
+  r := NewMatrix(a.n, b.m, []float64{0.0})
+  for i := 0; i < r.n; i++ {
+    for j := 0; j < r.m; j++ {
+      for n := 0; n < a.m; n++ {
+        r.ScalarSet(i, j, Add(r.ScalarAt(i, j), Mul(a.ScalarAt(i, n), b.ScalarAt(n, j))))
+      }
+    }
+  }
+  return r
+}
 
 func Trace(matrix Matrix) Scalar {
   t := NewScalar(0.0)

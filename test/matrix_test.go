@@ -35,7 +35,7 @@ func TestVector(t *testing.T) {
 
 func TestMatrix(t *testing.T) {
 
-  m1 := NewMatrix([]float64{1,2,3,4,5,6}, 2, 3)
+  m1 := NewMatrix(2, 3, []float64{1,2,3,4,5,6})
   m2 := m1.T()
 
   if m1.At(1,2) != m2.At(2,1) {
@@ -45,9 +45,20 @@ func TestMatrix(t *testing.T) {
 
 func TestMatrixTrace(t *testing.T) {
 
-  m1 := NewMatrix([]float64{1,2,3,4}, 2, 2)
+  m1 := NewMatrix(2, 2, []float64{1,2,3,4})
 
   if Trace(m1).Value() != 5 {
     t.Error("Wrong matrix trace!")
+  }
+}
+
+func TestMatrixMul(t *testing.T) {
+
+  m1 := NewMatrix(2, 3, []float64{1,2,3,4,5,6})
+  m2 := m1.T()
+  m3 := MMul(m1, m2)
+
+  if m3.At(0,0) != 14 {
+    t.Error("Matrix multiplication failed!")
   }
 }
