@@ -32,27 +32,24 @@ func TestScalar(t *testing.T) {
   if a.Value() != 1.0 {
     t.Error("a.Value() should be 1.0")
   }
-
 }
 
 func TestTan(t *testing.T) {
 
-  a := NewScalar(4.321).Variable()
+  a := NewVariable(4.321)
   s := Tan(a)
 
   if math.Abs(s.Derivative() - 6.87184) > 0.0001 {
     t.Error("Incorrect derivative for Tan()!", s.Derivative())
   }
-
 }
 
 func TestTanh(t *testing.T) {
 
-  a := NewScalar(4.321).Variable()
+  a := NewVariable(4.321)
   s := Tanh(a)
 
   if math.Abs(s.Derivative() - 0.00070588) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
-
 }

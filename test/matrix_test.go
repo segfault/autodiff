@@ -18,7 +18,6 @@ package test
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
 import   "testing"
 //import . "github.com/pbenner/autodiff/scalar"
 import . "github.com/pbenner/autodiff/matrix"
@@ -32,5 +31,14 @@ func TestVector(t *testing.T) {
   if v[1].Value() != 2.0 {
     t.Error("Vector initialization failed!")
   }
+}
 
+func TestMatrix(t *testing.T) {
+
+  m1 := NewMatrix([]float64{1,2,3,4,5,6}, 2, 3)
+  m2 := m1.T()
+
+  if m1.At(1,2) != m2.At(2,1) {
+    t.Error("Matrix transpose failed!")
+  }
 }

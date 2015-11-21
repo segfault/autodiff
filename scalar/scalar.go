@@ -34,6 +34,20 @@ func NewScalar(v float64) Scalar {
   return s
 }
 
+func NewConstant(v float64) Scalar {
+  s := Scalar{}
+  s.value      = v
+  s.derivative = 0
+  return s
+}
+
+func NewVariable(v float64) Scalar {
+  s := Scalar{}
+  s.value      = v
+  s.derivative = 1
+  return s
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (a Scalar) Value() float64 {
