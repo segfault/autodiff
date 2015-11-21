@@ -14,46 +14,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package scalar
+package test
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
+//import   "fmt"
+import   "testing"
+//import . "github.com/pbenner/autodiff/scalar"
+import . "github.com/pbenner/autodiff/matrix"
 
 /* -------------------------------------------------------------------------- */
 
-type Scalar struct {
-  value      float64
-  derivative float64
-}
+func TestVector(t *testing.T) {
 
-func NewScalar(v float64) *Scalar {
-  s := new(Scalar)
-  s.value      = v
-  s.derivative = 0
-  return s
-}
+  v := NewVector([]float64{1,2,3,4,5,6})
 
-/* -------------------------------------------------------------------------- */
+  if v[1].Value() != 2.0 {
+    t.Error("Vector initialization failed!")
+  }
 
-func (a *Scalar) Value() float64 {
-  return a.value
-}
-
-func (a *Scalar) Derivative() float64 {
-  return a.derivative
-}
-
-func (a *Scalar) Variable() *Scalar {
-  a.derivative = 1
-  return a
-}
-
-func (a *Scalar) Constant() *Scalar {
-  a.derivative = 0
-  return a
-}
-
-func (a *Scalar) String() string {
-  return fmt.Sprintf("<%f,%f>", a.Value(), a.Derivative())
 }

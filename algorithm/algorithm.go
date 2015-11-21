@@ -21,27 +21,30 @@ package scalar
 //import "fmt"
 import "math"
 
+import . "github.com/pbenner/autodiff/scalar"
+import . "github.com/pbenner/autodiff/matrix"
+
 /* -------------------------------------------------------------------------- */
 
-type Objective func([]*Scalar) *Scalar
+type Objective func(Vector) *Scalar
 
 /* -------------------------------------------------------------------------- */
 
-func setConstant(variables []*Scalar) {
-    for _, v := range variables {
-      v.Constant()
+func setConstant(variables Vector) {
+    for i, _ := range variables {
+      variables[i].Constant()
     }
 }
 
-func setVariable(variables []*Scalar) {
-    for _, v := range variables {
-      v.Variable()
+func setVariable(variables Vector) {
+    for i, _ := range variables {
+      variables[i].Variable()
     }
 }
 
 /* -------------------------------------------------------------------------- */
 
-func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
+func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
 
   var s *Scalar
 
@@ -49,14 +52,14 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
     // initialize all variables as constants
     setConstant(variables)
     // compute partial derivatives and update variables
-    for _, v := range variables {
-      v.Variable()
+    for i, _ := range variables {
+      variables[i].Variable()
       s = f(variables)
 
       // update variable
-      *v = *Sub(v, NewScalar(step*s.Derivative()))
+      variables[i] = *Sub(&variables[i], NewScalar(step*s.Derivative()))
       // reset derivative
-      v.Constant()
+      variables[i].Constant()
     }
     // compute total derivative
     setVariable(variables)
@@ -75,7 +78,7 @@ func GradientDescent(f Objective, variables []*Scalar, step, epsilon float64) {
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func Rprop(f Objective, variables []*Scalar, step_init, epsilon, eta float64) {
+func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
 
   var s *Scalar
   // step size for each variable
@@ -118,9 +121,9 @@ func Rprop(f Objective, variables []*Scalar, step_init, epsilon, eta float64) {
     // update variables
     for i, _ := range variables {
       if gradient_new[i] > 0.0 {
-        *variables[i] = *Sub(variables[i], NewScalar(step[i]))
+        variables[i] = *Sub(&variables[i], NewScalar(step[i]))
       } else {
-        *variables[i] = *Add(variables[i], NewScalar(step[i]))
+        variables[i] = *Add(&variables[i], NewScalar(step[i]))
       }
     }
     // compute total derivative

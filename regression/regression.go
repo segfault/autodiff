@@ -21,33 +21,39 @@ package main
 import   "fmt"
 import   "math/rand"
 import . "github.com/pbenner/autodiff/scalar"
+import . "github.com/pbenner/autodiff/matrix"
+import . "github.com/pbenner/autodiff/algorithm"
 import . "github.com/pbenner/autodiff/regression/line"
 
 
 /* -------------------------------------------------------------------------- */
 
-func sumOfSquares(x, y []*Scalar, l *Line) *Scalar {
+func sumOfSquares(x, y Vector, l *Line) *Scalar {
 
   s := NewScalar(0)
   n := NewScalar(float64(len(x)))
 
   for i,_ := range x {
-    s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), 2))
+    s = Add(s, Pow(Sub(l.Eval(&x[i]), &y[i]), 2))
   }
   return Div(s, n)
 }
 
-func gradientDescent(x, y []*Scalar, l *Line) *Line {
+func gradientDescent(x, y Vector, l *Line) *Line {
 
   // gradient step size
   const epsilon = 0.00001
   const step    = 0.1
 
-  // get a list of the variables
-  variables := []*Scalar{l.Slope(), l.Intercept()}
+  // get a vector of variables
+  variables := MakeVector(2)
+  variables[0] = *l.Slope()
+  variables[1] = *l.Intercept()
 
   // create the objective function
-  f := func(v []*Scalar) *Scalar {
+  f := func(v Vector) *Scalar {
+    l.SetSlope    (&v[0])
+    l.SetIntercept(&v[1])
     return sumOfSquares(x, y, l)
   }
 //  GradientDescent(f, variables, step, epsilon)
@@ -59,15 +65,15 @@ func gradientDescent(x, y []*Scalar, l *Line) *Line {
 func regression() {
 
   const n = 1000
-  x := make([]*Scalar, n)
-  y := make([]*Scalar, n)
+  x := MakeVector(n)
+  y := MakeVector(n)
 
   // random number generator
   r := rand.New(rand.NewSource(42))
 
   for i := 0; i < n; i++ {
-    x[i] = NewScalar(r.NormFloat64() + 0)
-    y[i] = NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
+    x[i] = *NewScalar(r.NormFloat64() + 0)
+    y[i] = *NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
   }
 
   l := NewLine(NewScalar(-1.23), NewScalar(1));
