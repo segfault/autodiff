@@ -18,6 +18,7 @@ package matrix
 
 /* -------------------------------------------------------------------------- */
 
+import . "github.com/pbenner/autodiff/algorithm"
 import . "github.com/pbenner/autodiff/scalar"
 
 /* -------------------------------------------------------------------------- */
@@ -58,6 +59,14 @@ func IdentityMatrix(n int) Matrix {
 }
 
 /* -------------------------------------------------------------------------- */
+
+func (matrix Matrix) Clone() Matrix {
+  return Matrix{
+    values: matrix.values.Clone(),
+    n     : matrix.n,
+    m     : matrix.m,
+    t     : matrix.t}
+}
 
 func (matrix Matrix) index(i, j int) int {
   var k int
@@ -115,11 +124,41 @@ func (matrix Matrix) T() Matrix {
 
 /* -------------------------------------------------------------------------- */
 
+func MAdd(a, b Matrix) Matrix {
+  if a.n != b.n || a.m != b.m {
+    panic("Matrix dimensions do not match!")
+  }
+  n := a.n
+  m := a.m
+  r := MakeMatrix(n, m)
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ScalarSet(i, j, Add(a.ScalarAt(i, j), b.ScalarAt(i, j)))
+    }
+  }
+  return r
+}
+
+func MSub(a, b Matrix) Matrix {
+  if a.n != b.n || a.m != b.m {
+    panic("Matrix dimensions do not match!")
+  }
+  n := a.n
+  m := a.m
+  r := MakeMatrix(n, m)
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ScalarSet(i, j, Sub(a.ScalarAt(i, j), b.ScalarAt(i, j)))
+    }
+  }
+  return r
+}
+
 func MMul(a, b Matrix) Matrix {
   if a.m != b.n {
     panic("Matrix dimensions do not match!")
   }
-  r := NewMatrix(a.n, b.m, []float64{0.0})
+  r := MakeMatrix(a.n, b.m)
   for i := 0; i < r.n; i++ {
     for j := 0; j < r.m; j++ {
       for n := 0; n < a.m; n++ {
@@ -139,4 +178,26 @@ func Trace(matrix Matrix) Scalar {
     t = Add(t, matrix.ScalarAt(i,i))
   }
   return t
+}
+
+func Norm(matrix Matrix) Scalar {
+  s := NewScalar(0.0)
+  for _, v := range matrix.values {
+    s = Add(s, Pow(v, 2.0))
+  }
+  return s
+}
+
+func Inverse(matrix Matrix) Matrix {
+  if matrix.n != matrix.m {
+    panic("Not a square matrix!")
+  }
+  I := IdentityMatrix(matrix.n)
+  r := matrix.Clone()
+  // objective function
+  f := func(variables Vector) Scalar {
+    return Norm(MSub(MMul(matrix, r), I))
+  }
+  Rprop(f, matrix.values, 0.01, 0.00001, 0.1)
+  return r
 }
