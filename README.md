@@ -23,10 +23,12 @@ Compute the inverse *r* of a matrix *m* by minimixing the Frobenius norm *||mb -
   r := matrix.Clone()
   // objective function
   f := func(variables Vector) Scalar {
+    r.SetValues(x)
     s := MNorm(MSub(MMul(matrix, r), I))
     return s
   }
-  Rprop(f, r.Values(), 0.01, 1e-12, 0.1)
+  x, _ := Rprop(f, r.Values(), 0.01, 1e-12, 0.1)
+  r.SetValues(x)
 ```
 
 ### Newton's method
