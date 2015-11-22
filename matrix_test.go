@@ -136,9 +136,9 @@ func TestMatrixNewton(t *testing.T) {
     return y
   }
 
-  v1 := NewVector([]float64{1,1})
-  v2 := Newton(f, v1, 0.001)
-  v3 := NewVector([]float64{1.537656, 1.906728})
+  v1    := NewVector([]float64{1,1})
+  v2, _ := Newton(f, v1, 1e-8)
+  v3    := NewVector([]float64{1.537656, 1.906728})
 
   if VNorm(VSub(v2, v3)).Value() > 1e-8  {
     t.Error("Newton method failed!")

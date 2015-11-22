@@ -135,18 +135,20 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
 
 /* -------------------------------------------------------------------------- */
 
-func Newton(f func(Vector) Vector, x Vector, epsilon float64) Vector {
-  x1 := x.Clone()
-  x2 := x.Clone()
+func Newton(f func(Vector) Vector, x Vector, epsilon float64) (Vector, []float64) {
+  x1  := x.Clone()
+  x2  := x.Clone()
+  err := []float64{}
   for {
-    y := f(x1)
-    J := Jacobian(f, x1)
-    Q := MInverse(J)
-    x2 = VSub(x1, MxV(Q, y))
-    if VNorm(VSub(x1, x2)).Value() < epsilon {
+    y  := f(x1)
+    J  := Jacobian(f, x1)
+    Q  := MInverse(J)
+    x2  = VSub(x1, MxV(Q, y))
+    err = append(err, VNorm(VSub(x1, x2)).Value())
+    if err[len(err)-1] < epsilon {
       break
     }
     x1.CopyFrom(x2)
   }
-  return x2
+  return x2, err
 }
