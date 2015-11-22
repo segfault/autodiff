@@ -33,6 +33,19 @@ func TestScalar(t *testing.T) {
   }
 }
 
+func TestDiff(t *testing.T) {
+
+  f := func(x Scalar) Scalar {
+    return Add(Mul(NewScalar(2), Pow(x, 3)), NewScalar(4))
+  }
+  x := NewVariable(9)
+  y := f(x)
+
+  if y.Derivative() != 486 {
+    t.Error("Differentiation failed!")
+  }
+}
+
 func TestTan(t *testing.T) {
 
   a := NewVariable(4.321)

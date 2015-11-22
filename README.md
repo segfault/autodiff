@@ -1,5 +1,17 @@
 ## Examples
 
+### Differentiation
+
+Compute the derivative of a function *f* at *x = 9*
+
+```go
+  f := func(x Scalar) Scalar {
+    return Add(Mul(NewScalar(2), Pow(x, 3)), NewScalar(4))
+  }
+  x := NewVariable(9)
+  y := f(x)
+```
+
 ### Newton's method
 
 Find the root of a function *f* with initial value *x0 = (1,1)*
