@@ -22,7 +22,7 @@ Compute the inverse *r* of a matrix *m* by minimixing the Frobenius norm *||mb -
   I := IdentityMatrix(matrix.Dims()[0])
   r := matrix.Clone()
   // objective function
-  f := func(variables Vector) Scalar {
+  f := func(x Vector) Scalar {
     r.SetValues(x)
     s := MNorm(MSub(MMul(matrix, r), I))
     return s
