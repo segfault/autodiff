@@ -11,6 +11,7 @@ Compute the derivative of a function *f* at *x = 9*
   x := NewVariable(9)
   y := f(x)
 ```
+where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
 
 ### Newton's method
 
