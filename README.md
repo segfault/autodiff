@@ -13,6 +13,23 @@ Compute the derivative of a function *f* at *x = 9*
 ```
 where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
 
+### Gradient descent
+
+Compare vanilla gradient descent with resilient backpropagation
+```go
+  f := func(x Vector) Scalar {
+    // x^4 - 3x^3 + 2
+    return Add(Sub(Pow(x[0], 4), Mul(NewConstant(3), Pow(x[0], 3))), NewConstant(2))
+  }
+  x0 := NewVector([]float64{8})
+  // vanilla gradient descent
+  xn1, err1 := GradientDescent(f, x0, 0.0001, 1e-8)
+  // resilient backpropagation
+  xn2, err2 := Rprop(f, x0, 0.0001, 1e-8, 0.4)
+```
+![Gradient descent](demo/example1/example1.png)
+
+
 ### Matrix inversion
 
 Compute the inverse *r* of a matrix *m* by minimixing the Frobenius norm *||mb - I||*
