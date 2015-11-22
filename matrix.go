@@ -85,6 +85,10 @@ func (matrix Matrix) At(i, j int) float64 {
   return matrix.values[k].Value()
 }
 
+func (matrix Matrix) Values() Vector {
+  return matrix.values
+}
+
 func (matrix Matrix) ScalarAt(i, j int) Scalar {
   k := matrix.index(i, j)
   if k >= len(matrix.values) {

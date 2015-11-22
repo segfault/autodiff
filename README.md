@@ -13,6 +13,22 @@ Compute the derivative of a function *f* at *x = 9*
 ```
 where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
 
+### Matrix inversion
+
+Compute the inverse *r* of a matrix *m* by minimixing the Frobenius norm *||mb - I||*
+```go
+  m := NewMatrix(2, 2, []float64{1,2,3,4})
+
+  I := IdentityMatrix(matrix.Dims()[0])
+  r := matrix.Clone()
+  // objective function
+  f := func(variables Vector) Scalar {
+    s := MNorm(MSub(MMul(matrix, r), I))
+    return s
+  }
+  Rprop(f, r.Values(), 0.01, 1e-12, 0.1)
+```
+
 ### Newton's method
 
 Find the root of a function *f* with initial value *x0 = (1,1)*
