@@ -22,10 +22,6 @@ import "math"
 
 /* -------------------------------------------------------------------------- */
 
-type Objective func(Vector) Scalar
-
-/* -------------------------------------------------------------------------- */
-
 func setConstant(variables Vector) {
     for i, _ := range variables {
       variables[i].Constant()
@@ -40,31 +36,40 @@ func setVariable(variables Vector) {
 
 /* -------------------------------------------------------------------------- */
 
-func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
+func GradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64) (Vector, []float64) {
 
-  var s Scalar
+  var s   Scalar
+  var err []float64
+  // copy variables
+  x := x0.Clone()
 
   for {
     // initialize all variables as constants
-    setConstant(variables)
+    setConstant(x)
     // compute partial derivatives and update variables
-    for i, _ := range variables {
-      variables[i].Variable()
-      s = f(variables)
+    for i, _ := range x {
+      x[i].Variable()
+      s = f(x)
 
       // update variable
-      variables[i] = Sub(variables[i], NewScalar(step*s.Derivative()))
+      x[i] = Sub(x[i], NewScalar(step*s.Derivative()))
       // reset derivative
-      variables[i].Constant()
+      x[i].Constant()
+      if math.IsNaN(x[i].Value()) {
+        panic("Gradient descent diverged!")
+      }
     }
     // compute total derivative
-    setVariable(variables)
-    s = f(variables)
+    setVariable(x)
+    s = f(x)
     // evaluate stop criterion
-    if (math.Abs(s.Derivative()) < epsilon) {
+    err = append(err, math.Abs(s.Derivative()))
+    if (err[len(err)-1] < epsilon) {
+      setConstant(x)
       break;
     }
   }
+  return x, err
 }
 
 /* -------------------------------------------------------------------------- */
@@ -74,39 +79,42 @@ func GradientDescent(f Objective, variables Vector, step, epsilon float64) {
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
+func Rprop(f func(Vector) Scalar, x0 Vector, step_init, epsilon, eta float64) (Vector, []float64) {
 
-  var s Scalar
+  var s   Scalar
+  var err []float64
+  // copy variables
+  x := x0.Clone()
   // step size for each variable
-  step := make([]float64, len(variables))
+  step := make([]float64, len(x))
   // gradients
-  gradient_new := make([]float64, len(variables))
-  gradient_old := make([]float64, len(variables))
+  gradient_new := make([]float64, len(x))
+  gradient_old := make([]float64, len(x))
   // initialize values
-  for i, _ := range variables {
+  for i, _ := range x {
     step[i]         = step_init
     gradient_new[i] = 1
     gradient_old[i] = 1
   }
 
   for {
-    for i, _ := range variables {
+    for i, _ := range x {
       gradient_old[i] = gradient_new[i]
     }
-    // initialize all variables as constants
-    setConstant(variables)
-    // compute partial derivatives and update variables
-    for i, _ := range variables {
+    // initialize all x as constants
+    setConstant(x)
+    // compute partial derivatives and update x
+    for i, _ := range x {
       // differentiate with respect to the ith variable
-      variables[i].Variable()
-      s = f(variables)
+      x[i].Variable()
+      s = f(x)
       // save derivative
       gradient_new[i] = s.Derivative()
       // set variable back to constant
-      variables[i].Constant()
+      x[i].Constant()
     }
     // update step size
-    for i, _ := range variables {
+    for i, _ := range x {
       if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
           (gradient_old[i] > 0 && gradient_new[i] > 0)) {
         step[i] *= 1.0 + eta
@@ -114,23 +122,28 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
         step[i] *= 1.0 - eta
       }
     }
-    // update variables
-    for i, _ := range variables {
+    // update x
+    for i, _ := range x {
       if gradient_new[i] > 0.0 {
-        variables[i] = Sub(variables[i], NewScalar(step[i]))
+        x[i] = Sub(x[i], NewScalar(step[i]))
       } else {
-        variables[i] = Add(variables[i], NewScalar(step[i]))
+        x[i] = Add(x[i], NewScalar(step[i]))
+      }
+      if math.IsNaN(x[i].Value()) {
+        panic("Gradient descent diverged!")
       }
     }
     // compute total derivative
-    setVariable(variables)
-    s = f(variables)
+    setVariable(x)
+    s = f(x)
     // evaluate stop criterion
-    if (math.Abs(s.Derivative()) < epsilon) {
-      setConstant(variables)
+    err = append(err, math.Abs(s.Derivative()))
+    if (err[len(err)-1] < epsilon) {
+      setConstant(x)
       break;
     }
   }
+  return x, err
 }
 
 /* -------------------------------------------------------------------------- */

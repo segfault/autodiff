@@ -89,6 +89,10 @@ func (matrix Matrix) Values() Vector {
   return matrix.values
 }
 
+func (matrix *Matrix) SetValues(v Vector) {
+  matrix.values = v
+}
+
 func (matrix Matrix) ScalarAt(i, j int) Scalar {
   k := matrix.index(i, j)
   if k >= len(matrix.values) {
@@ -220,11 +224,13 @@ func MInverse(matrix Matrix) Matrix {
   I := IdentityMatrix(matrix.n)
   r := matrix.Clone()
   // objective function
-  f := func(variables Vector) Scalar {
+  f := func(x Vector) Scalar {
+    r.SetValues(x)
     s := MNorm(MSub(MMul(matrix, r), I))
     return s
   }
-  Rprop(f, r.values, 0.01, 1e-12, 0.1)
+  x, _ := Rprop(f, r.Values(), 0.01, 1e-12, 0.1)
+  r.SetValues(x)
   return r
 }
 
