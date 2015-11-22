@@ -2,22 +2,22 @@
 
 ### Newton's method
 
-```go
+Find the root of a function *f* with initial value *x0 = (1,1)*
 
+```go
   f := func(x Vector) Vector {
     if len(x) != 2 {
       panic("Invalid input vector!")
     }
     y := MakeVector(2)
-    // x1^2 + y^2 - 6
+    // y1 = x1^2 + x2^2 - 6
+    // y2 = x1^3 - x2^2
     y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
-    // x^3 - y^2
     y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
 
     return y
   }
 
-  v1    := NewVector([]float64{1,1})
-  v2, _ := Newton(f, v1, 1e-8)
-  v3    := NewVector([]float64{1.537656, 1.906728})
+  x0    := NewVector([]float64{1,1})
+  xn, _ := Newton(f, x0, 1e-8)
 ```

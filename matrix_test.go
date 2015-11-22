@@ -128,9 +128,9 @@ func TestMatrixNewton(t *testing.T) {
       panic("Invalid input vector!")
     }
     y := MakeVector(2)
-    // x1^2 + y^2 - 6
+    // y1 = x1^2 + x2^2 - 6
     y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
-    // x^3 - y^2
+    // y2 = x1^3 - x2^2
     y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
 
     return y
