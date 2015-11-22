@@ -223,3 +223,32 @@ func MInverse(matrix Matrix) Matrix {
   Rprop(f, r.values, 0.01, 1e-12, 0.1)
   return r
 }
+
+/* -------------------------------------------------------------------------- */
+
+func Jacobian(f func(Vector) Vector, x Vector) Matrix {
+  n := 0
+  m := len(x)
+  r := Matrix{}
+  for j := 0; j < m; j++ {
+    x[j].Constant()
+  }
+  for j := 0; j < m; j++ {
+    // differentiate with respect to the ith variable
+    x[j].Variable()
+    y := f(x)
+    if j == 0 {
+      n = len(y)
+      r = MakeMatrix(n, m)
+    }
+    if n != len(y) {
+      panic("Jacobian(): dimensions do not match!")
+    }
+    // copy derivatives
+    for i := 0; i < n; i++ {
+      r.Set(i, j, y[i].Derivative())
+    }
+    x[j].Constant()
+  }
+  return r
+}

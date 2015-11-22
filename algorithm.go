@@ -18,7 +18,6 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-//import "fmt"
 import "math"
 
 /* -------------------------------------------------------------------------- */
@@ -128,6 +127,7 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
     s = f(variables)
     // evaluate stop criterion
     if (math.Abs(s.Derivative()) < epsilon) {
+      setConstant(variables)
       break;
     }
   }
@@ -135,6 +135,18 @@ func Rprop(f Objective, variables Vector, step_init, epsilon, eta float64) {
 
 /* -------------------------------------------------------------------------- */
 
-func Newton(f Objective, variables Vector, step_init, epsilon, eta float64) {
-
+func Newton(f func(Vector) Vector, x Vector, epsilon float64) Vector {
+  x1 := x.Clone()
+  x2 := x.Clone()
+  for {
+    y := f(x1)
+    J := Jacobian(f, x1)
+    Q := MInverse(J)
+    x2 = VSub(x1, MxV(Q, y))
+    if VNorm(VSub(x1, x2)).Value() < epsilon {
+      break
+    }
+    x1.CopyFrom(x2)
+  }
+  return x2
 }

@@ -78,6 +78,15 @@ func (v Vector) String() string {
   return buffer.String()
 }
 
+func (v *Vector) CopyFrom(w Vector) {
+  if len(*v) != len(w) {
+    panic("CopyFrom(): Vector dimensions do not match!")
+  }
+  for i := 0; i < len(w); i++ {
+    (*v)[i] = w[i]
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func VAdd(a, b Vector) Vector {

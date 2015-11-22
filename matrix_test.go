@@ -95,3 +95,52 @@ func TestMatrixInverse(t *testing.T) {
     t.Error("Inverting matrix failed!")
   }
 }
+
+func TestMatrixJacobian(t *testing.T) {
+
+  f := func(x Vector) Vector {
+    if len(x) != 2 {
+      panic("Invalid input vector!")
+    }
+    y := MakeVector(3)
+    // x1^2 + y^2 - 6
+    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
+    // x^3 - y^2
+    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
+    y[2] = NewScalar(2)
+
+    return y
+  }
+
+  v1 := NewVector([]float64{1,1})
+  m1 := Jacobian(f, v1)
+  m2 := NewMatrix(3, 2, []float64{2, 2, 3, -2, 0, 0})
+
+  if MNorm(MSub(m1, m2)).Value() > 1e-8 {
+    t.Error("Inverting matrix failed!")
+  }
+}
+
+func TestMatrixNewton(t *testing.T) {
+
+  f := func(x Vector) Vector {
+    if len(x) != 2 {
+      panic("Invalid input vector!")
+    }
+    y := MakeVector(2)
+    // x1^2 + y^2 - 6
+    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
+    // x^3 - y^2
+    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
+
+    return y
+  }
+
+  v1 := NewVector([]float64{1,1})
+  v2 := Newton(f, v1, 0.001)
+  v3 := NewVector([]float64{1.537656, 1.906728})
+
+  if VNorm(VSub(v2, v3)).Value() > 1e-8  {
+    t.Error("Newton method failed!")
+  }
+}
