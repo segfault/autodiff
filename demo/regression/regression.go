@@ -21,7 +21,7 @@ package main
 import   "fmt"
 import   "math/rand"
 import . "github.com/pbenner/autodiff"
-import . "github.com/pbenner/autodiff/regression/line"
+import . "github.com/pbenner/autodiff/demo/regression/line"
 
 
 /* -------------------------------------------------------------------------- */
