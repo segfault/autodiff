@@ -28,9 +28,9 @@ func setConstant(variables Vector) {
     }
 }
 
-func setVariable(variables Vector) {
+func setVariable(variables Vector, order int) {
     for i, _ := range variables {
-      variables[i].Variable()
+      variables[i].Variable(order)
     }
 }
 
@@ -48,11 +48,11 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64) (V
     setConstant(x)
     // compute partial derivatives and update variables
     for i, _ := range x {
-      x[i].Variable()
+      x[i].Variable(1)
       s = f(x)
 
       // update variable
-      x[i] = Sub(x[i], NewScalar(step*s.Derivative()))
+      x[i] = Sub(x[i], NewConstant(step*s.Derivative(1)))
       // reset derivative
       x[i].Constant()
       if math.IsNaN(x[i].Value()) {
@@ -60,10 +60,10 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64) (V
       }
     }
     // compute total derivative
-    setVariable(x)
+    setVariable(x, 1)
     s = f(x)
     // evaluate stop criterion
-    err = append(err, math.Abs(s.Derivative()))
+    err = append(err, math.Abs(s.Derivative(1)))
     if (err[len(err)-1] < epsilon) {
       setConstant(x)
       break;
@@ -106,10 +106,10 @@ func Rprop(f func(Vector) Scalar, x0 Vector, step_init, epsilon, eta float64) (V
     // compute partial derivatives and update x
     for i, _ := range x {
       // differentiate with respect to the ith variable
-      x[i].Variable()
+      x[i].Variable(1)
       s = f(x)
       // save derivative
-      gradient_new[i] = s.Derivative()
+      gradient_new[i] = s.Derivative(1)
       // set variable back to constant
       x[i].Constant()
     }
@@ -125,19 +125,19 @@ func Rprop(f func(Vector) Scalar, x0 Vector, step_init, epsilon, eta float64) (V
     // update x
     for i, _ := range x {
       if gradient_new[i] > 0.0 {
-        x[i] = Sub(x[i], NewScalar(step[i]))
+        x[i] = Sub(x[i], NewConstant(step[i]))
       } else {
-        x[i] = Add(x[i], NewScalar(step[i]))
+        x[i] = Add(x[i], NewConstant(step[i]))
       }
       if math.IsNaN(x[i].Value()) {
         panic("Gradient descent diverged!")
       }
     }
     // compute total derivative
-    setVariable(x)
+    setVariable(x, 1)
     s = f(x)
     // evaluate stop criterion
-    err = append(err, math.Abs(s.Derivative()))
+    err = append(err, math.Abs(s.Derivative(1)))
     if (err[len(err)-1] < epsilon) {
       setConstant(x)
       break;

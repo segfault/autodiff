@@ -20,34 +20,34 @@ package autodiff
 
 type Matrix struct {
   values Vector
-  n      int
-  m      int
+  rows   int
+  cols   int
   t      bool
 }
 
-func NewMatrix(n, m int, values []float64) Matrix {
-  tmp := MakeVector(n*m)
+func NewMatrix(rows, cols int, values []float64) Matrix {
+  tmp := MakeVector(rows*cols)
   if len(values) == 1 {
-    for i := 0; i < n*m; i++ {
-      tmp[i] = NewScalar(values[0])
+    for i := 0; i < rows*cols; i++ {
+      tmp[i] = NewConstant(values[0])
     }
-  } else if len(values) == n*m {
-    for i := 0; i < n*m; i++ {
-      tmp[i] = NewScalar(values[i])
+  } else if len(values) == rows*cols {
+    for i := 0; i < rows*cols; i++ {
+      tmp[i] = NewConstant(values[i])
     }
   } else {
     panic("Matrix dimension does not fit input values!")
   }
-  return Matrix{tmp, n, m, false}
+  return Matrix{tmp, rows, cols, false}
 }
 
-func MakeMatrix(n, m int) Matrix {
-  return Matrix{MakeVector(n*m), n, m, false}
+func MakeMatrix(rows, cols int) Matrix {
+  return Matrix{MakeVector(rows*cols), rows, cols, false}
 }
 
-func IdentityMatrix(n int) Matrix {
-  matrix := MakeMatrix(n, n)
-  for i := 0; i < n; i++ {
+func IdentityMatrix(dim int) Matrix {
+  matrix := MakeMatrix(dim, dim)
+  for i := 0; i < dim; i++ {
     matrix.Set(i, i, 1)
   }
   return matrix
@@ -58,23 +58,23 @@ func IdentityMatrix(n int) Matrix {
 func (matrix Matrix) Clone() Matrix {
   return Matrix{
     values: matrix.values.Clone(),
-    n     : matrix.n,
-    m     : matrix.m,
+    rows  : matrix.rows,
+    cols  : matrix.cols,
     t     : matrix.t}
 }
 
 func (matrix Matrix) index(i, j int) int {
   var k int
   if matrix.t {
-    k = j*matrix.n + i
+    k = j*matrix.rows + i
   } else {
-    k = i*matrix.m + j
+    k = i*matrix.cols + j
   }
   return k
 }
 
 func (matrix Matrix) Dims() (int, int) {
-  return matrix.n, matrix.m
+  return matrix.rows, matrix.cols
 }
 
 func (matrix Matrix) At(i, j int) float64 {
@@ -106,7 +106,7 @@ func (matrix Matrix) Set(i, j int, v float64) {
   if k >= len(matrix.values) {
     panic("At(): Index out of bounds!")
   }
-  matrix.values[k] = NewScalar(v)
+  matrix.values[k].value = v
 }
 
 func (matrix Matrix) ScalarSet(i, j int, s Scalar) {
@@ -120,22 +120,22 @@ func (matrix Matrix) ScalarSet(i, j int, s Scalar) {
 func (matrix Matrix) T() Matrix {
   return Matrix{
     values:  matrix.values,
-    n     :  matrix.m,
-    m     :  matrix.n,
+    rows  :  matrix.cols,
+    cols  :  matrix.rows,
     t     : !matrix.t}
 }
 
 /* -------------------------------------------------------------------------- */
 
 func MAdd(a, b Matrix) Matrix {
-  if a.n != b.n || a.m != b.m {
+  if a.rows != b.rows || a.cols != b.cols {
     panic("Matrix dimensions do not match!")
   }
-  n := a.n
-  m := a.m
-  r := MakeMatrix(n, m)
-  for i := 0; i < n; i++ {
-    for j := 0; j < m; j++ {
+  rows := a.rows
+  cols := a.cols
+  r := MakeMatrix(rows, cols)
+  for i := 0; i < rows; i++ {
+    for j := 0; j < cols; j++ {
       r.ScalarSet(i, j, Add(a.ScalarAt(i, j), b.ScalarAt(i, j)))
     }
   }
@@ -143,14 +143,14 @@ func MAdd(a, b Matrix) Matrix {
 }
 
 func MSub(a, b Matrix) Matrix {
-  if a.n != b.n || a.m != b.m {
+  if a.rows != b.rows || a.cols != b.cols {
     panic("Matrix dimensions do not match!")
   }
-  n := a.n
-  m := a.m
-  r := MakeMatrix(n, m)
-  for i := 0; i < n; i++ {
-    for j := 0; j < m; j++ {
+  rows := a.rows
+  cols := a.cols
+  r := MakeMatrix(rows, cols)
+  for i := 0; i < rows; i++ {
+    for j := 0; j < cols; j++ {
       r.ScalarSet(i, j, Sub(a.ScalarAt(i, j), b.ScalarAt(i, j)))
     }
   }
@@ -158,13 +158,13 @@ func MSub(a, b Matrix) Matrix {
 }
 
 func MMul(a, b Matrix) Matrix {
-  if a.m != b.n {
+  if a.cols != b.rows {
     panic("Matrix dimensions do not match!")
   }
-  r := MakeMatrix(a.n, b.m)
-  for i := 0; i < r.n; i++ {
-    for j := 0; j < r.m; j++ {
-      for n := 0; n < a.m; n++ {
+  r := MakeMatrix(a.rows, b.cols)
+  for i := 0; i < r.rows; i++ {
+    for j := 0; j < r.cols; j++ {
+      for n := 0; n < a.cols; n++ {
         r.ScalarSet(i, j, Add(r.ScalarAt(i, j), Mul(a.ScalarAt(i, n), b.ScalarAt(n, j))))
       }
     }
@@ -173,12 +173,12 @@ func MMul(a, b Matrix) Matrix {
 }
 
 func MxV(a Matrix, b Vector) Vector {
-  if a.m != len(b) {
+  if a.cols != len(b) {
     panic("Matrix/Vector dimensions do not match!")
   }
-  r := MakeVector(a.n)
+  r := MakeVector(a.rows)
   for i := 0; i < len(r); i++ {
-    for n := 0; n < a.m; n++ {
+    for n := 0; n < a.cols; n++ {
       r[i] = Add(r[i], Mul(a.ScalarAt(i, n), b[n]))
     }
   }
@@ -186,12 +186,12 @@ func MxV(a Matrix, b Vector) Vector {
 }
 
 func VxM(a Vector, b Matrix) Vector {
-  if len(a) != b.n {
+  if len(a) != b.rows {
     panic("Matrix/Vector dimensions do not match!")
   }
-  r := MakeVector(b.m)
+  r := MakeVector(b.cols)
   for i := 0; i < len(r); i++ {
-    for n := 0; n < b.n; n++ {
+    for n := 0; n < b.rows; n++ {
       r[i] = Add(r[i], Mul(a[n], b.ScalarAt(n, i)))
     }
   }
@@ -199,18 +199,18 @@ func VxM(a Vector, b Matrix) Vector {
 }
 
 func MTrace(matrix Matrix) Scalar {
-  t := NewScalar(0.0)
-  if matrix.n != matrix.m {
+  t := NewConstant(0.0)
+  if matrix.rows != matrix.cols {
     panic("Not a square matrix!")
   }
-  for i := 0; i < matrix.n; i++ {
+  for i := 0; i < matrix.rows; i++ {
     t = Add(t, matrix.ScalarAt(i,i))
   }
   return t
 }
 
 func MNorm(matrix Matrix) Scalar {
-  s := NewScalar(0.0)
+  s := NewConstant(0.0)
   for _, v := range matrix.values {
     s = Add(s, Pow(v, 2.0))
   }
@@ -218,10 +218,10 @@ func MNorm(matrix Matrix) Scalar {
 }
 
 func MInverse(matrix Matrix) Matrix {
-  if matrix.n != matrix.m {
+  if matrix.rows != matrix.cols {
     panic("Not a square matrix!")
   }
-  I := IdentityMatrix(matrix.n)
+  I := IdentityMatrix(matrix.rows)
   r := matrix.Clone()
   // objective function
   f := func(x Vector) Scalar {
@@ -245,7 +245,7 @@ func Jacobian(f func(Vector) Vector, x Vector) Matrix {
   }
   for j := 0; j < m; j++ {
     // differentiate with respect to the ith variable
-    x[j].Variable()
+    x[j].Variable(1)
     y := f(x)
     if j == 0 {
       n = len(y)
@@ -256,7 +256,7 @@ func Jacobian(f func(Vector) Vector, x Vector) Matrix {
     }
     // copy derivatives
     for i := 0; i < n; i++ {
-      r.Set(i, j, y[i].Derivative())
+      r.Set(i, j, y[i].Derivative(1))
     }
     x[j].Constant()
   }

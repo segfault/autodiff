@@ -22,15 +22,6 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestVector(t *testing.T) {
-
-  v := NewVector([]float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
-  }
-}
-
 func TestMatrix(t *testing.T) {
 
   m1 := NewMatrix(2, 3, []float64{1,2,3,4,5,6})
@@ -104,10 +95,10 @@ func TestMatrixJacobian(t *testing.T) {
     }
     y := MakeVector(3)
     // x1^2 + y^2 - 6
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
+    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewConstant(6))
     // x^3 - y^2
     y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
-    y[2] = NewScalar(2)
+    y[2] = NewConstant(2)
 
     return y
   }
@@ -129,7 +120,7 @@ func TestMatrixNewton(t *testing.T) {
     }
     y := MakeVector(2)
     // y1 = x1^2 + x2^2 - 6
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
+    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewConstant(6))
     // y2 = x1^3 - x2^2
     y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
 

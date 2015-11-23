@@ -24,17 +24,22 @@ import "bytes"
 
 type Vector []Scalar
 
-func NewVector(w []float64) Vector {
-  v := make(Vector, len(w))
+func NewVector(values []float64) Vector {
+  v := make(Vector, len(values))
 
-  for i, _ := range w {
-    v[i] = NewScalar(w[i])
+  for i, _ := range values {
+    v[i] = NewConstant(values[i])
   }
   return v
 }
 
-func MakeVector(n int) Vector {
-  return make(Vector, n)
+func MakeVector(length int) Vector {
+  v := make(Vector, length)
+
+  for i := 0; i < length; i++ {
+    v[i] = NewConstant(0.0)
+  }
+  return v
 }
 
 /* -------------------------------------------------------------------------- */
@@ -50,11 +55,11 @@ func (v Vector) Value(i int) float64 {
 }
 
 func (v Vector) Derivative(i int) float64 {
-  return v[i].Derivative()
+  return v[i].Derivative(i)
 }
 
-func (v Vector) Variable(i int) Vector {
-  v[i].Variable()
+func (v Vector) Variable(i, order int) Vector {
+  v[i].Variable(order)
   return v
 }
 
@@ -112,7 +117,7 @@ func VSub(a, b Vector) Vector {
 }
 
 func VNorm(a Vector) Scalar {
-  r := NewScalar(0.0)
+  r := NewConstant(0.0)
   for i := 0; i < len(a); i++ {
     r = Add(r, Pow(a[i], 2))
   }

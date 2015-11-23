@@ -18,52 +18,15 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "math"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestScalar(t *testing.T) {
+func TestVector(t *testing.T) {
 
-  a := NewConstant(1.0)
+  v := NewVector([]float64{1,2,3,4,5,6})
 
-  if a.Value() != 1.0 {
-    t.Error("a.Value() should be 1.0")
-  }
-}
-
-func TestDiff(t *testing.T) {
-
-  f := func(x Scalar) Scalar {
-    return Add(Mul(NewConstant(2), Pow(x, 3)), NewConstant(4))
-  }
-  x := NewVariable(9, 2)
-  y := f(x)
-
-  if y.Derivative(1) != 486 {
-    t.Error("Differentiation failed!")
-  }
-  if y.Derivative(2) != 108 {
-    t.Error("Differentiation failed!")
-  }
-}
-
-func TestTan(t *testing.T) {
-
-  a := NewVariable(4.321, 1)
-  s := Tan(a)
-
-  if math.Abs(s.Derivative(1) - 6.87184) > 0.0001 {
-    t.Error("Incorrect derivative for Tan()!", s.Derivative(1))
-  }
-}
-
-func TestTanh(t *testing.T) {
-
-  a := NewVariable(4.321, 1)
-  s := Tanh(a)
-
-  if math.Abs(s.Derivative(1) - 0.00070588) > 0.0000001 {
-    t.Error("Incorrect derivative for Tanh()!")
+  if v[1].Value() != 2.0 {
+    t.Error("Vector initialization failed!")
   }
 }

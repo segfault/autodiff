@@ -8,7 +8,7 @@ Compute the derivative of a function *f* at *x = 9*
   f := func(x Scalar) Scalar {
     return Add(Mul(NewScalar(2), Pow(x, 3)), NewScalar(4))
   }
-  x := NewVariable(9)
+  x := NewVariable(9, 1)
   y := f(x)
 ```
 where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
@@ -60,7 +60,7 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
     y := MakeVector(2)
     // y1 = x1^2 + x2^2 - 6
     // y2 = x1^3 - x2^2
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewScalar(6))
+    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewConstant(6))
     y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
 
     return y
