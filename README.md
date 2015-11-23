@@ -32,7 +32,7 @@ Compare vanilla gradient descent with resilient backpropagation
 
 ### Matrix inversion
 
-Compute the inverse *r* of a matrix *m* by minimixing the Frobenius norm *||mb - I||*
+Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb - I||*
 ```go
   m := NewMatrix(2, 2, []float64{1,2,3,4})
 
