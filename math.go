@@ -179,3 +179,7 @@ func Pow(a Scalar, k float64) Scalar {
   }
   return c
 }
+
+func Sqrt(a Scalar) Scalar {
+  return Pow(a, 1.0/2.0)
+}

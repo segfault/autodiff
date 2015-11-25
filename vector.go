@@ -83,6 +83,14 @@ func (v Vector) String() string {
   return buffer.String()
 }
 
+func (v Vector) Matrix(n, m int) Matrix {
+  if n*m != len(v) {
+    panic("Matrix dimension does not fit input vector!")
+  }
+  return Matrix{v, n, m, false}
+
+}
+
 func (v *Vector) CopyFrom(w Vector) {
   if len(*v) != len(w) {
     panic("CopyFrom(): Vector dimensions do not match!")
@@ -121,5 +129,5 @@ func VNorm(a Vector) Scalar {
   for i := 0; i < len(a); i++ {
     r = Add(r, Pow(a[i], 2))
   }
-  return r
+  return Sqrt(r)
 }

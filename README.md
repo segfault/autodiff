@@ -23,9 +23,9 @@ Compare vanilla gradient descent with resilient backpropagation
   }
   x0 := NewVector([]float64{8})
   // vanilla gradient descent
-  xn1, err1 := GradientDescent(f, x0, 0.0001, 1e-8)
+  xn1, err1 := GradientDescent(f, x0, 1e-8, 0.0001)
   // resilient backpropagation
-  xn2, err2 := Rprop(f, x0, 0.0001, 1e-8, 0.4)
+  xn2, err2 := Rprop(f, x0, 1e-8, 0.0001, 0.4)
 ```
 ![Gradient descent](demo/example1/example1.png)
 

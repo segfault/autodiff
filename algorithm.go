@@ -36,7 +36,7 @@ func setVariable(variables Vector, order int) {
 
 /* -------------------------------------------------------------------------- */
 
-func GradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64) (Vector, []float64) {
+func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64) (Vector, []float64) {
 
   var s   Scalar
   var err []float64
@@ -79,7 +79,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64) (V
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func Rprop(f func(Vector) Scalar, x0 Vector, step_init, epsilon, eta float64) (Vector, []float64) {
+func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64) (Vector, []float64) {
 
   var s   Scalar
   var err []float64

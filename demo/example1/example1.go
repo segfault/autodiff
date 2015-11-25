@@ -46,9 +46,9 @@ func plotGradientNorm(gn1, gn2 []float64) {
   if err != nil {
     panic(err)
   }
-  p.Title.Text = "Squared norm of the gradient"
+  p.Title.Text = "Norm of the gradient"
   p.X.Label.Text = "interation"
-  p.Y.Label.Text = "||·||^2"
+  p.Y.Label.Text = "||·||"
   p.X.Scale = plot.LogScale{}
   p.Y.Scale = plot.LogScale{}
   p.X.Tick.Marker = plot.LogTicks{}
@@ -68,7 +68,6 @@ func plotGradientNorm(gn1, gn2 []float64) {
 
 }
 
-
 func main() {
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
@@ -76,9 +75,9 @@ func main() {
   }
   x0 := NewVector([]float64{4})
   // vanilla gradient descent
-  xn1, err1 := GradientDescent(f, x0, 0.0001, 1e-8)
+  xn1, err1 := GradientDescent(f, x0, 1e-8, 0.0001)
   // resilient backpropagation
-  xn2, err2 := Rprop(f, x0, 0.0001, 1e-8, 0.4)
+  xn2, err2 := Rprop(f, x0, 1e-8, 0.0001, 0.4)
 
   fmt.Println(xn1)
   fmt.Println(xn2)

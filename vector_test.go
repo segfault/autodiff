@@ -30,3 +30,13 @@ func TestVector(t *testing.T) {
     t.Error("Vector initialization failed!")
   }
 }
+
+func TestVectorToMatrix(t *testing.T) {
+
+  v := NewVector([]float64{1,2,3,4,5,6})
+  m := v.Matrix(2, 3)
+
+  if m.At(1,0) != 4 {
+    t.Error("Vector to matrix conversion failed!")
+  }
+}

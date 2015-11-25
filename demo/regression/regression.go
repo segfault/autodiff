@@ -39,8 +39,9 @@ func sumOfSquares(x, y Vector, l *Line) Scalar {
 
 func gradientDescent(x, y Vector, l *Line) *Line {
 
-  // gradient step size
+  // precision
   const epsilon = 0.00001
+  // gradient step size
   const step    = 0.1
 
   // get a vector of variables
@@ -55,7 +56,7 @@ func gradientDescent(x, y Vector, l *Line) *Line {
     return sumOfSquares(x, y, l)
   }
 //  GradientDescent(f, variables, step, epsilon)
-  Rprop(f, variables, step, epsilon, 0.2)
+  Rprop(f, variables, epsilon, step, 0.2)
 
   return l
 }
