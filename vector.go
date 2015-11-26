@@ -83,6 +83,14 @@ func (v Vector) String() string {
   return buffer.String()
 }
 
+func (v Vector) Slice() []float64 {
+  s := make([]float64, len(v))
+  for i, _ := range v {
+    s[i] = v[i].Value()
+  }
+  return s
+}
+
 func (v Vector) Matrix(n, m int) Matrix {
   if n*m != len(v) {
     panic("Matrix dimension does not fit input vector!")

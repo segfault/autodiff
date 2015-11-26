@@ -36,37 +36,52 @@ func setVariable(variables Vector, order int) {
 
 /* -------------------------------------------------------------------------- */
 
-func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64) (Vector, []float64) {
+func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, args ...interface{}) (Vector, []float64) {
+
+  var hook func([]float64, Vector, Scalar) bool = nil
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case func([]float64, Vector, Scalar) bool:
+      hook = a
+    default:
+    }
+  }
 
   var s   Scalar
   var err []float64
   // copy variables
   x := x0.Clone()
+  // initialize all variables as constants
+  setConstant(x)
+  // slice containing the gradient
+  gradient := make([]float64, len(x))
 
   for {
-    // initialize all variables as constants
-    setConstant(x)
     // compute partial derivatives and update variables
     for i, _ := range x {
+      // differentiate once with respect to the ith variable
       x[i].Variable(1)
       s = f(x)
-
-      // update variable
-      x[i] = Sub(x[i], NewConstant(step*s.Derivative(1)))
-      // reset derivative
+      // save partial derivative
+      gradient[i] = s.Derivative(1)
+      // set variables constant again
       x[i].Constant()
-      if math.IsNaN(x[i].Value()) {
-        panic("Gradient descent diverged!")
-      }
     }
-    // compute total derivative
-    setVariable(x, 1)
-    s = f(x)
+    // execute hook if available
+    if hook != nil && hook(gradient, x, s) {
+      break;
+    }
     // evaluate stop criterion
     err = append(err, math.Abs(s.Derivative(1)))
     if (err[len(err)-1] < epsilon) {
-      setConstant(x)
       break;
+    }
+    // update variables
+    for i, _ := range x {
+      x[i] = Sub(x[i], NewConstant(step*s.Derivative(1)))
+      if math.IsNaN(x[i].Value()) {
+        panic("Gradient descent diverged!")
+      }
     }
   }
   return x, err
@@ -79,12 +94,23 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64) (V
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64) (Vector, []float64) {
+func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, args ...interface{}) (Vector, []float64) {
+
+  var hook func([]float64, Vector, Scalar) bool = nil
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case func([]float64, Vector, Scalar) bool:
+      hook = a
+    default:
+    }
+  }
 
   var s   Scalar
   var err []float64
   // copy variables
   x := x0.Clone()
+  // initialize all x as constants
+  setConstant(x)
   // step size for each variable
   step := make([]float64, len(x))
   // gradients
@@ -101,8 +127,6 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64) (V
     for i, _ := range x {
       gradient_old[i] = gradient_new[i]
     }
-    // initialize all x as constants
-    setConstant(x)
     // compute partial derivatives and update x
     for i, _ := range x {
       // differentiate with respect to the ith variable
@@ -112,6 +136,15 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64) (V
       gradient_new[i] = s.Derivative(1)
       // set variable back to constant
       x[i].Constant()
+    }
+    // execute hook if available
+    if hook != nil && hook(gradient_new, x, s) {
+      break;
+    }
+    // evaluate stop criterion
+    err = append(err, math.Abs(s.Derivative(1)))
+    if (err[len(err)-1] < epsilon) {
+      break;
     }
     // update step size
     for i, _ := range x {
@@ -132,15 +165,6 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64) (V
       if math.IsNaN(x[i].Value()) {
         panic("Gradient descent diverged!")
       }
-    }
-    // compute total derivative
-    setVariable(x, 1)
-    s = f(x)
-    // evaluate stop criterion
-    err = append(err, math.Abs(s.Derivative(1)))
-    if (err[len(err)-1] < epsilon) {
-      setConstant(x)
-      break;
     }
   }
   return x, err
