@@ -172,7 +172,17 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
 
 /* -------------------------------------------------------------------------- */
 
-func Newton(f func(Vector) Vector, x Vector, epsilon float64) (Vector, []float64) {
+func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{}) (Vector, []float64) {
+
+  var hook func(Matrix, Vector, Vector) bool = nil
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case func(Matrix, Vector, Vector) bool:
+      hook = a
+    default:
+    }
+  }
+
   x1  := x.Clone()
   x2  := x.Clone()
   err := []float64{}
@@ -181,6 +191,11 @@ func Newton(f func(Vector) Vector, x Vector, epsilon float64) (Vector, []float64
     J  := Jacobian(f, x1)
     Q  := MInverse(J)
     x2  = VSub(x1, MxV(Q, y))
+    // execute hook if available
+    if hook != nil && hook(J, x, y) {
+      break;
+    }
+    // evaluate stop criterion
     err = append(err, VNorm(VSub(x1, x2)).Value())
     if err[len(err)-1] < epsilon {
       break
