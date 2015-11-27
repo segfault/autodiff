@@ -81,14 +81,10 @@ func main() {
   // append initial value for lambda
   px0m := NewVector(append(px0v, 1))
 
-  // objective functions
-  f := func(px Vector) Vector { return objective_f(px) }
-  g := func(px Vector) Scalar { return objective_g(px) }
-
   fmt.Println("Rprop optimization:")
-  pxn1, _ := Rprop (g, px0m, epsilon, step, 0.5, hook_g)
+  pxn1, _ := Rprop (objective_g, px0m, epsilon, step, 0.5, hook_g)
   fmt.Println("Newton optimization:")
-  pxn2, _ := Newton(f, px0m, epsilon, hook_f)
+  pxn2, _ := Newton(objective_f, px0m, epsilon, hook_f)
 
   fmt.Println("Rprop  p(x): ", pxn1)
   fmt.Println("Newton p(x): ", pxn2)
