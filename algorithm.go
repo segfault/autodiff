@@ -34,6 +34,14 @@ func setVariable(variables Vector, order int) {
     }
 }
 
+func norm(v []float64) float64 {
+  sum := 0.0
+  for _, x := range v {
+    sum += math.Pow(x, 2.0)
+  }
+  return math.Sqrt(sum)
+}
+
 /* -------------------------------------------------------------------------- */
 
 func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, args ...interface{}) (Vector, []float64) {
@@ -72,7 +80,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
       break;
     }
     // evaluate stop criterion
-    err = append(err, math.Abs(s.Derivative(1)))
+    err = append(err, norm(gradient))
     if (err[len(err)-1] < epsilon) {
       break;
     }
@@ -142,7 +150,7 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
       break;
     }
     // evaluate stop criterion
-    err = append(err, math.Abs(s.Derivative(1)))
+    err = append(err, norm(gradient_new))
     if (err[len(err)-1] < epsilon) {
       break;
     }
