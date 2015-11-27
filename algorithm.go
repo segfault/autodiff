@@ -52,6 +52,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
     case func([]float64, Vector, Scalar) bool:
       hook = a
     default:
+      panic("GradientDescent(): Invalid optional argument!")
     }
   }
 
@@ -110,6 +111,7 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
     case func([]float64, Vector, Scalar) bool:
       hook = a
     default:
+      panic("Rprop(): Invalid optional argument!")
     }
   }
 
@@ -188,6 +190,7 @@ func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{
     case func(Matrix, Vector, Vector) bool:
       hook = a
     default:
+      panic("Newton(): Invalid optional argument!")
     }
   }
 
