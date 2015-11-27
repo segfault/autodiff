@@ -200,7 +200,7 @@ func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{
     Q  := MInverse(J)
     x2  = VSub(x1, MxV(Q, y))
     // execute hook if available
-    if hook != nil && hook(J, x, y) {
+    if hook != nil && hook(J, x2, y) {
       break;
     }
     // evaluate stop criterion
