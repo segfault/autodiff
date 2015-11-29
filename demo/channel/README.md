@@ -8,7 +8,7 @@ The gradient based approaches use the Lagrangian
 
 <img src="https://raw.githubusercontent.com/pbenner/autodiff/master/demo/channel/README//eq_no_02.png" alt="" height="60">
 
-where
+where *I* is the active set of constraints. For the comparison
 - Newton's method is used to find the roots of the gradient
 - Rprop minimizes the squared norm of the gradient
 

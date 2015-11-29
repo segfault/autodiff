@@ -25,10 +25,10 @@ $$
     \sum_x \pi(x) - 1
   \right)
   -
-  \sum_x \lambda_x \pi(x)
+  \sum_{x\in I} \lambda_x \pi(x)
   \ ,
 $$
-where
+where *I* is the active set of constraints. For the comparison
 - Newton's method is used to find the roots of the gradient
 - Rprop minimizes the squared norm of the gradient
 

@@ -15,4 +15,3 @@ parse_latex(rmd1,
             )
 
 system("mv eq_no_* README")
-
