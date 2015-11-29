@@ -47,7 +47,7 @@ func plotGradientNorm(gn1, gn2 []float64) {
     panic(err)
   }
   p.Title.Text = "Norm of the gradient"
-  p.X.Label.Text = "interation"
+  p.X.Label.Text = "iteration"
   p.Y.Label.Text = "||·||"
   p.X.Scale = plot.LogScale{}
   p.Y.Scale = plot.LogScale{}
