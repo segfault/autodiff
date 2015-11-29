@@ -1,7 +1,5 @@
 
-Find the channel capacity of 
-<img src="https://raw.githubusercontent.com/pbenner/autodiff/master/demo/channel/README//eq_no_02.png" alt="" >
- by maximizing the mutual information
+Find the capacity of a channel between *X* and *Y* by maximizing the mutual information
 
-<img src="https://raw.githubusercontent.com/pbenner/autodiff/master/demo/channel/README//eq_no_01.png" alt="" >
+<img src="https://raw.githubusercontent.com/pbenner/autodiff/master/demo/channel/README//eq_no_01.png" alt="" height="30">
 
