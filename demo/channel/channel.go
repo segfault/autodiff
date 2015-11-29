@@ -224,7 +224,8 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []
   px0m     := NewVector(append(px0, make([]float64, n+1)...))
 
   // active constaints
-  active := make([]bool, n)
+  active1 := make([]bool, n)
+  active2 := make([]bool, n)
 
   // keep track of the path of an algorithm
   trace1 := []float64{}
@@ -243,8 +244,8 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []
   }
 
   // objective functions
-  f := func(px Vector) Vector { return objective_f(active, channelm, px) }
-  g := func(px Vector) Scalar { return objective_g(active, channelm, px) }
+  f := func(px Vector) Vector { return objective_f(active1, channelm, px) }
+  g := func(px Vector) Scalar { return objective_g(active2, channelm, px) }
 
   // execute algorithms
   Rprop (g, px0m, epsilon, step, 0.01, hook1)
