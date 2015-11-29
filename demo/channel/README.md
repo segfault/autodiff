@@ -10,6 +10,6 @@ The gradient based approaches use the Lagrangian
 
 where
 - Newton's method is used to find the roots of the gradient
-- Rprop minimized the squared norm of the gradient
+- Rprop minimizes the squared norm of the gradient
 
 ![Optimization](channel.png)
