@@ -158,19 +158,23 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
     }
     // update step size
     for i, _ := range x {
-      if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
-          (gradient_old[i] > 0 && gradient_new[i] > 0)) {
-        step[i] *= 1.0 + eta
-      } else {
-        step[i] *= 1.0 - eta
+      if gradient_new[i] != 0.0 {
+        if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
+            (gradient_old[i] > 0 && gradient_new[i] > 0)) {
+          step[i] *= 1.0 + eta
+        } else {
+          step[i] *= 1.0 - eta
+        }
       }
     }
     // update x
     for i, _ := range x {
-      if gradient_new[i] > 0.0 {
-        x[i] = Sub(x[i], NewConstant(step[i]))
-      } else {
-        x[i] = Add(x[i], NewConstant(step[i]))
+      if gradient_new[i] != 0.0 {
+        if gradient_new[i] > 0.0 {
+          x[i] = Sub(x[i], NewConstant(step[i]))
+        } else {
+          x[i] = Add(x[i], NewConstant(step[i]))
+        }
       }
       if math.IsNaN(x[i].Value()) {
         panic("Gradient descent diverged!")
