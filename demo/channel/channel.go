@@ -84,6 +84,13 @@ func flatten(m [][]float64) []float64 {
   return v
 }
 
+func distance(v1, v2 []float64) float64 {
+  sum := 0.0
+  for i, _ := range v1 {
+    sum += math.Pow(v1[i]-v2[i], 2.0)
+  }
+  return math.Sqrt(sum)
+}
 
 /* hooks for keeping track of convergence speed
  * -------------------------------------------------------------------------- */
@@ -93,11 +100,7 @@ func hook_g(trace *[]float64, pxstar []float64, gradient []float64, variables Ve
   // split variables
   px := variables[0:n]
   // distance to optimum
-  d := 0.0
-  for i := 0; i < n; i++ {
-    d += math.Pow(pxstar[i]-px[i].Value(), 2.0)
-  }
-  d = math.Sqrt(d)
+  d := distance(px.Slice(), pxstar)
   // append result to trace
   *trace = append(*trace, d)
 
@@ -109,11 +112,7 @@ func hook_f(trace *[]float64, pxstar []float64, gradient Matrix, variables Vecto
   // split variables
   px := variables[0:n]
   // distance to optimum
-  d := 0.0
-  for i := 0; i < n; i++ {
-    d += math.Pow(pxstar[i]-px[i].Value(), 2.0)
-  }
-  d = math.Sqrt(d)
+  d := distance(px.Slice(), pxstar)
   // append result to trace
   *trace = append(*trace, d)
 
@@ -125,11 +124,7 @@ func hook_b(trace *[]float64, pxstar []float64, variables []float64) bool {
   // split variables
   px := variables[0:n]
   // distance to optimum
-  d := 0.0
-  for i := 0; i < n; i++ {
-    d += math.Pow(pxstar[i]-px[i], 2.0)
-  }
-  d = math.Sqrt(d)
+  d := distance(px, pxstar)
   // append result to trace
   *trace = append(*trace, d)
 
@@ -228,9 +223,9 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []
   active2 := make([]bool, n)
 
   // keep track of the path of an algorithm
-  trace1 := []float64{}
-  trace2 := []float64{}
-  trace3 := []float64{}
+  trace1 := []float64{distance(px0, pxstar)}
+  trace2 := []float64{distance(px0, pxstar)}
+  trace3 := []float64{distance(px0, pxstar)}
 
   // hooks
   hook1 := func(gradient []float64, variables Vector, s Scalar) bool {
