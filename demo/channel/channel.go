@@ -247,7 +247,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   Rprop (g, px0m, epsilon, step, 0.01, hook1)
   Newton(f, px0m, epsilon, hook2)
   Blahut(channel, px0, 500, Hook{hook3}, Lambda{1.0})
-  Blahut(channel, px0, 100, Hook{hook4}, Lambda{7.0})
+  Blahut(channel, px0,  40, Hook{hook4}, Lambda{8.0})
 
   return trace
 }
