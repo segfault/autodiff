@@ -18,7 +18,6 @@ package main
 
 /* -------------------------------------------------------------------------- */
 
-import   "fmt"
 import   "math"
 import . "github.com/pbenner/autodiff"
 import . "github.com/pbenner/autodiff/demo/channel/blahut"
@@ -119,10 +118,7 @@ func hook_f(trace *[]float64, pxstar []float64, gradient Matrix, variables Vecto
   return false
 }
 
-func hook_b(trace *[]float64, pxstar []float64, variables []float64) bool {
-  n := (len(variables) - 1)/2
-  // split variables
-  px := variables[0:n]
+func hook_b(trace *[]float64, pxstar []float64, px []float64) bool {
   // distance to optimum
   d := distance(px, pxstar)
   // append result to trace
@@ -205,7 +201,7 @@ func objective_g(active []bool, channel Matrix, px Vector) Scalar {
 /* main function
  * -------------------------------------------------------------------------- */
 
-func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []float64, []float64) {
+func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) {
   n := len(channel)
   m := len(channel[0])
   // precision
@@ -223,19 +219,24 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []
   active2 := make([]bool, n)
 
   // keep track of the path of an algorithm
-  trace1 := []float64{distance(px0, pxstar)}
-  trace2 := []float64{distance(px0, pxstar)}
-  trace3 := []float64{distance(px0, pxstar)}
+  trace := make([][]float64, 4)
+  trace[0] = []float64{distance(px0, pxstar)}
+  trace[1] = []float64{distance(px0, pxstar)}
+  trace[2] = []float64{distance(px0, pxstar)}
+  trace[3] = []float64{distance(px0, pxstar)}
 
   // hooks
   hook1 := func(gradient []float64, variables Vector, s Scalar) bool {
-    return hook_g(&trace1, pxstar, gradient, variables, s)
+    return hook_g(&trace[0], pxstar, gradient, variables, s)
   }
   hook2 := func(gradient Matrix, variables Vector, s Vector) bool {
-    return hook_f(&trace2, pxstar, gradient, variables, s)
+    return hook_f(&trace[1], pxstar, gradient, variables, s)
   }
-  hook3 := func(px []float64) bool {
-    return hook_b(&trace3, pxstar, px)
+  hook3 := func(px []float64, J float64) bool {
+    return hook_b(&trace[2], pxstar, px)
+  }
+  hook4 := func(px []float64, J float64) bool {
+    return hook_b(&trace[3], pxstar, px)
   }
 
   // objective functions
@@ -245,9 +246,10 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([]float64, []
   // execute algorithms
   Rprop (g, px0m, epsilon, step, 0.01, hook1)
   Newton(f, px0m, epsilon, hook2)
-  Blahut(channel, px0, 190, hook3)
+  Blahut(channel, px0, 500, Hook{hook3}, Lambda{1.0})
+  Blahut(channel, px0, 100, Hook{hook4}, Lambda{7.0})
 
-  return trace1, trace2, trace3
+  return trace
 }
 
 func main() {
@@ -265,14 +267,11 @@ func main() {
   // initial value
   px0 := []float64{1.0/3.0, 1.0/3.0, 1.0/3.0}
 
-  t1, t2, t3 := channel_capacity(channel, pxstar, px0)
-
-  fmt.Println("rprop : ", t1)
-  fmt.Println("newton: ", t2)
-  fmt.Println("blahut: ", t3)
+  trace := channel_capacity(channel, pxstar, px0)
 
   plotGradientNorm(
-    line{t1, "Rprop"},
-    line{t2, "Newton"},
-    line{t3, "Blahut"})
+    line{trace[0], "Rprop"},
+    line{trace[1], "Newton"},
+    line{trace[2], "Blahut"},
+    line{trace[3], "PP-Blahut"})
 }
