@@ -147,6 +147,10 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
     // deactivate constraint
     if lambda[i].Value() > 0.0 {
       active[i] = false
+    }
+    if active[i] {
+      px[i]     = NewConstant(0.0)
+    } else {
       lambda[i] = NewConstant(0.0)
     }
   }
@@ -207,7 +211,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   // precision
   const epsilon = 1e-12
   // initial gradient step size
-  const step    = 0.1
+  const step    = 0.001
 
   // copy variables for automatic differentation
   channelm := NewMatrix(n, m, flatten(channel))
