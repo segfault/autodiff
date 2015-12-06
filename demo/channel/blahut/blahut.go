@@ -101,8 +101,8 @@ func blahut_init_q(n, m int) [][]float64 {
 
 func Blahut(channel [][]float64, p_init []float64, steps int, args ...interface{}) []float64 {
   // default values for optional parameters
-  var hook func([]float64, float64) bool = nil
-  var lambda float64 = 0.5
+  hook   := Hook  {nil}.Value
+  lambda := Lambda{1.0}.Value
 
   // parse optional arguments
   for _, arg := range args {
