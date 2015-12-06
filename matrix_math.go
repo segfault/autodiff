@@ -177,6 +177,7 @@ func MInverse(matrix Matrix) Matrix {
 func Jacobian(f func(Vector) Vector, x Vector) Matrix {
   n := 0
   m := len(x)
+  t := x.ElementType()
   r := Matrix{}
   for j := 0; j < m; j++ {
     x[j].Constant()
@@ -194,7 +195,7 @@ func Jacobian(f func(Vector) Vector, x Vector) Matrix {
     }
     // copy derivatives
     for i := 0; i < n; i++ {
-      r.Set(NewReal(y[i].Derivative(1)),
+      r.Set(NewScalar(t, y[i].Derivative(1)),
         i, j)
     }
     x[j].Constant()
