@@ -19,81 +19,76 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "fmt"
+import "reflect"
 
 /* -------------------------------------------------------------------------- */
 
-type Scalar struct {
-  value         float64
-  derivative [2]float64
-  order         int
+// this allows to idenfity the type of a scalar
+type ScalarType reflect.Type
+
+type Scalar interface {
+  // type reflections
+  Type      ()        ScalarType
+  // copy and cloning
+  Clone     ()        Scalar
+  Copy      (Scalar)
+  // field access
+  Set       (float64)
+  Order     ()        int
+  Value     ()        float64
+  Derivative(int)     float64
+  Constant  ()
+  Variable  (int)
+  // some basic operations on scalars
+  Equals    (Scalar)  bool
+  Add       (Scalar)  Scalar
+  Sub       (Scalar)  Scalar
+  Mul       (Scalar)  Scalar
+  Div       (Scalar)  Scalar
+  Pow       (float64) Scalar
+  Sqrt      ()        Scalar
+  Sin       ()        Scalar
+  Sinh      ()        Scalar
+  Cos       ()        Scalar
+  Cosh      ()        Scalar
+  Tan       ()        Scalar
+  Tanh      ()        Scalar
+  Exp       ()        Scalar
+  Log       ()        Scalar
+  // nice printing
+  fmt.Stringer
 }
 
-func NewScalar(v float64, order int) Scalar {
-  s := Scalar{
-    value     : v,
-    derivative: [2]float64{0, 0},
-    order     : order }
-  return s
+/* keep a map of valid scalar implementations and a reference
+ * to the constructors
+ * -------------------------------------------------------------------------- */
+
+type rtype map[ScalarType]func(float64) Scalar
+
+// initialize empty registry
+var registry rtype = make(rtype)
+
+// scalar types can be registered so that the constructors below can be used for
+// all types
+func RegisterScalar(t ScalarType, constructor func(float64) Scalar) {
+  registry[t] = constructor
 }
 
-func NewConstant(v float64) Scalar {
-  s := Scalar{
-    value     : v,
-    derivative: [2]float64{0, 0},
-    order     : 0 }
-  return s
-}
+/* constructors
+ * -------------------------------------------------------------------------- */
 
-func NewVariable(v float64, order int) Scalar {
-  s := Scalar{
-    value     : v,
-    derivative: [2]float64{0, 0},
-    order     : order }
-  s.derivative[0] = 1
-  s.derivative[1] = 0
-  return s
-}
-
-/* -------------------------------------------------------------------------- */
-
-func (a Scalar) Order() int {
-  return a.order
-}
-
-func (a Scalar) Value() float64 {
-  return a.value
-}
-
-func (a Scalar) Derivative(i int) float64 {
-  if i != 1 && i != 2 {
-    panic("Invalid order!")
+func NewScalar(t ScalarType, value float64) Scalar {
+  f, ok := registry[t]
+  if !ok {
+    panic("NewScalar(): Invalid scalar type!")
   }
-  return a.derivative[i-1]
+  return f(value)
 }
 
-func (a *Scalar) Variable(order int) *Scalar {
-  a.order = order
-  a.derivative[0] = 1
-  a.derivative[1] = 0
-  return a
-}
-
-func (a *Scalar) Constant() *Scalar {
-  a.order = 0
-  a.derivative[0] = 0
-  a.derivative[1] = 0
-  return a
-}
-
-func (a *Scalar) String() string {
-  switch a.order {
-  case 0:
-    return fmt.Sprintf("<%f>", a.Value())
-  case 1:
-    return fmt.Sprintf("<%f,%f>", a.Value(), a.Derivative(1))
-  case 2:
-    return fmt.Sprintf("<%f,%f,%f>", a.Value(), a.Derivative(1), a.Derivative(2))
-  default:
-    panic("Invalid order!")
+func ZeroScalar(t ScalarType) Scalar {
+  f, ok := registry[t]
+  if !ok {
+    panic("NewScalar(): Invalid scalar type!")
   }
+  return f(0.0)
 }

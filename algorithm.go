@@ -87,7 +87,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
     }
     // update variables
     for i, _ := range x {
-      x[i] = Sub(x[i], NewConstant(step*s.Derivative(1)))
+      x[i] = Sub(x[i], NewReal(step*s.Derivative(1)))
       if math.IsNaN(x[i].Value()) {
         panic("Gradient descent diverged!")
       }
@@ -171,9 +171,9 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
     for i, _ := range x {
       if gradient_new[i] != 0.0 {
         if gradient_new[i] > 0.0 {
-          x[i] = Sub(x[i], NewConstant(step[i]))
+          x[i] = Sub(x[i], NewReal(step[i]))
         } else {
-          x[i] = Add(x[i], NewConstant(step[i]))
+          x[i] = Add(x[i], NewReal(step[i]))
         }
       }
       if math.IsNaN(x[i].Value()) {
@@ -215,7 +215,7 @@ func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{
     if err[len(err)-1] < epsilon {
       break
     }
-    x1.CopyFrom(x2)
+    x1.Copy(x2)
   }
   return x2, err
 }

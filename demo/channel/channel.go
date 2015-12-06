@@ -147,22 +147,22 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
     // deactivate constraint
     if lambda[i].Value() > 0.0 {
       active[i] = false
-      lambda[i] = NewConstant(0.0)
+      lambda[i] = NewReal(0.0)
     }
   }
   // compute p(y) from p(y|x)*p(x)
-  py := MakeVector(m)
+  py := NullVector(RealType, m)
   for j := 0; j < m; j++ {
-    py[j] = NewConstant(0.0)
+    py[j] = NewReal(0.0)
     for i := 0; i < n; i++ {
-      py[j] = Add(py[j], Mul(channel.ScalarAt(i, j), px[i]))
+      py[j] = Add(py[j], Mul(channel.At(i, j), px[i]))
     }
   }
-  gradient := MakeVector(2*n+1)
+  gradient := NullVector(RealType, 2*n+1)
   // derivative with respect to px[i]
   for i := 0; i < n; i++ {
     // -1
-    gradient[i] = NewConstant(-1.0)
+    gradient[i] = NewReal(-1.0)
     // -lambda_i
     if active[i] {
       gradient[i] = Sub(gradient[i], lambda[i])
@@ -171,7 +171,7 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
     gradient[i] = Add(gradient[i], lambda[n])
     for j := 0; j < m; j++ {
       // t = p(y|x)
-      t := channel.ScalarAt(i, j)
+      t := channel.At(i, j)
       // p(x|y) log p(x|y)/p(y) - lambda
       if t.Value() > 0.0 {
         gradient[i] = Add(gradient[i], Mul(t, Log(Div(t, py[j]))))
@@ -181,13 +181,13 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
   // derivative with respect to lambda_i
   for i := 0; i < n; i++ {
     if active[i] {
-      gradient[n+i] = Sub(NewConstant(0.0), px[i])
+      gradient[n+i] = Sub(NewReal(0.0), px[i])
     } else {
-      gradient[n+i] = NewConstant(0.0)
+      gradient[n+i] = NewReal(0.0)
     }
   }
   // derivative with respect to lambda_n
-  gradient[2*n] = NewConstant(-1.0)
+  gradient[2*n] = NewReal(-1.0)
   for i := 0; i < n; i++ {
     gradient[2*n] = Add(gradient[2*n], px[i])
   }
@@ -210,9 +210,9 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   const step    = 0.1
 
   // copy variables for automatic differentation
-  channelm := NewMatrix(n, m, flatten(channel))
+  channelm := NewMatrix(RealType, n, m, flatten(channel))
   // add n+1 lagrange multipliers
-  px0m     := NewVector(append(px0, make([]float64, n+1)...))
+  px0m     := NewVector(RealType, append(px0, make([]float64, n+1)...))
 
   // active constaints
   active1 := make([]bool, n)

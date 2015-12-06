@@ -18,25 +18,37 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "testing"
-
-/* -------------------------------------------------------------------------- */
-
-func TestVector(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
-  }
+func (matrix Matrix) T() Matrix {
+  return Matrix{
+    values:  matrix.values,
+    rows  :  matrix.cols,
+    cols  :  matrix.rows,
+    t     : !matrix.t}
 }
 
-func TestVectorToMatrix(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
-
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
+func (matrix Matrix) PermuteRows(_p []int) {
+  if len(_p) != matrix.rows {
+    panic("PermuteRows(): permutation vector has invalid length!")
+  }
+  // make a copy of _p
+  p := make([]int, len(_p))
+  copy(p, _p)
+  // permute matrix
+  for i := 0; i < matrix.rows; i++ {
+    if i != p[i] {
+      for j := 0; j < matrix.cols; j++ {
+        v1 := matrix.At(  i , j)
+        v2 := matrix.At(p[i], j)
+        matrix.Set(v2,   i , j)
+        matrix.Set(v1, p[i], j)
+      }
+      // save permutation
+      for k := 0; k < matrix.rows; k++ {
+        if p[k] == i {
+          p[k], p[i] = p[i], i
+          break
+        }
+      }
+    }
   }
 }

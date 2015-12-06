@@ -51,14 +51,14 @@ func objective_f(px Vector) Vector {
   if len(px) != n+1 {
     panic("Input vector has invalid dimension!")
   }
-  gradient := MakeVector(n+1)
+  gradient := NullVector(RealType, n+1)
   // derivative with respect to px[i]
   for i := 0; i < n; i++ {
-    gradient[i] = Sub(NewConstant(-1), Log(px[i]))
+    gradient[i] = Sub(NewReal(-1), Log(px[i]))
     gradient[i] = Sub(gradient[i], px[n])
   }
   // derivative with respect to lambda
-  gradient[n] = NewConstant(-1.0)
+  gradient[n] = NewReal(-1.0)
   for i := 0; i < n; i++ {
     gradient[n] = Add(gradient[n], px[i])
   }
@@ -79,7 +79,7 @@ func main() {
   // initial value for px
   px0v := []float64{0.5, 0.2, 0.3}
   // append initial value for lambda
-  px0m := NewVector(append(px0v, 1))
+  px0m := NewVector(RealType, append(px0v, 1))
 
   fmt.Println("Rprop optimization:")
   pxn1, _ := Rprop (objective_g, px0m, epsilon, step, 0.5, hook_g)

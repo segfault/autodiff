@@ -18,25 +18,61 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "testing"
-
-/* -------------------------------------------------------------------------- */
-
-func TestVector(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
-  }
+func Equal(a, b Scalar) bool {
+  return a.Equals(b)
 }
 
-func TestVectorToMatrix(t *testing.T) {
+func Add(a, b Scalar) Scalar {
+  return a.Add(b)
+}
 
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
+func Sub(a, b Scalar) Scalar {
+  return a.Sub(b)
+}
 
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
-  }
+func Mul(a, b Scalar) Scalar {
+  return a.Mul(b)
+}
+
+func Div(a, b Scalar) Scalar {
+  return a.Div(b)
+}
+
+func Pow(a Scalar, k float64) Scalar {
+  return a.Pow(k)
+}
+
+func Sqrt(a Scalar) Scalar {
+  return a.Sqrt()
+}
+
+func Sin(a Scalar) Scalar {
+  return a.Sin()
+}
+
+func Sinh(a Scalar) Scalar {
+  return a.Sinh()
+}
+
+func Cos(a Scalar) Scalar {
+  return a.Cos()
+}
+
+func Cosh(a Scalar) Scalar {
+  return a.Cosh()
+}
+
+func Tan(a Scalar) Scalar {
+  return a.Tan()
+}
+
+func Tanh(a Scalar) Scalar {
+  return a.Tanh()
+}
+
+func Exp(a Scalar) Scalar {
+  return a.Exp()
+}
+func Log(a Scalar) Scalar {
+  return a.Log()
 }

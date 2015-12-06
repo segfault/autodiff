@@ -19,53 +19,87 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "bytes"
+import "reflect"
 
-/* -------------------------------------------------------------------------- */
+/* vector type declaration
+ * -------------------------------------------------------------------------- */
 
 type Vector []Scalar
 
-func NewVector(values []float64) Vector {
+/* constructors
+ * -------------------------------------------------------------------------- */
+
+func NewVector(t ScalarType, values []float64) Vector {
   v := make(Vector, len(values))
 
   for i, _ := range values {
-    v[i] = NewConstant(values[i])
+    v[i] = NewScalar(t, values[i])
   }
   return v
 }
 
-func MakeVector(length int) Vector {
+func NullVector(t ScalarType, length int) Vector {
   v := make(Vector, length)
 
   for i := 0; i < length; i++ {
-    v[i] = NewConstant(0.0)
+    v[i] = NewScalar(t, 0.0)
   }
   return v
 }
 
-/* -------------------------------------------------------------------------- */
-
 func (v Vector) Clone() Vector {
   result := make(Vector, len(v))
-  copy(result, v)
+
+  for i, _ := range v {
+    result[i] = v[i].Clone()
+  }
   return result
 }
 
-func (v Vector) Value(i int) float64 {
-  return v[i].Value()
+func (v Vector) Copy(w Vector) {
+  if len(v) != len(w) {
+    panic("CopyFrom(): Vector dimensions do not match!")
+  }
+  for i := 0; i < len(w); i++ {
+    v[i].Copy(w[i])
+  }
 }
 
-func (v Vector) Derivative(i int) float64 {
-  return v[i].Derivative(i)
+/* imlement ScalarContainer
+ * -------------------------------------------------------------------------- */
+
+func (v Vector) At(args ...int) Scalar {
+  return v[args[0]].Clone()
 }
 
-func (v Vector) Variable(i, order int) Vector {
-  v[i].Variable(order)
-  return v
+func (v Vector) Set(value Scalar, args ...int) {
+  v[args[0]].Copy(value)
 }
 
-func (v Vector) Constant(i int) Vector {
-  v[i].Constant()
-  return v
+func (v Vector) ElementType() ScalarType {
+  if len(v) > 0 {
+    return reflect.TypeOf(v[0])
+  }
+  return nil
+}
+
+/* type conversion
+ * -------------------------------------------------------------------------- */
+
+func (v Vector) Matrix(n, m int) Matrix {
+  if n*m != len(v) {
+    panic("Matrix dimension does not fit input vector!")
+  }
+  return Matrix{v, n, m, false}
+
+}
+
+func (v Vector) Slice() []float64 {
+  s := make([]float64, len(v))
+  for i, _ := range v {
+    s[i] = v[i].Value()
+  }
+  return s
 }
 
 func (v Vector) String() string {
@@ -81,61 +115,4 @@ func (v Vector) String() string {
   buffer.WriteString("]")
 
   return buffer.String()
-}
-
-func (v Vector) Slice() []float64 {
-  s := make([]float64, len(v))
-  for i, _ := range v {
-    s[i] = v[i].Value()
-  }
-  return s
-}
-
-func (v Vector) Matrix(n, m int) Matrix {
-  if n*m != len(v) {
-    panic("Matrix dimension does not fit input vector!")
-  }
-  return Matrix{v, n, m, false}
-
-}
-
-func (v *Vector) CopyFrom(w Vector) {
-  if len(*v) != len(w) {
-    panic("CopyFrom(): Vector dimensions do not match!")
-  }
-  for i := 0; i < len(w); i++ {
-    (*v)[i] = w[i]
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-
-func VAdd(a, b Vector) Vector {
-  if len(a) != len(b) {
-    panic("Vector dimensions do not match!")
-  }
-  r := MakeVector(len(a))
-  for i := 0; i < len(a); i++ {
-    r[i] = Add(a[i], b[i])
-  }
-  return r
-}
-
-func VSub(a, b Vector) Vector {
-  if len(a) != len(b) {
-    panic("Vector dimensions do not match!")
-  }
-  r := MakeVector(len(a))
-  for i := 0; i < len(a); i++ {
-    r[i] = Sub(a[i], b[i])
-  }
-  return r
-}
-
-func VNorm(a Vector) Scalar {
-  r := NewConstant(0.0)
-  for i := 0; i < len(a); i++ {
-    r = Add(r, Pow(a[i], 2))
-  }
-  return Sqrt(r)
 }

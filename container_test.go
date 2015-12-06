@@ -22,21 +22,12 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestVector(t *testing.T) {
+func TestContainer(t *testing.T) {
 
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
+  var c ScalarContainer = NewVector(RealType, []float64{1,2,3,4})
 
-  if v[1].Value() != 2.0 {
+  if c.At(1).Value() != 2.0 {
     t.Error("Vector initialization failed!")
   }
-}
 
-func TestVectorToMatrix(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
-
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
-  }
 }

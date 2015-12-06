@@ -18,25 +18,55 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+import "math"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
 
-func TestVector(t *testing.T) {
+func TestReal(t *testing.T) {
 
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
+  a := NewReal(1.0)
 
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
+  if a.Value() != 1.0 {
+    t.Error("a.Value() should be 1.0")
   }
 }
 
-func TestVectorToMatrix(t *testing.T) {
+func TestDiff(t *testing.T) {
 
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
+  f := func(x Scalar) Scalar {
+    return NewReal(2).Mul(x.Pow(3)).Add(NewReal(4))
+  }
+  x := NewReal(9)
+  x.Variable(2)
+  y := f(x)
 
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
+  if y.Derivative(1) != 486 {
+    t.Error("Differentiation failed!")
+  }
+  if y.Derivative(2) != 108 {
+    t.Error("Differentiation failed!")
+  }
+}
+
+func TestTan(t *testing.T) {
+
+  a := NewReal(4.321)
+  a.Variable(1)
+  s := Tan(a)
+
+  if math.Abs(s.Derivative(1) - 6.87184) > 0.0001 {
+    t.Error("Incorrect derivative for Tan()!", s.Derivative(1))
+  }
+}
+
+func TestTanh(t *testing.T) {
+
+  a := NewReal(4.321)
+  a.Variable(1)
+  s := Tanh(a)
+
+  if math.Abs(s.Derivative(1) - 0.00070588) > 0.0000001 {
+    t.Error("Incorrect derivative for Tanh()!")
   }
 }

@@ -28,8 +28,8 @@ import . "github.com/pbenner/autodiff/demo/regression/line"
 
 func sumOfSquares(x, y Vector, l *Line) Scalar {
 
-  s := NewScalar(0)
-  n := NewScalar(float64(len(x)))
+  s := NewScalar(RealType, 0)
+  n := NewScalar(RealType, float64(len(x)))
 
   for i,_ := range x {
     s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), 2))
@@ -45,7 +45,7 @@ func gradientDescent(x, y Vector, l *Line) *Line {
   const step    = 0.1
 
   // get a vector of variables
-  variables := MakeVector(2)
+  variables := NullVector(RealType, 2)
   variables[0] = l.Slope()
   variables[1] = l.Intercept()
 
@@ -64,18 +64,18 @@ func gradientDescent(x, y Vector, l *Line) *Line {
 func main() {
 
   const n = 1000
-  x := MakeVector(n)
-  y := MakeVector(n)
+  x := NullVector(RealType, n)
+  y := NullVector(RealType, n)
 
   // random number generator
   r := rand.New(rand.NewSource(42))
 
   for i := 0; i < n; i++ {
-    x[i] = NewScalar(r.NormFloat64() + 0)
-    y[i] = NewScalar(r.NormFloat64() + 2*x[i].Value()+1)
+    x[i] = NewScalar(RealType, r.NormFloat64() + 0)
+    y[i] = NewScalar(RealType, r.NormFloat64() + 2*x[i].Value()+1)
   }
 
-  l := NewLine(NewScalar(-1.23), NewScalar(1));
+  l := NewLine(NewScalar(RealType, -1.23), NewScalar(RealType, 1));
   l  = gradientDescent(x, y, l)
 
   fmt.Println("slope: ", l.Slope().Value(), "intercept: ", l.Intercept().Value())

@@ -18,25 +18,44 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "testing"
-
-/* -------------------------------------------------------------------------- */
-
-func TestVector(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
+func VEqual(a, b Vector) bool {
+  if len(a) != len(b) {
+    panic("VEqual(): Vector dimensions do not match!")
   }
+  for i, _ := range (a) {
+    if !Equal(a[i], b[i]) {
+      return false
+    }
+  }
+  return true
 }
 
-func TestVectorToMatrix(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
-
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
+func VAdd(a, b Vector) Vector {
+  if len(a) != len(b) {
+    panic("VAdd(): Vector dimensions do not match!")
   }
+  r := NullVector(a.ElementType(), len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Add(a[i], b[i])
+  }
+  return r
+}
+
+func VSub(a, b Vector) Vector {
+  if len(a) != len(b) {
+    panic("VSub(): Vector dimensions do not match!")
+  }
+  r := NullVector(a.ElementType(), len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Sub(a[i], b[i])
+  }
+  return r
+}
+
+func VNorm(a Vector) Scalar {
+  r := Pow(a[0], 2)
+  for i := 1; i < len(a); i++ {
+    r = Add(r, Pow(a[i], 2))
+  }
+  return Sqrt(r)
 }

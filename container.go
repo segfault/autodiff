@@ -18,25 +18,14 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "testing"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
-func TestVector(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-
-  if v[1].Value() != 2.0 {
-    t.Error("Vector initialization failed!")
-  }
-}
-
-func TestVectorToMatrix(t *testing.T) {
-
-  v := NewVector(RealType, []float64{1,2,3,4,5,6})
-  m := v.Matrix(2, 3)
-
-  if m.At(1,0).Value() != 4 {
-    t.Error("Vector to matrix conversion failed!")
-  }
+type ScalarContainer interface {
+  At (...int)         Scalar
+  Set(Scalar, ...int)
+  ElementType() ScalarType
+  // nice printing
+  fmt.Stringer
 }

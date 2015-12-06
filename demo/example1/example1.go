@@ -71,9 +71,9 @@ func plotGradientNorm(gn1, gn2 []float64) {
 func main() {
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
-    return Add(Sub(Pow(x[0], 4), Mul(NewConstant(3), Pow(x[0], 3))), NewConstant(2))
+    return Add(Sub(Pow(x[0], 4), Mul(NewReal(3), Pow(x[0], 3))), NewReal(2))
   }
-  x0 := NewVector([]float64{4})
+  x0 := NewVector(RealType, []float64{4})
   // vanilla gradient descent
   xn1, err1 := GradientDescent(f, x0, 1e-8, 0.0001)
   // resilient backpropagation
