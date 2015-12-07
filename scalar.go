@@ -41,6 +41,7 @@ type Scalar interface {
   Variable  (int)
   // some basic operations on scalars
   Equals    (Scalar)  bool
+  Neg       ()        Scalar
   Add       (Scalar)  Scalar
   Sub       (Scalar)  Scalar
   Mul       (Scalar)  Scalar

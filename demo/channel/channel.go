@@ -185,7 +185,7 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
   // derivative with respect to lambda_i
   for i := 0; i < n; i++ {
     if active[i] {
-      gradient[n+i] = Sub(NewReal(0.0), px[i])
+      gradient[n+i] = Neg(px[i])
     } else {
       gradient[n+i] = NewReal(0.0)
     }

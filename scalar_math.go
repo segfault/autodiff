@@ -22,6 +22,10 @@ func Equal(a, b Scalar) bool {
   return a.Equals(b)
 }
 
+func Neg(a Scalar) Scalar {
+  return a.Neg()
+}
+
 func Add(a, b Scalar) Scalar {
   return a.Add(b)
 }

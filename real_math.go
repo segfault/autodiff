@@ -27,6 +27,18 @@ func (a *Real) Equals(b Scalar) bool {
   return math.Abs(a.Value() - b.Value()) < epsilon
 }
 
+func (a *Real) Neg() Scalar {
+  n := a.Order()
+  c := Real{value: -a.Value(), order: n}
+  if n >= 1 {
+    c.derivative[0] = -a.Derivative(1)
+  }
+  if n >= 2 {
+    c.derivative[1] = -a.Derivative(2)
+  }
+  return &c
+}
+
 func (a *Real) Add(b Scalar) Scalar {
   n := IMax(a.Order(), b.Order())
   c := Real{value: a.Value() + b.Value(), order: n}
