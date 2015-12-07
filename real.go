@@ -24,9 +24,7 @@ import "reflect"
 /* -------------------------------------------------------------------------- */
 
 type Real struct {
-  value         float64
-  derivative [2]float64
-  order         int
+  BasicState
 }
 
 /* register scalar type
@@ -43,69 +41,16 @@ func init() {
  * -------------------------------------------------------------------------- */
 
 func NewReal(v float64) *Real {
-  s := Real{
-    value     : v,
-    derivative: [2]float64{0, 0},
-    order     : 0 }
+  s := Real{*NewBasicState(v)}
   return &s
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Clone() Scalar {
-  r := NewReal(a.value)
-  r.order         = a.order
-  r.derivative[0] = a.derivative[0]
-  r.derivative[1] = a.derivative[1]
+  r := NewReal(0.0)
+  r.Copy(a)
   return r
-}
-
-func (a *Real) Copy(b Scalar) {
-  a.order = b.Order()
-  a.value = b.Value()
-  a.derivative[0] = b.Derivative(1)
-  a.derivative[1] = b.Derivative(2)
-}
-
-/* field access
- * -------------------------------------------------------------------------- */
-
-func (a *Real) Set(v float64) {
-  a.value = v
-  if a.order == 0 {
-    a.derivative[0] = 0
-    a.derivative[1] = 0
-  } else {
-    a.derivative[0] = 1
-    a.derivative[1] = 0
-  }
-}
-
-func (a *Real) Order() int {
-  return a.order
-}
-
-func (a *Real) Value() float64 {
-  return a.value
-}
-
-func (a *Real) Derivative(i int) float64 {
-  if i != 1 && i != 2 {
-    panic("Invalid order!")
-  }
-  return a.derivative[i-1]
-}
-
-func (a *Real) Variable(order int) {
-  a.order = order
-  a.derivative[0] = 1
-  a.derivative[1] = 0
-}
-
-func (a *Real) Constant() {
-  a.order = 0
-  a.derivative[0] = 0
-  a.derivative[1] = 0
 }
 
 func (a *Real) Type() ScalarType {

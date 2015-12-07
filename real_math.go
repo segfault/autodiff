@@ -28,75 +28,75 @@ func (a *Real) Equals(b Scalar) bool {
 }
 
 func (a *Real) Neg() Scalar {
-  n := a.Order()
-  c := Real{value: -a.Value(), order: n}
-  if n >= 1 {
+  c := NewReal(-a.Value())
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = -a.Derivative(1)
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = -a.Derivative(2)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Add(b Scalar) Scalar {
-  n := IMax(a.Order(), b.Order())
-  c := Real{value: a.Value() + b.Value(), order: n}
-  if n >= 1 {
+  c := NewReal(a.Value() + b.Value())
+  c.order = IMax(a.Order(), b.Order())
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1) + b.Derivative(1)
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Derivative(2) + b.Derivative(2)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Sub(b Scalar) Scalar {
-  n := IMax(a.Order(), b.Order())
-  c := Real{value: a.Value() - b.Value(), order: n}
-  if n >= 1 {
+  c := NewReal(a.Value() - b.Value())
+  c.order = IMax(a.Order(), b.Order())
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1) - b.Derivative(1)
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Derivative(2) - b.Derivative(2)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Mul(b Scalar) Scalar {
-  n := IMax(a.Order(), b.Order())
-  c := Real{value: a.Value()*b.Value(), order: n}
-  if n >= 1 {
+  c := NewReal(a.Value()*b.Value())
+  c.order = IMax(a.Order(), b.Order())
+  if c.order >= 1 {
     c.derivative[0] = a.Value()*b.Derivative(1) + a.Derivative(1)*b.Value()
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Value()*b.Derivative(2) + a.Derivative(2)*b.Value() + 2*a.Derivative(1)*b.Derivative(1)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Div(b Scalar) Scalar {
-  n := IMax(a.Order(), b.Order())
-  c := Real{value: a.Value()/b.Value(), order: n}
-  if n >= 1 {
+  c := NewReal(a.Value()/b.Value())
+  c.order = IMax(a.Order(), b.Order())
+  if c.order >= 1 {
     c.derivative[0] = (a.Derivative(1)*b.Value() - a.Value()*b.Derivative(1))/(b.Value()*b.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = (2*a.Value()*math.Pow(b.Derivative(1), 2) + math.Pow(b.Value(), 2)*a.Derivative(2) - b.Value()*(2*a.Derivative(1)*b.Derivative(1) + a.Value()*b.Derivative(2)))/math.Pow(b.Value(), 3)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Pow(k float64) Scalar {
-  n := a.Order()
-  c := Real{value: math.Pow(a.Value(), k), order: n}
-  if n >= 1 {
+  c := NewReal(math.Pow(a.Value(), k))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = k*math.Pow(a.Value(), k-1)*a.Derivative(1)
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = k*math.Pow(a.Value(), k-1)*a.Derivative(2) + k*(k-1)*math.Pow(a.Value(), k-2)*math.Pow(a.Derivative(1), 2)
   }
-  return &c
+  return c
 }
 
 func (a *Real) Sqrt() Scalar {
@@ -106,97 +106,97 @@ func (a *Real) Sqrt() Scalar {
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Sin() Scalar {
-  n := a.Order()
-  c := Real{value: math.Sin(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Sin(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*math.Cos(a.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Derivative(2)*math.Cos(a.Value()) - math.Pow(a.Derivative(1), 2)*math.Sin(a.Value())
   }
-  return &c
+  return c
 }
 
 func (a *Real) Sinh() Scalar {
-  n := a.Order()
-  c := Real{value: math.Sinh(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Sinh(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*math.Cosh(a.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Derivative(2)*math.Cosh(a.Value()) + math.Pow(a.Derivative(1), 2)*math.Sinh(a.Value())
   }
-  return &c
+  return c
 }
 
 func (a *Real) Cos() Scalar {
-  n := a.Order()
-  c := Real{value: math.Cos(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Cos(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = -a.Derivative(1)*math.Sin(a.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = -a.Derivative(2)*math.Sin(a.Value()) - math.Pow(a.Derivative(1), 2)*math.Cos(a.Value())
   }
-  return &c
+  return c
 }
 
 func (a *Real) Cosh() Scalar {
-  n := a.Order()
-  c := Real{value: math.Cosh(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Cosh(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*math.Sin(a.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = a.Derivative(2)*math.Sin(a.Value()) + math.Pow(a.Derivative(1), 2)*math.Cos(a.Value())
   }
-  return &c
+  return c
 }
 
 func (a *Real) Tan() Scalar {
-  n := a.Order()
-  c := Real{value: math.Tan(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Tan(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*(1.0+math.Pow(math.Tan(a.Value()), 2))
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = (1.0+math.Pow(math.Tan(a.Value()), 2))*(a.Derivative(2) + 2*math.Tan(a.Value())*math.Pow(a.Derivative(1), 2))
   }
-  return &c
+  return c
 }
 
 func (a *Real) Tanh() Scalar {
-  n := a.Order()
-  c := Real{value: math.Tanh(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Tanh(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*(1.0-math.Pow(math.Tanh(a.Value()), 2))
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = (1.0-math.Pow(math.Tanh(a.Value()), 2))*(a.Derivative(2) - 2*math.Tanh(a.Value())*math.Pow(a.Derivative(1), 2))
   }
-  return &c
+  return c
 }
 
 func (a *Real) Exp() Scalar {
-  n := a.Order()
-  c := Real{value: math.Exp(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Exp(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)*math.Exp(a.Value())
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = (a.Derivative(2) + math.Pow(a.Derivative(1), 2))*math.Exp(a.Value())
   }
-  return &c
+  return c
 }
 
 func (a *Real) Log() Scalar {
-  n := a.Order()
-  c := Real{value: math.Log(a.Value()), order: n}
-  if n >= 1 {
+  c := NewReal(math.Log(a.Value()))
+  c.order = a.Order()
+  if c.order >= 1 {
     c.derivative[0] = a.Derivative(1)/a.Value()
   }
-  if n >= 2 {
+  if c.order >= 2 {
     c.derivative[1] = (a.Derivative(2)*a.Value() - a.Derivative(1)*a.Derivative(1))/(a.Value()*a.Value())
   }
-  return &c
+  return c
 }

@@ -26,11 +26,7 @@ import "reflect"
 // this allows to idenfity the type of a scalar
 type ScalarType reflect.Type
 
-type Scalar interface {
-  // type reflections
-  Type      ()        ScalarType
-  // copy and cloning
-  Clone     ()        Scalar
+type ScalarState interface {
   Copy      (Scalar)
   // field access
   Set       (float64)
@@ -39,6 +35,13 @@ type Scalar interface {
   Derivative(int)     float64
   Constant  ()
   Variable  (int)
+}
+
+type Scalar interface {
+  ScalarState
+  Clone     ()        Scalar
+  // type reflections
+  Type      ()        ScalarType
   // some basic operations on scalars
   Equals    (Scalar)  bool
   Neg       ()        Scalar
