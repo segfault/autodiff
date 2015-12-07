@@ -20,7 +20,6 @@ package autodiff
 
 import "math"
 import "testing"
-import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
