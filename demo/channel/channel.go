@@ -149,9 +149,9 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
       active[i] = false
     }
     if active[i] {
-      px[i]     = NewReal(0.0)
+      px[i].Set(0.0)
     } else {
-      lambda[i] = NewReal(0.0)
+      lambda[i].Set(0.0)
     }
   }
   // compute p(y) from p(y|x)*p(x)
@@ -218,9 +218,20 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   // add n+1 lagrange multipliers
   px0m     := NewVector(RealType, append(px0, make([]float64, n+1)...))
 
+  // for Newton's method we need to specify the active set of constraints
+  // (i.e. if a constraint is deactivated the respective rows and columns
+  //  need to be removed from the Jacobian before computing the inverse)
+  submatrix := make([]bool, 2*n+1)
+  // initialize submatrix (all rows/columns that belong to inequality constraints
+  // are excluded initially
+  for i := 0; i < n; i++ {
+    submatrix[i] = true
+  }
+  submatrix[2*n] = true
+
   // active constaints
   active1 := make([]bool, n)
-  active2 := make([]bool, n)
+  active2 := submatrix[n:2*n]
 
   // keep track of the path of an algorithm
   trace := make([][]float64, 4)
@@ -244,12 +255,12 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   }
 
   // objective functions
-  f := func(px Vector) Vector { return objective_f(active1, channelm, px) }
-  g := func(px Vector) Scalar { return objective_g(active2, channelm, px) }
+  f := func(px Vector) Vector { return objective_f(active2, channelm, px) }
+  g := func(px Vector) Scalar { return objective_g(active1, channelm, px) }
 
   // execute algorithms
   Rprop (g, px0m, epsilon, step, 0.01, hook1)
-  Newton(f, px0m, epsilon, hook2)
+  Newton(f, px0m, epsilon, hook2, submatrix)
   Blahut(channel, px0, 500, Hook{hook3}, Lambda{1.0})
   Blahut(channel, px0,  40, Hook{hook4}, Lambda{8.0})
 

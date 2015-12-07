@@ -188,25 +188,15 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
 
 /* -------------------------------------------------------------------------- */
 
-func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{}) (Vector, []float64) {
-
-  var hook func(Matrix, Vector, Vector) bool = nil
-  for _, arg := range args {
-    switch a := arg.(type) {
-    case func(Matrix, Vector, Vector) bool:
-      hook = a
-    default:
-      panic("Newton(): Invalid optional argument!")
-    }
-  }
-
+func newton(f func(Vector) Vector, x Vector, epsilon float64,
+  hook func(Matrix, Vector, Vector) bool, submatrix []bool) (Vector, []float64) {
   x1  := x.Clone()
   x2  := x.Clone()
   err := []float64{}
   for {
     y  := f(x1)
     J  := Jacobian(f, x1)
-    Q  := MInverse(J)
+    Q  := MInverse(J, submatrix)
     x2  = VSub(x1, MxV(Q, y))
     // execute hook if available
     if hook != nil && hook(J, x2, y) {
@@ -220,4 +210,23 @@ func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{
     x1.Copy(x2)
   }
   return x2, err
+}
+
+func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{}) (Vector, []float64) {
+
+  var hook func(Matrix, Vector, Vector) bool = nil
+  var submatrix []bool = nil
+
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case func(Matrix, Vector, Vector) bool:
+      hook = a
+    case []bool:
+      submatrix = a
+    default:
+      panic("Newton(): Invalid optional argument!")
+    }
+  }
+
+  return newton(f, x, epsilon, hook, submatrix)
 }

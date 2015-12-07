@@ -154,7 +154,7 @@ func mInverse(matrix Matrix) Matrix {
   return r
 }
 
-func MInverse(matrix Matrix) Matrix {
+func MInverse(matrix Matrix, args ...interface{}) Matrix {
   if matrix.rows != matrix.cols {
     panic("MInverse(): Not a square matrix!")
   }
@@ -170,7 +170,7 @@ func MInverse(matrix Matrix) Matrix {
     b[i] = NewScalar(t, 1.0)
   }
   // call Gauss-Jordan algorithm
-  GaussJordan(a, x, b)
+  GaussJordan(a, x, b, args...)
   return x
 }
 
@@ -203,7 +203,9 @@ func Jacobian(f func(Vector) Vector, x Vector) Matrix {
   return r
 }
 
-func GaussJordan(a, x Matrix, b Vector) {
+/* -------------------------------------------------------------------------- */
+
+func gaussJordan(a, x Matrix, b Vector, submatrix []bool) {
   epsilon := 1e-12
   // number of rows
   n, _ := a.Dims()
@@ -221,31 +223,46 @@ func GaussJordan(a, x Matrix, b Vector) {
   }
   // loop over columns
   for i := 0; i < n; i++ {
+    if !submatrix[i] {
+      continue
+    }
+    // check if matrix is singular
+    if math.Abs(a.At(p[i], i).Value()) < epsilon {
+      panic("GaussJordan(): matrix is singular!")
+    }
     // find row with maximum value at column i
     maxrow := i
     for j := i+1; j < n; j++ {
+      if !submatrix[j] {
+        continue
+      }
       if math.Abs(a.At(p[j], i).Value()) > math.Abs(a.At(p[maxrow], i).Value()) {
         maxrow = j
       }
     }
     // swap rows
     p[i], p[maxrow] = p[maxrow], p[i]
-    // check if matrix is singular
-    if math.Abs(a.At(p[i], i).Value()) < epsilon {
-      panic("GaussJordan(): matrix is singular!")
-    }
     // eliminate column i
     for j := i+1; j < n; j++ {
+      if !submatrix[j] {
+        continue
+      }
       // c = a[j, i] / a[i, i]
       c := Div(a.At(p[j], i), a.At(p[i], i))
       // loop over columns in a
       for k := i; k < n; k++ {
+        if !submatrix[k] {
+          continue
+        }
         // a[j, k] -= a[i, k]*c
         a.Set(Sub(a.At(p[j], k), Mul(a.At(p[i], k), c)),
           p[j], k)
       }
       // loop over columns in x
       for k := 0; k < n; k++ {
+        if !submatrix[k] {
+          continue
+        }
         // a[j, k] -= a[i, k]*c
         x.Set(Sub(x.At(p[j], k), Mul(x.At(p[i], k), c)),
           p[j], k)
@@ -256,18 +273,30 @@ func GaussJordan(a, x Matrix, b Vector) {
   }
   // backsubstitute
   for i := n-1; i >= 0; i-- {
+    if !submatrix[i] {
+      continue
+    }
     c := a.At(p[i], i)
     for j := 0; j < i; j++ {
+      if !submatrix[j] {
+        continue
+      }
       // b[j] -= a[j,i]*b[i]/c
       b[p[j]] = Sub(b[p[j]], Div(Mul(a.At(p[j], i), b[p[i]]), c))
       // loop over colums in x
       for k := n-1; k >= 0; k-- {
+        if !submatrix[k] {
+          continue
+        }
         // x[j,k] -= a[j,i]*x[i,k]/c
         x.Set(Sub(x.At(p[j], k), Div(Mul(a.At(p[j], i), x.At(p[i], k)), c)),
           p[j], k)
       }
       // loop over colums in a
       for k := n-1; k >= 0; k-- {
+        if !submatrix[k] {
+          continue
+        }
         // a[j,k] -= a[j,i]*a[i,k]/c
         a.Set(Sub(a.At(p[j], k), Div(Mul(a.At(p[j], i), a.At(p[i], k)), c)),
           p[j], k)
@@ -277,6 +306,9 @@ func GaussJordan(a, x Matrix, b Vector) {
       p[i], i)
     // normalize ith row in x
     for k := 0; k < n; k++ {
+      if !submatrix[k] {
+        continue
+      }
       x.Set(Div(x.At(p[i], k), c),
         p[i], k)
     }
@@ -286,4 +318,29 @@ func GaussJordan(a, x Matrix, b Vector) {
   a.PermuteRows(p)
   x.PermuteRows(p)
   b.Permute(p)
+}
+
+func GaussJordan(a, x Matrix, b Vector, args ...interface{}) {
+
+  var submatrix []bool
+
+  // loop over optional arguments
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case []bool:
+      submatrix = a
+    default:
+      panic("GaussJordan(): Invalid optional argument!")
+    }
+  }
+  // initialize with default values
+  if submatrix == nil {
+    n, _ := a.Dims()
+    submatrix = make([]bool, n)
+    for i, _ := range submatrix {
+      submatrix[i] = true
+    }
+  }
+
+  gaussJordan(a, x, b, submatrix)
 }

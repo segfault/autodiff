@@ -72,8 +72,13 @@ func (a *Real) Copy(b Scalar) {
 
 func (a *Real) Set(v float64) {
   a.value = v
-  a.derivative[0] = 0.0
-  a.derivative[1] = 0.0
+  if a.order == 0 {
+    a.derivative[0] = 0
+    a.derivative[1] = 0
+  } else {
+    a.derivative[0] = 1
+    a.derivative[1] = 0
+  }
 }
 
 func (a *Real) Order() int {

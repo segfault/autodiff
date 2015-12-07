@@ -19,6 +19,7 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "testing"
+import "fmt"
 
 /* -------------------------------------------------------------------------- */
 
@@ -101,6 +102,22 @@ func TestMatrixInverse(t *testing.T) {
   m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
   m2 := MInverse(m1)
   m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
+
+  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+    t.Error("Inverting matrix failed!")
+  }
+}
+
+func TestSubmatrixInverse(t *testing.T) {
+
+  // exclude the third row/column
+  submatrix := []bool{true, true, false}
+
+  m1 := NewMatrix(RealType, 3, 3, []float64{1,2,50,3,4,60,70,80,90})
+  m2 := MInverse(m1, submatrix)
+  m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
+
+  fmt.Println(m2)
 
   if MNorm(MSub(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")

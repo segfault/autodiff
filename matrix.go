@@ -45,7 +45,7 @@ func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
       tmp[i] = NewScalar(t, values[i])
     }
   } else {
-    panic("Matrix dimension does not fit input values!")
+    panic("NewMatrix(): Matrix dimension does not fit input values!")
   }
   return Matrix{tmp, rows, cols, false}
 }
