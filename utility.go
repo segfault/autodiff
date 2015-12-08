@@ -18,6 +18,10 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+import "math"
+
+/* -------------------------------------------------------------------------- */
+
 func IMin(a, b int) int {
   if a < b {
     return a
@@ -31,5 +35,13 @@ func IMax(a, b int) int {
     return a
   } else {
     return b
+  }
+}
+
+func sign(a float64) int {
+  if math.Signbit(a) {
+    return -1
+  } else {
+    return 1
   }
 }
