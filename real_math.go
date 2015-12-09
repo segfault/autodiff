@@ -27,6 +27,14 @@ func (a *Real) Equals(b Scalar) bool {
   return math.Abs(a.Value() - b.Value()) < epsilon
 }
 
+func (a *Real) Greater(b Scalar) bool {
+  return a.Value() > b.Value()
+}
+
+func (a *Real) Smaller(b Scalar) bool {
+  return a.Value() < b.Value()
+}
+
 func (a *Real) Neg() Scalar {
   c := NewReal(-a.Value())
   c.order = a.Order()

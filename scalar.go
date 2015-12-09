@@ -44,6 +44,8 @@ type Scalar interface {
   Type      ()        ScalarType
   // some basic operations on scalars
   Equals    (Scalar)  bool
+  Greater   (Scalar)  bool
+  Smaller   (Scalar)  bool
   Neg       ()        Scalar
   Add       (Scalar)  Scalar
   Sub       (Scalar)  Scalar
