@@ -18,6 +18,10 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+import "math"
+
+/* -------------------------------------------------------------------------- */
+
 type BasicState struct {
   value         float64
   derivative [2]float64
@@ -66,6 +70,10 @@ func (a *BasicState) Value() float64 {
   return a.value
 }
 
+func (a *BasicState) LogValue() float64 {
+  return math.Log(a.value)
+}
+
 func (a *BasicState) Derivative(i int) float64 {
   if i != 1 && i != 2 {
     panic("Invalid order!")
@@ -73,9 +81,20 @@ func (a *BasicState) Derivative(i int) float64 {
   return a.derivative[i-1]
 }
 
+func (a *BasicState) SetDerivative(i int, v float64) {
+  if i != 1 && i != 2 {
+    panic("Invalid order!")
+  }
+  a.derivative[i-1] = v
+}
+
 func (a *BasicState) Variable(order int) {
   a.order = order
-  a.derivative[0] = 1
+  if order > 0 {
+    a.derivative[0] = 1
+  } else {
+    a.derivative[0] = 0
+  }
   a.derivative[1] = 0
 }
 

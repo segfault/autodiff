@@ -27,14 +27,16 @@ import "reflect"
 type ScalarType reflect.Type
 
 type ScalarState interface {
-  Copy      (Scalar)
+  Copy         (Scalar)
   // field access
-  Set       (float64)
-  Order     ()        int
-  Value     ()        float64
-  Derivative(int)     float64
-  Constant  ()
-  Variable  (int)
+  Set          (float64)
+  Order        ()             int
+  Value        ()             float64
+  LogValue     ()             float64
+  Derivative   (int)          float64
+  SetDerivative(int, float64)
+  Constant     ()
+  Variable     (int)
 }
 
 type Scalar interface {
