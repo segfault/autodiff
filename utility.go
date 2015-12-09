@@ -22,7 +22,7 @@ import "math"
 
 /* -------------------------------------------------------------------------- */
 
-func IMin(a, b int) int {
+func iMin(a, b int) int {
   if a < b {
     return a
   } else {
@@ -30,7 +30,7 @@ func IMin(a, b int) int {
   }
 }
 
-func IMax(a, b int) int {
+func iMax(a, b int) int {
   if a > b {
     return a
   } else {

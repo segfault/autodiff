@@ -49,7 +49,7 @@ func (a *Real) Neg() Scalar {
 
 func (a *Real) Add(b Scalar) Scalar {
   c := NewReal(a.Value() + b.Value())
-  c.order = IMax(a.Order(), b.Order())
+  c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
     c.derivative[0] = a.Derivative(1) + b.Derivative(1)
   }
@@ -61,7 +61,7 @@ func (a *Real) Add(b Scalar) Scalar {
 
 func (a *Real) Sub(b Scalar) Scalar {
   c := NewReal(a.Value() - b.Value())
-  c.order = IMax(a.Order(), b.Order())
+  c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
     c.derivative[0] = a.Derivative(1) - b.Derivative(1)
   }
@@ -73,7 +73,7 @@ func (a *Real) Sub(b Scalar) Scalar {
 
 func (a *Real) Mul(b Scalar) Scalar {
   c := NewReal(a.Value()*b.Value())
-  c.order = IMax(a.Order(), b.Order())
+  c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
     c.derivative[0] = a.Value()*b.Derivative(1) + a.Derivative(1)*b.Value()
   }
@@ -85,7 +85,7 @@ func (a *Real) Mul(b Scalar) Scalar {
 
 func (a *Real) Div(b Scalar) Scalar {
   c := NewReal(a.Value()/b.Value())
-  c.order = IMax(a.Order(), b.Order())
+  c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
     c.derivative[0] = (a.Derivative(1)*b.Value() - a.Value()*b.Derivative(1))/(b.Value()*b.Value())
   }
