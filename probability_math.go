@@ -61,7 +61,7 @@ func (a *Probability) Add(b Scalar) Scalar {
   if Smaller(b, NewReal(0.0)) {
     // b < 0.0
     c = NewReal(0.0)
-    c.(*Real).value = a.Value() - b.Value()
+    c.(*Real).value = a.Value() + b.Value()
   } else {
     // b >= 0.0
     c = NewProbability(0.0)

@@ -51,6 +51,9 @@ func NewProbability(value float64) *Probability {
 /* -------------------------------------------------------------------------- */
 
 func (a *Probability) Copy(b Scalar) {
+  if Smaller(b, NewReal(0.0)) {
+    panic("Copy(): cannot set probability to a negative value!")
+  }
   a.order = b.Order()
   a.value = b.LogValue()
   a.derivative[0] = b.Derivative(1)
