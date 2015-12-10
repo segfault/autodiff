@@ -8,7 +8,7 @@ Compute the derivative of a function *f* at *x = 9*
   f := func(x Scalar) Scalar {
     return Add(Mul(NewReal(2), Pow(x, 3)), NewReal(4))
   }
-  x := NewReal(9, 1)
+  x := NewReal(9)
   x.Variable(1)
   y := f(x)
 ```
