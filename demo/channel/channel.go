@@ -149,9 +149,9 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
       active[i] = false
     }
     if active[i] {
-      px[i].Set(0.0)
+      px[i].SetValue(0.0)
     } else {
-      lambda[i].Set(0.0)
+      lambda[i].SetValue(0.0)
     }
   }
   // compute p(y) from p(y|x)*p(x)
@@ -261,8 +261,8 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   // execute algorithms
   Rprop (g, px0m, epsilon, step, 0.01, hook1)
   Newton(f, px0m, epsilon, hook2, submatrix)
-  Blahut(channel, px0, 500, Hook{hook3}, Lambda{1.0})
-  Blahut(channel, px0,  40, Hook{hook4}, Lambda{8.0})
+  BlahutNaive(channel, px0, 500, HookNaive{hook3}, Lambda{1.0})
+  BlahutNaive(channel, px0,  40, HookNaive{hook4}, Lambda{8.0})
 
   return trace
 }

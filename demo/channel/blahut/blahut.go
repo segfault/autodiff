@@ -19,95 +19,98 @@ package blahut
 /* -------------------------------------------------------------------------- */
 
 import   "math"
+import . "github.com/pbenner/autodiff"
 
-/* optional parameters
+/* initialization of data structures
  * -------------------------------------------------------------------------- */
 
-type Lambda struct {
-  Value float64
+func blahut_init_c(channel [][]float64) Matrix {
+  n := len(channel)
+  m := len(channel[0])
+  return NewMatrix(ProbabilityType, n, m, flatten(channel))
 }
 
-type Hook struct {
-  Value func([]float64, float64) bool
+func blahut_init_p(p_init []float64) Vector {
+  return NewVector(ProbabilityType, p_init)
 }
 
-/* utility
- * -------------------------------------------------------------------------- */
-
-func flatten(m [][]float64) []float64 {
-  v := []float64{}
-  for i, _ := range m {
-    v = append(v, m[i]...)
-  }
-  return v
+func blahut_init_q(n, m int) Matrix {
+  return NullMatrix(ProbabilityType, n, m)
 }
 
-func normalize(p []float64) {
-  sum := 0.0
-  for _, v := range p {
-    sum += v
-  }
-  for i, _ := range p {
-    p[i] /= sum
-  }
+func blahut_init_r(n int) Vector {
+  return NullVector(ProbabilityType, n)
 }
 
 /* naive Blahut implementation
  * -------------------------------------------------------------------------- */
 
-func blahut_compute_q(channel [][]float64, p []float64, q [][]float64) {
-  n := len(channel)
-  m := len(channel[0])
+func blahut_compute_q(channel Matrix, p Vector, q Matrix) {
+  n, m := channel.Dims()
   for j := 0; j < m; j++ {
     for i := 0; i < n; i++ {
-      q[j][i] = channel[i][j]*p[i]
+      q.Set(Mul(channel.At(i, j), p.At(i)), j, i)
     }
-    normalize(q[j])
+    normalizeVector(q.Row(j))
   }
 }
 
-func blahut_compute_r(channel, q [][]float64, r []float64) {
+func blahut_compute_r(channel, q Matrix, r Vector) {
+  n, m := channel.Dims()
+  for i := 0; i < n; i++ {
+    r[i].SetValue(0.0)
+    for j := 0; j < m; j++ {
+      r.Set(Sub(r.At(i), Mul(channel.At(i, j), Log(q.At(j, i)))), i)
+    }
+    r.Set(Exp(Neg(r.At(i))), i)
+  }
+}
+
+func blahut_compute_J(r Vector, J Scalar) {
+  sum := NewScalar(r.ElementType(), 0.0)
+  for i, _ := range r {
+    sum = Add(sum, r[i])
+  }
+  J.Set(Div(Log(sum), NewScalar(r.ElementType(), math.Log(2.0))))
+}
+
+func blahut_compute_p(r Vector, lambda float64, p Vector) {
+  for i, _ := range p {
+    p.Set(Mul(Pow(p.At(i), 1.0 - lambda), Pow(r.At(i), lambda)),
+      i)
+  }
+  normalizeVector(p)
+}
+
+func blahut(channel [][]float64, p_init []float64, steps int,
+  hook func(Vector, Scalar) bool,
+  lambda float64) Vector {
+
   n := len(channel)
   m := len(channel[0])
-  for i := 0; i < n; i++ {
-    r[i] = 0.0
-    for j := 0; j < m; j++ {
-      r[i] += channel[i][j]*math.Log(q[j][i])
+  p := blahut_init_p(p_init)
+  q := blahut_init_q(n, m)
+  c := blahut_init_c(channel)
+  r := blahut_init_r(n)
+  J := NewProbability(0.0)
+
+  for k := 0; k < steps; k++ {
+    blahut_compute_q(c, p, q)
+    blahut_compute_r(c, q, r)
+    blahut_compute_J(r, J)
+    blahut_compute_p(r, lambda, p)
+
+    if hook != nil && hook(p, J) {
+      break
     }
-    r[i] = math.Exp(r[i])
   }
-}
-
-func blahut_compute_J(r []float64, J *float64) {
-  sum := 0.0
-  for i, _ := range r {
-    sum += r[i]
-  }
-  *J = math.Log(sum)/math.Log(2.0)
-}
-
-func blahut_compute_p(r []float64, lambda float64, p []float64) {
-  for i, _ := range p {
-    p[i] = math.Pow(p[i], 1.0 - lambda)*math.Pow(r[i], lambda)
-  }
-  normalize(p)
-}
-
-func blahut_init_p(p_init []float64) []float64 {
-  p := make([]float64, len(p_init))
-  copy(p, p_init)
   return p
 }
 
-func blahut_init_q(n, m int) [][]float64 {
-  q := make([][]float64, m)
-  for j := 0; j < m; j++ {
-    q[j] = make([]float64, n)
-  }
-  return q
-}
+/* main
+ * -------------------------------------------------------------------------- */
 
-func Blahut(channel_ [][]float64, p_init_ []float64, steps int, args ...interface{}) []float64 {
+func Blahut(channel [][]float64, p_init []float64, steps int, args ...interface{}) Vector {
   // default values for optional parameters
   hook   := Hook  {nil}.Value
   lambda := Lambda{1.0}.Value
@@ -123,24 +126,5 @@ func Blahut(channel_ [][]float64, p_init_ []float64, steps int, args ...interfac
       panic("blahut(): Invalid optional argument!")
     }
   }
-
-  n := len(channel)
-  m := len(channel[0])
-  p := blahut_init_p(p_init)
-  q := blahut_init_q(n, m)
-  r := make([]float64, n)
-  J := 0.0
-  channel := NewMatrix(ProbabilityType, n, m, flatten(channel_))
-
-  for k := 0; k < steps; k++ {
-    blahut_compute_q(channel, p, q)
-    blahut_compute_r(channel, q, r)
-    blahut_compute_J(r, &J)
-    blahut_compute_p(r, lambda, p)
-
-    if hook != nil && hook(p, J) {
-      break
-    }
-  }
-  return p
+  return blahut(channel, p_init, steps, hook, lambda)
 }
