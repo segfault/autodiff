@@ -44,18 +44,30 @@ func TestProbabilityNeg(t *testing.T) {
 
 func TestProbabilityAdd(t *testing.T) {
 
-  v1 := []float64{2,  2,  0}
-  v2 := []float64{2,  0,  2}
-  v3 := []float64{4,  2,  2}
+  var p1, p2 Scalar
+
+  v1 := []float64{2,  2,  0,  2,  2, -1, -1}
+  v2 := []float64{2,  0,  2, -1, -3,  1,  2}
+  v3 := []float64{4,  2,  2,  1, -1,  0,  1}
 
   for i, _ := range v1 {
-    p1 := NewProbability(v1[i])
-    p2 := NewProbability(v2[i])
+    if v1[i] > 0.0 {
+      p1 = NewProbability(v1[i])
+    } else {
+      p1 = NewReal(v1[i])
+    }
+    if v2[i] > 0.0 {
+      p2 = NewProbability(v2[i])
+    } else {
+      p2 = NewReal(v2[i])
+    }
+    r := Add(p1, p2)
 
-    r := Add(p1, p2).(*Probability)
-
-    if !Equal(r, NewProbability(v3[i])) {
-      t.Error("Addition test", i, "failed")
+    if !Equal(r, NewReal(v3[i])) {
+      t.Error("Addition test", i, " (1) failed")
+    }
+    if  Smaller(r, NewReal(0.0)) && r.Type() != RealType {
+      t.Error("Addition test", i, " (2) failed")
     }
   }
 }
@@ -88,7 +100,7 @@ func TestProbabilityDiv(t *testing.T) {
     p1 := NewProbability(v1[i])
     p2 := NewProbability(v2[i])
 
-    r := Div(p1, p2).(*Probability)
+    r := Div(p1, p2)
 
     if !Equal(r, NewProbability(v3[i])) {
       t.Error("Division test", i, "failed")

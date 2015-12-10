@@ -34,6 +34,14 @@ type Hook struct {
 /* utility
  * -------------------------------------------------------------------------- */
 
+func flatten(m [][]float64) []float64 {
+  v := []float64{}
+  for i, _ := range m {
+    v = append(v, m[i]...)
+  }
+  return v
+}
+
 func normalize(p []float64) {
   sum := 0.0
   for _, v := range p {
@@ -99,7 +107,7 @@ func blahut_init_q(n, m int) [][]float64 {
   return q
 }
 
-func Blahut(channel [][]float64, p_init []float64, steps int, args ...interface{}) []float64 {
+func Blahut(channel_ [][]float64, p_init_ []float64, steps int, args ...interface{}) []float64 {
   // default values for optional parameters
   hook   := Hook  {nil}.Value
   lambda := Lambda{1.0}.Value
@@ -122,6 +130,7 @@ func Blahut(channel [][]float64, p_init []float64, steps int, args ...interface{
   q := blahut_init_q(n, m)
   r := make([]float64, n)
   J := 0.0
+  channel := NewMatrix(ProbabilityType, n, m, flatten(channel_))
 
   for k := 0; k < steps; k++ {
     blahut_compute_q(channel, p, q)
