@@ -24,16 +24,6 @@ import . "github.com/pbenner/autodiff"
 /* initialization of data structures
  * -------------------------------------------------------------------------- */
 
-func blahut_init_c(channel [][]float64) Matrix {
-  n := len(channel)
-  m := len(channel[0])
-  return NewMatrix(ProbabilityType, n, m, flatten(channel))
-}
-
-func blahut_init_p(p_init []float64) Vector {
-  return NewVector(ProbabilityType, p_init)
-}
-
 func blahut_init_q(n, m int) Matrix {
   return NullMatrix(ProbabilityType, n, m)
 }
@@ -82,21 +72,19 @@ func blahut_compute_p(r Vector, lambda float64, p Vector) {
   normalizeVector(p)
 }
 
-func blahut(channel [][]float64, p_init []float64, steps int,
+func blahut(channel Matrix, p_init Vector, steps int,
   hook func(Vector, Scalar) bool,
   lambda float64) Vector {
 
-  n := len(channel)
-  m := len(channel[0])
-  p := blahut_init_p(p_init)
+  n, m := channel.Dims()
+  p := p_init.Clone()
   q := blahut_init_q(n, m)
-  c := blahut_init_c(channel)
   r := blahut_init_r(n)
   J := NewProbability(0.0)
 
   for k := 0; k < steps; k++ {
-    blahut_compute_q(c, p, q)
-    blahut_compute_r(c, q, r)
+    blahut_compute_q(channel, p, q)
+    blahut_compute_r(channel, q, r)
     blahut_compute_J(r, J)
     blahut_compute_p(r, lambda, p)
 
@@ -110,7 +98,7 @@ func blahut(channel [][]float64, p_init []float64, steps int,
 /* main
  * -------------------------------------------------------------------------- */
 
-func Blahut(channel [][]float64, p_init []float64, steps int, args ...interface{}) Vector {
+func Blahut(channel Matrix, p_init Vector, steps int, args ...interface{}) Vector {
   // default values for optional parameters
   hook   := Hook  {nil}.Value
   lambda := Lambda{1.0}.Value

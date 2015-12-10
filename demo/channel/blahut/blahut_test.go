@@ -21,19 +21,23 @@ package blahut
 import "testing"
 import "math"
 
+import . "github.com/pbenner/autodiff"
+
 /* -------------------------------------------------------------------------- */
 
 func TestBlahut(t *testing.T) {
 
-  channel := [][]float64{
-    {0.60, 0.30, 0.10},
-    {0.70, 0.10, 0.20},
-    {0.50, 0.05, 0.45} }
+  channel := NewMatrix(ProbabilityType, 3, 3,
+    flatten([][]float64{
+      {0.60, 0.30, 0.10},
+      {0.70, 0.10, 0.20},
+      {0.50, 0.05, 0.45}}))
 
-  // fixed point
-  pxstar  := []float64{0.501735, 0.0, 0.498265}
   // initial value
-  px0 := []float64{1.0/3.0, 1.0/3.0, 1.0/3.0}
+  px0 := NewVector(ProbabilityType,
+    []float64{1.0/3.0, 1.0/3.0, 1.0/3.0})
+  // fixed point
+  pxstar := []float64{0.501735, 0.0, 0.498265}
 
   pxn := Blahut(channel, px0, 1000)
 
@@ -51,10 +55,10 @@ func TestBlahutNaive(t *testing.T) {
     {0.70, 0.10, 0.20},
     {0.50, 0.05, 0.45} }
 
-  // fixed point
-  pxstar  := []float64{0.501735, 0.0, 0.498265}
   // initial value
   px0 := []float64{1.0/3.0, 1.0/3.0, 1.0/3.0}
+  // fixed point
+  pxstar := []float64{0.501735, 0.0, 0.498265}
 
   pxn := BlahutNaive(channel, px0, 1000)
 
