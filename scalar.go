@@ -28,12 +28,14 @@ type ScalarType reflect.Type
 
 type ScalarState interface {
   Copy         (Scalar)
-  // field access
-  Set          (float64)
+  // read access
   Order        ()             int
   Value        ()             float64
   LogValue     ()             float64
   Derivative   (int)          float64
+  // write access
+  Set          (Scalar)
+  SetValue     (float64)
   SetDerivative(int, float64)
   Constant     ()
   Variable     (int)

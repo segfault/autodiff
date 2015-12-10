@@ -32,13 +32,36 @@ func TestMatrix(t *testing.T) {
   }
 }
 
+func TestMatrixRowCol(t *testing.T) {
+
+  m  := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  v1 := m.Row(1)
+  v2 := m.Col(2)
+
+  v1.Set(NewReal(100), 0)
+  v2.Set(NewReal(200), 0)
+
+  if m.At(1,0).Value() != 100 {
+    t.Error("Matrix Row() test failed!")
+  }
+  if m.At(0,2).Value() != 200 {
+    t.Error("Matrix Col() test failed!")
+  }
+  if len(v1) != 3 {
+    t.Error("Matrix Row() test failed!")
+  }
+  if len(v2) != 2 {
+    t.Error("Matrix Col() test failed!")
+  }
+}
+
 func TestMatrixReference(t *testing.T) {
 
   m := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   c := NewReal(163)
 
   m.Set(c, 0, 0)
-  c.Set(400)
+  c.SetValue(400)
 
   if m.At(0,0).Value() != 163 {
     t.Error("Matrix transpose failed!")

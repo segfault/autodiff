@@ -48,19 +48,8 @@ func (a *BasicState) Copy(b Scalar) {
   a.derivative[1] = b.Derivative(2)
 }
 
-/* field access
+/* read access
  * -------------------------------------------------------------------------- */
-
-func (a *BasicState) Set(v float64) {
-  a.value = v
-  if a.order == 0 {
-    a.derivative[0] = 0
-    a.derivative[1] = 0
-  } else {
-    a.derivative[0] = 1
-    a.derivative[1] = 0
-  }
-}
 
 func (a *BasicState) Order() int {
   return a.order
@@ -79,6 +68,23 @@ func (a *BasicState) Derivative(i int) float64 {
     panic("Invalid order!")
   }
   return a.derivative[i-1]
+}
+
+/* write access
+ * -------------------------------------------------------------------------- */
+
+func (a *BasicState) Set(b Scalar) {
+  a.Copy(b)
+}
+
+func (a *BasicState) SetValue(v float64) {
+  a.value = v
+  if a.order == 0 {
+    a.derivative[0] = 0
+  } else {
+    a.derivative[0] = 1
+  }
+  a.derivative[1] = 0
 }
 
 func (a *BasicState) SetDerivative(i int, v float64) {

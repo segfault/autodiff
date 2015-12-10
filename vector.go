@@ -30,7 +30,7 @@ type Vector []Scalar
  * -------------------------------------------------------------------------- */
 
 func NewVector(t ScalarType, values []float64) Vector {
-  v := make(Vector, len(values))
+  v := NilVector(len(values))
 
   for i, _ := range values {
     v[i] = NewScalar(t, values[i])
@@ -39,13 +39,19 @@ func NewVector(t ScalarType, values []float64) Vector {
 }
 
 func NullVector(t ScalarType, length int) Vector {
-  v := make(Vector, length)
+  v := NilVector(length)
 
   for i := 0; i < length; i++ {
     v[i] = NewScalar(t, 0.0)
   }
   return v
 }
+
+func NilVector(length int) Vector {
+  return make(Vector, length)
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (v Vector) Clone() Vector {
   result := make(Vector, len(v))

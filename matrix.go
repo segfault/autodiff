@@ -50,6 +50,10 @@ func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
   return Matrix{tmp, rows, cols, false}
 }
 
+func NullMatrix(t ScalarType, rows, cols int) Matrix {
+  return Matrix{NullVector(t, rows*cols), rows, cols, false}
+}
+
 /* copy and cloning
  * -------------------------------------------------------------------------- */
 
@@ -70,10 +74,6 @@ func (m1 Matrix) Copy(m2 Matrix) {
 
 /* constructors for special types of matrices
  * -------------------------------------------------------------------------- */
-
-func NullMatrix(t ScalarType, rows, cols int) Matrix {
-  return Matrix{NullVector(t, rows*cols), rows, cols, false}
-}
 
 func IdentityMatrix(t ScalarType, dim int) Matrix {
   matrix := NullMatrix(t, dim, dim)
@@ -106,6 +106,20 @@ func (matrix Matrix) Values() Vector {
 
 func (matrix *Matrix) SetValues(v Vector) {
   matrix.values = v
+}
+
+func (matrix *Matrix) Row(i int) Vector {
+  n := matrix.index(i, 0)
+  m := matrix.index(i, matrix.cols)
+  return matrix.values[n:m]
+}
+
+func (matrix *Matrix) Col(j int) Vector {
+  v := NilVector(matrix.rows)
+  for i := 0; i < matrix.rows; i++ {
+    v[i] = matrix.values[matrix.index(i, j)]
+  }
+  return v
 }
 
 /* implement ScalarContainer

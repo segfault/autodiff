@@ -50,6 +50,13 @@ func NewProbability(value float64) *Probability {
 
 /* -------------------------------------------------------------------------- */
 
+func (a *Probability) Copy(b Scalar) {
+  a.order = b.Order()
+  a.value = b.LogValue()
+  a.derivative[0] = b.Derivative(1)
+  a.derivative[1] = b.Derivative(2)
+}
+
 func (a *Probability) Clone() Scalar {
   r := NewProbability(0.0)
   r.Copy(a)
@@ -62,6 +69,10 @@ func (a *Probability) Value() float64 {
 
 func (a *Probability) LogValue() float64 {
   return a.value
+}
+
+func (a *Probability) SetValue(v float64) {
+  a.BasicState.SetValue(math.Log(v))
 }
 
 func (a *Probability) Type() ScalarType {
@@ -78,11 +89,11 @@ func (a *Probability) Real() *Real {
 func (a *Probability) String() string {
   switch a.order {
   case 0:
-    return fmt.Sprintf("<exp(%e)>", math.Exp(a.LogValue()))
+    return fmt.Sprintf("<exp(%e)>", a.LogValue())
   case 1:
-    return fmt.Sprintf("<exp(%e),%e>", math.Exp(a.LogValue()), a.Derivative(1))
+    return fmt.Sprintf("<exp(%e),%e>", a.LogValue(), a.Derivative(1))
   case 2:
-    return fmt.Sprintf("<exp(%e),%e,%e>", math.Exp(a.LogValue()), a.Derivative(1), a.Derivative(2))
+    return fmt.Sprintf("<exp(%e),%e,%e>", a.LogValue(), a.Derivative(1), a.Derivative(2))
   default:
     panic("Invalid order!")
   }
