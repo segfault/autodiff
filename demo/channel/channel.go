@@ -20,7 +20,7 @@ package main
 
 import   "math"
 import . "github.com/pbenner/autodiff"
-import . "github.com/pbenner/autodiff/demo/channel/blahut"
+import . "github.com/pbenner/autodiff/demo/blahut"
 
 import   "github.com/gonum/plot"
 import   "github.com/gonum/plot/plotter"
