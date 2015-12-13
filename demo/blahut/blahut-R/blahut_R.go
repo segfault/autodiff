@@ -30,7 +30,7 @@ import . "github.com/pbenner/autodiff/demo/blahut"
 /* -------------------------------------------------------------------------- */
 
 func parseRawVector(str string) []float64 {
-  r := regexp.MustCompile("[-0-9.]+")
+  r := regexp.MustCompile("[-0-9e.]+")
   m := r.FindAllStringSubmatch(str, -1)
   if m == nil {
     panic("parseRawVector(): Invalid vector!")
@@ -71,6 +71,7 @@ func parseMatrix(str string) Matrix {
     panic("parseMatrix(): Invalid matrix!")
   }
   v := parseRawVector(m[5])
+
   return NewMatrix(ProbabilityType, rto, cto, v)
 }
 
