@@ -50,7 +50,9 @@ func blahut_compute_r(channel, q Matrix, r Vector) {
   for i := 0; i < n; i++ {
     r[i].SetValue(0.0)
     for j := 0; j < m; j++ {
-      r.Set(Sub(r.At(i), Mul(channel.At(i, j), Log(q.At(j, i)))), i)
+      if !math.IsInf(channel.At(i, j).LogValue(), -1) {
+        r.Set(Sub(r.At(i), Mul(channel.At(i, j), Log(q.At(j, i)))), i)
+      }
     }
     r.Set(Exp(Neg(r.At(i))), i)
   }
