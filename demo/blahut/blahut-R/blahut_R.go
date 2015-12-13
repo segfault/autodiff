@@ -96,7 +96,7 @@ func main() {
   optLambda     := getopt.StringLong("lambda",     'l',   "", "proximal point step size [default: 1.0]")
   optIterations := getopt.IntLong   ("iterations", 'i', 1000, "number of iterations     [default: 1000]")
   optHelp       := getopt.BoolLong  ("help",       'h',       "print help")
-  optVerbose    := getopt.BoolLong  ("verbose", 'v', "print verbose output")
+  optVerbose    := getopt.BoolLong  ("verbose",    'v',       "print verbose output")
 
   getopt.SetParameters("channel p_init")
   getopt.Parse()
