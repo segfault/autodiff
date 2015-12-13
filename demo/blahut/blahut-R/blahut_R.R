@@ -5,11 +5,11 @@
 # ------------------------------------------------------------------------------
 
 blahut.dir <- getwd()
-blahut <- function(channel, px.init, lambda = 1.0, binary = sprintf("%s/blahut-R", blahut.dir)) {
+blahut <- function(n, channel, px.init, lambda = 1.0, binary = sprintf("%s/blahut-R", blahut.dir)) {
     channel.str <- capture.output(str(channel))
     px.init.str <- capture.output(str(px.init))
 
-    command <- sprintf("%s -l %f '%s' '%s'", binary, lambda, channel.str, px.init.str)
+    command <- sprintf("%s -i %d -l %f '%s' '%s'", binary, n, lambda, channel.str, px.init.str)
     eval(parse(text = system(command, intern=TRUE)))
 }
 
