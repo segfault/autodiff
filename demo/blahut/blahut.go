@@ -25,7 +25,7 @@ import . "github.com/pbenner/autodiff"
  * -------------------------------------------------------------------------- */
 
 func blahut_init_q(n, m int) Matrix {
-  return NullMatrix(ProbabilityType, n, m)
+  return NullMatrix(ProbabilityType, m, n)
 }
 
 func blahut_init_r(n int) Vector {
