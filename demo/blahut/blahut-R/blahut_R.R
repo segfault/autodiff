@@ -1,8 +1,13 @@
 
 # ------------------------------------------------------------------------------
 
-binary <- "./blahut-R"
-lambda <- 1.0
+blahut <- function(channel, px.init, lambda = 1.0, blahut = "./blahut-R") {
+    channel.str <- capture.output(str(channel))
+    px.init.str <- capture.output(str(px.init))
+
+    command <- sprintf("%s -l %f '%s' '%s'", binary, lambda, channel.str, px.init.str)
+    eval(parse(text = system(command, intern=TRUE)))
+}
 
 # ------------------------------------------------------------------------------
 
@@ -16,8 +21,4 @@ px.init <- c(1/3, 1/3, 1/3)
 
 # ------------------------------------------------------------------------------
 
-channel.str <- capture.output(str(channel))
-px.init.str <- capture.output(str(px.init))
-
-command <- sprintf("%s -l %f '%s' '%s'", binary, lambda, channel.str, px.init.str)
-px <- eval(parse(text = system(command, intern=TRUE)))
+px <- blahut(channel, px.init)
