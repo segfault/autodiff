@@ -87,7 +87,7 @@ func printVector(v Vector) {
 }
 
 func hook(px Vector, J Scalar) bool {
-  fmt.Printf("%s (J = %f)\n", px.String(), J.Value())
+  fmt.Fprintf(os.Stderr, "%s (J = %f)\n", px.String(), J.Value())
   return false
 }
 
