@@ -50,7 +50,8 @@ func blahut_compute_r(channel, q Matrix, r Vector) {
   for i := 0; i < n; i++ {
     r[i].SetValue(0.0)
     for j := 0; j < m; j++ {
-      if !math.IsInf(channel.At(i, j).LogValue(), -1) {
+      if !math.IsInf(channel.At(i, j).LogValue(), -1) && // 0 log q = 0
+         !math.IsInf(r[i].LogValue(), 1) {               // Inf + x = Inf
         r.Set(Sub(r.At(i), Mul(channel.At(i, j), Log(q.At(j, i)))), i)
       }
     }
@@ -68,8 +69,15 @@ func blahut_compute_J(r Vector, J Scalar) {
 
 func blahut_compute_p(r Vector, lambda float64, p Vector) {
   for i, _ := range p {
-    p.Set(Mul(Pow(p.At(i), 1.0 - lambda), Pow(r.At(i), lambda)),
-      i)
+    if math.IsInf(p.At(i).LogValue(), -1) {
+      // p[i] = r[i]
+      p.Set(r.At(i),
+        i)
+    } else {
+      // p[i] = p[i]^(1-lambda) * r[i]^lambda
+      p.Set(Mul(Pow(p.At(i), 1.0 - lambda), Pow(r.At(i), lambda)),
+        i)
+    }
   }
   normalizeVector(p)
 }
