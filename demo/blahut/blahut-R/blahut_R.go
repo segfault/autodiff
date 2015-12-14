@@ -18,10 +18,12 @@ package main
 
 /* -------------------------------------------------------------------------- */
 
+import   "bufio"
 import   "fmt"
-import   "os"
 import   "regexp"
 import   "strconv"
+import   "strings"
+import   "os"
 import   "code.google.com/p/getopt"
 
 import . "github.com/pbenner/autodiff"
@@ -83,7 +85,7 @@ func printVector(v Vector) {
     }
     fmt.Print(v[i].Value())
   }
-  fmt.Print(")")
+  fmt.Println(")")
 }
 
 func hook(px Vector, J Scalar) bool {
@@ -93,27 +95,46 @@ func hook(px Vector, J Scalar) bool {
 
 func main() {
 
-  optLambda     := getopt.StringLong("lambda",     'l',   "", "proximal point step size [default: 1.0]")
-  optIterations := getopt.IntLong   ("iterations", 'i', 1000, "number of iterations     [default: 1000]")
-  optHelp       := getopt.BoolLong  ("help",       'h',       "print help")
-  optVerbose    := getopt.BoolLong  ("verbose",    'v',       "print verbose output")
+  var channel Matrix
+  var px_init Vector
 
-  getopt.SetParameters("channel p_init")
+  optLambda     := getopt.StringLong("lambda",     'l', "1.0", "proximal point step size [default: 1.0]")
+  optIterations := getopt.IntLong   ("iterations", 'i',  1000, "number of iterations     [default: 1000]")
+  optHelp       := getopt.BoolLong  ("help",       'h',        "print help")
+  optVerbose    := getopt.BoolLong  ("verbose",    'v',        "print verbose output")
+
+  getopt.SetParameters("<channel p_init | - >")
   getopt.Parse()
 
   if *optHelp {
     getopt.Usage()
     os.Exit(0)
   }
-  if len(getopt.Args()) != 2 {
+  // get channel and px_init
+  if len(getopt.Args()) == 1 && strings.Compare(getopt.Args()[0], "-") == 0 {
+    // from stdin
+    bio := bufio.NewReader(os.Stdin)
+    line1, err1 := bio.ReadString('\n')
+    line2, err2 := bio.ReadString('\n')
+    if err1 != nil {
+      panic(err1)
+    }
+    if err2 != nil {
+      panic(err2)
+    }
+    channel = parseMatrix(strings.Trim(line1, "\n"))
+    px_init = parseVector(strings.Trim(line2, "\n"))
+  }
+  if len(getopt.Args()) == 2 {
+    // from command line arguments
+    channel = parseMatrix(getopt.Args()[0])
+    px_init = parseVector(getopt.Args()[1])
+  }
+  if len(getopt.Args()) == 0 || len(getopt.Args()) > 2 {
     getopt.Usage()
     os.Exit(1)
   }
 
-  // parse channel
-  channel := parseMatrix(getopt.Args()[0])
-  // parse initial value
-  px_init := parseVector(getopt.Args()[1])
   // check dimensions
   if n, _ := channel.Dims(); len(px_init) != n {
     panic("Channel dimension does not match length of p_init!")

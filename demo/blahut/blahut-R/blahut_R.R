@@ -9,8 +9,15 @@ blahut <- function(n, channel, px.init, lambda = 1.0, binary = sprintf("%s/blahu
     channel.str <- capture.output(str(t(channel), vec.len=length(channel)))
     px.init.str <- capture.output(str(px.init, vec.len=length(px.init)))
 
-    command <- sprintf("%s -i %d -l %f '%s' '%s'", binary, n, lambda, channel.str, px.init.str)
-    eval(parse(text = system(command, intern=TRUE)))
+    # create fifo
+    output <- sprintf("%s.out", binary)
+    # create pipes
+    cmd <- sprintf("%s -i %d -l %f - > %s 2>&1", binary, n, lambda, output)
+    p   <- pipe(cmd)
+    # execute command
+    writeLines(sprintf("%s\n%s\n", channel.str, px.init.str), con = p)
+    # get and parse output
+    eval(parse(output))
 }
 
 # ------------------------------------------------------------------------------
