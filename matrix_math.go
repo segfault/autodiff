@@ -149,7 +149,7 @@ func mInverse(matrix Matrix) Matrix {
     s := MNorm(MSub(MMul(matrix, r), I))
     return s
   }
-  x, _ := Rprop(f, r.Values(), 1e-12, 0.01, 0.1)
+  x := Rprop(f, r.Values(), 1e-12, 0.01, 0.1)
   r.SetValues(x)
   return r
 }

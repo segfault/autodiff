@@ -44,7 +44,7 @@ func norm(v []float64) float64 {
 
 /* -------------------------------------------------------------------------- */
 
-func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, args ...interface{}) (Vector, []float64) {
+func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, args ...interface{}) Vector {
 
   var hook func([]float64, Vector, Scalar) bool = nil
   for _, arg := range args {
@@ -56,8 +56,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
     }
   }
 
-  var s   Scalar
-  var err []float64
+  var s Scalar
   t := x0.ElementType()
   // copy variables
   x := x0.Clone()
@@ -82,8 +81,8 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
       break;
     }
     // evaluate stop criterion
-    err = append(err, norm(gradient))
-    if (err[len(err)-1] < epsilon) {
+    err := norm(gradient)
+    if (err < epsilon) {
       break;
     }
     // update variables
@@ -94,7 +93,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
       }
     }
   }
-  return x, err
+  return x
 }
 
 /* -------------------------------------------------------------------------- */
@@ -104,7 +103,7 @@ func GradientDescent(f func(Vector) Scalar, x0 Vector, epsilon, step float64, ar
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, args ...interface{}) (Vector, []float64) {
+func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, args ...interface{}) Vector {
 
   var hook func([]float64, Vector, Scalar) bool = nil
   for _, arg := range args {
@@ -116,8 +115,7 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
     }
   }
 
-  var s   Scalar
-  var err []float64
+  var s Scalar
   t := x0.ElementType()
   // copy variables
   x := x0.Clone()
@@ -154,8 +152,8 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
       break;
     }
     // evaluate stop criterion
-    err = append(err, norm(gradient_new))
-    if (err[len(err)-1] < epsilon) {
+    err := norm(gradient_new)
+    if (err < epsilon) {
       break;
     }
     // update step size
@@ -183,7 +181,7 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
       }
     }
   }
-  return x, err
+  return x
 }
 
 /* -------------------------------------------------------------------------- */
