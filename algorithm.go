@@ -187,10 +187,9 @@ func Rprop(f func(Vector) Scalar, x0 Vector, epsilon, step_init, eta float64, ar
 /* -------------------------------------------------------------------------- */
 
 func newton(f func(Vector) Vector, x Vector, epsilon float64,
-  hook func(Matrix, Vector, Vector) bool, submatrix []bool) (Vector, []float64) {
+  hook func(Matrix, Vector, Vector) bool, submatrix []bool) Vector {
   x1  := x.Clone()
   x2  := x.Clone()
-  err := []float64{}
   for {
     y  := f(x1)
     J  := Jacobian(f, x1)
@@ -201,16 +200,16 @@ func newton(f func(Vector) Vector, x Vector, epsilon float64,
       break;
     }
     // evaluate stop criterion
-    err = append(err, VNorm(VSub(x1, x2)).Value())
-    if err[len(err)-1] < epsilon {
+    err := VNorm(VSub(x1, x2)).Value()
+    if err < epsilon {
       break
     }
     x1.Copy(x2)
   }
-  return x2, err
+  return x2
 }
 
-func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{}) (Vector, []float64) {
+func Newton(f func(Vector) Vector, x Vector, epsilon float64, args ...interface{}) Vector {
 
   var hook func(Matrix, Vector, Vector) bool = nil
   var submatrix []bool = nil
