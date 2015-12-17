@@ -126,3 +126,22 @@ func Blahut(channel Matrix, p_init Vector, steps int, args ...interface{}) Vecto
   }
   return blahut(channel, p_init, steps, hook, lambda)
 }
+
+/* mutual information
+ * -------------------------------------------------------------------------- */
+
+func mi_hook(result *Scalar, p Vector, J Scalar) bool {
+  *result = J
+  return false
+}
+
+func MI(channel Matrix, p Vector) Scalar {
+  // resulting mutual information
+  var result Scalar
+  // create hook
+  h := func(p Vector, J Scalar) bool { return mi_hook(&result, p, J) }
+  // call blahut for one iteration
+  Blahut(channel, p, 1, Hook{h})
+
+  return result
+}
