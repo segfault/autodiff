@@ -35,23 +35,27 @@ type Matrix struct {
  * -------------------------------------------------------------------------- */
 
 func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
-  tmp := NullVector(t, rows*cols)
+  m := NilMatrix(rows, cols)
   if len(values) == 1 {
     for i := 0; i < rows*cols; i++ {
-      tmp[i] = NewScalar(t, values[0])
+      m.values[i] = NewScalar(t, values[0])
     }
   } else if len(values) == rows*cols {
     for i := 0; i < rows*cols; i++ {
-      tmp[i] = NewScalar(t, values[i])
+      m.values[i] = NewScalar(t, values[i])
     }
   } else {
     panic("NewMatrix(): Matrix dimension does not fit input values!")
   }
-  return Matrix{tmp, rows, cols, false}
+  return m
 }
 
 func NullMatrix(t ScalarType, rows, cols int) Matrix {
   return Matrix{NullVector(t, rows*cols), rows, cols, false}
+}
+
+func NilMatrix(rows, cols int) Matrix {
+  return Matrix{NilVector(rows*cols), rows, cols, false}
 }
 
 /* copy and cloning
@@ -157,6 +161,20 @@ func (matrix Matrix) ElementType() ScalarType {
     return reflect.TypeOf(matrix.values[0])
   }
   return nil
+}
+
+func (matrix Matrix) Constant(args ...int) {
+  i := args[0]
+  j := args[1]
+  k := matrix.index(i, j)
+  matrix.values[k].Constant()
+}
+
+func (matrix Matrix) Variable(order int, args ...int) {
+  i := args[0]
+  j := args[1]
+  k := matrix.index(i, j)
+  matrix.values[k].Variable(order)
 }
 
 /* type conversion

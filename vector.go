@@ -89,6 +89,14 @@ func (v Vector) ElementType() ScalarType {
   return nil
 }
 
+func (v Vector) Constant(args ...int) {
+  v[args[0]].Constant()
+}
+
+func (v Vector) Variable(order int, args ...int) {
+  v[args[0]].Variable(order)
+}
+
 /* type conversion
  * -------------------------------------------------------------------------- */
 

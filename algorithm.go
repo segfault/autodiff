@@ -23,15 +23,15 @@ import "math"
 /* -------------------------------------------------------------------------- */
 
 func setConstant(variables Vector) {
-    for i, _ := range variables {
-      variables[i].Constant()
-    }
+  for i, _ := range variables {
+    variables.Constant(i)
+  }
 }
 
 func setVariable(variables Vector, order int) {
-    for i, _ := range variables {
-      variables[i].Variable(order)
-    }
+  for i, _ := range variables {
+    variables.Variable(order, i)
+  }
 }
 
 func norm(v []float64) float64 {
