@@ -20,6 +20,7 @@ package main
 
 import   "math"
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/gaussJordan"
 import   "github.com/pbenner/autodiff/algorithm/newton"
 import   "github.com/pbenner/autodiff/algorithm/rprop"
 import   "github.com/pbenner/autodiff/algorithm/blahut"
@@ -265,7 +266,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
     rprop.Hook{hook1},
     rprop.Epsilon{epsilon})
   newton.Run(f, px0m,
-    newton.Submatrix{submatrix},
+    gaussJordan.Submatrix{submatrix},
     newton.Hook{hook2},
     newton.Epsilon{epsilon})
   blahut.RunNaive(channel, px0, 500,

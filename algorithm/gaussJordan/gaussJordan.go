@@ -157,10 +157,10 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
   // loop over optional arguments
   for _, arg := range args {
     switch a := arg.(type) {
-    case []bool:
-      submatrix = a
-    case float64:
-      epsilon = a
+    case Submatrix:
+      submatrix = a.Value
+    case Epsilon:
+      epsilon = a.Value
     default:
       panic("GaussJordan(): Invalid optional argument!")
     }

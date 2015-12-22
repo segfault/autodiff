@@ -20,6 +20,7 @@ package matrixInverse
 
 import   "testing"
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/gaussJordan"
 
 /* -------------------------------------------------------------------------- */
 
@@ -40,7 +41,7 @@ func TestSubmatrixInverse(t *testing.T) {
   submatrix := []bool{true, true, false}
 
   m1 := NewMatrix(RealType, 3, 3, []float64{1,2,50,3,4,60,70,80,90})
-  m2 := Run(m1, submatrix)
+  m2 := Run(m1, gaussJordan.Submatrix{submatrix})
   m3 := NewMatrix(RealType, 3, 3, []float64{-2, 1, 0, 1.5, -0.5, 0, 0, 0, 1})
 
   if MNorm(MSub(m2, m3)).Value() > 1e-8 {

@@ -27,10 +27,6 @@ type Epsilon struct {
   Value float64
 }
 
-type Submatrix struct {
-  Value []bool
-}
-
 type Hook struct {
   Value func(Matrix, Vector, Vector) bool
 }
@@ -38,13 +34,14 @@ type Hook struct {
 /* -------------------------------------------------------------------------- */
 
 func newton(f func(Vector) Vector, x Vector, epsilon float64,
-  hook func(Matrix, Vector, Vector) bool, submatrix []bool) Vector {
+  hook func(Matrix, Vector, Vector) bool,
+  options []interface{}) Vector {
   x1  := x.Clone()
   x2  := x.Clone()
   for {
     y  := f(x1)
     J  := Jacobian(f, x1)
-    Q  := matrixInverse.Run(J, submatrix)
+    Q  := matrixInverse.Run(J, options...)
     x2  = VSub(x1, MxV(Q, y))
     // execute hook if available
     if hook != nil && hook(J, x2, y) {
@@ -66,19 +63,17 @@ func Run(f func(Vector) Vector, x Vector, args ...interface{}) Vector {
 
   hook      := Hook     { nil}.Value
   epsilon   := Epsilon  {1e-8}.Value
-  submatrix := Submatrix{ nil}.Value
+  options   := make([]interface{}, 0)
 
   for _, arg := range args {
     switch a := arg.(type) {
     case Hook:
       hook = a.Value
-    case Submatrix:
-      submatrix = a.Value
     case Epsilon:
       epsilon = a.Value
     default:
-      panic("Newton(): Invalid optional argument!")
+      options = append(options, a)
     }
   }
-  return newton(f, x, epsilon, hook, submatrix)
+  return newton(f, x, epsilon, hook, options)
 }
