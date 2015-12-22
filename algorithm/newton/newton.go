@@ -48,8 +48,7 @@ func newton(f func(Vector) Vector, x Vector, epsilon float64,
       break;
     }
     // evaluate stop criterion
-    err := VNorm(VSub(x1, x2)).Value()
-    if err < epsilon {
+    if VNorm(y).Value() < epsilon {
       break
     }
     x1.Copy(x2)
