@@ -19,7 +19,10 @@ package main
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
+import   "math"
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/gradientDescent"
+import   "github.com/pbenner/autodiff/algorithm/rprop"
 
 import   "github.com/gonum/plot"
 import   "github.com/gonum/plot/plotter"
@@ -68,16 +71,39 @@ func plotGradientNorm(gn1, gn2 []float64) {
 
 }
 
+/* -------------------------------------------------------------------------- */
+
+func norm(v []float64) float64 {
+  sum := 0.0
+  for _, x := range v {
+    sum += math.Pow(x, 2.0)
+  }
+  return math.Sqrt(sum)
+}
+
+func hook(err *[]float64, gradient []float64, px Vector, s Scalar) bool {
+  *err = append(*err, norm(gradient))
+  return false
+}
+
+/* -------------------------------------------------------------------------- */
+
 func main() {
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
     return Add(Sub(Pow(x[0], 4), Mul(NewReal(3), Pow(x[0], 3))), NewReal(2))
   }
+  err1 := make([]float64, 0)
+  err2 := make([]float64, 0)
   x0 := NewVector(RealType, []float64{4})
   // vanilla gradient descent
-  xn1, err1 := GradientDescent(f, x0, 1e-8, 0.0001)
+  xn1 := gradientDescent.Run(f, x0, 0.0001,
+    gradientDescent.Hook{func(gradient []float64, px Vector, s Scalar) bool { return hook(&err1, gradient, px, s) }},
+    gradientDescent.Epsilon{1e-8})
   // resilient backpropagation
-  xn2, err2 := Rprop(f, x0, 1e-8, 0.0001, 0.4)
+  xn2 := rprop.Run(f, x0, 0.0001, 0.4,
+    rprop.Hook{func(gradient []float64, px Vector, s Scalar) bool { return hook(&err2, gradient, px, s) }},
+    rprop.Epsilon{1e-8})
 
   fmt.Println(xn1)
   fmt.Println(xn2)

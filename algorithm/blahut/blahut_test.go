@@ -39,7 +39,7 @@ func TestBlahut(t *testing.T) {
   // fixed point
   pxstar := []float64{0.501735, 0.0, 0.498265}
 
-  pxn := Blahut(channel, px0, 1000)
+  pxn := Run(channel, px0, 1000)
 
   for i := 0; i < len(px0); i++ {
     if math.Abs(pxn[i].Value() - pxstar[i]) > 1e-5 {
@@ -60,7 +60,7 @@ func TestBlahutNaive(t *testing.T) {
   // fixed point
   pxstar := []float64{0.501735, 0.0, 0.498265}
 
-  pxn := BlahutNaive(channel, px0, 1000)
+  pxn := RunNaive(channel, px0, 1000)
 
   for i := 0; i < len(px0); i++ {
     if math.Abs(pxn[i] - pxstar[i]) > 1e-5 {

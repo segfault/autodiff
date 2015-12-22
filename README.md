@@ -24,9 +24,9 @@ Compare vanilla gradient descent with resilient backpropagation
   }
   x0 := NewVector(RealType, []float64{8})
   // vanilla gradient descent
-  xn1, err1 := GradientDescent(f, x0, 1e-8, 0.0001)
+  xn1, err1 := gradientDescent.Run(f, x0, 0.0001, gradientDescent.Epsilon{1e-8})
   // resilient backpropagation
-  xn2, err2 := Rprop(f, x0, 1e-8, 0.0001, 0.4)
+  xn2, err2 := rprop.Run(f, x0, 0.0001, 0.4, rprop.Epsilon{1e-8})
 ```
 ![Gradient descent](demo/example1/example1.png)
 
@@ -45,7 +45,7 @@ Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb -
     s := MNorm(MSub(MMul(matrix, r), I))
     return s
   }
-  x, _ := Rprop(f, r.Values(), 0.01, 1e-12, 0.1)
+  x, _ := rprop.Run(f, r.Values(), 0.01, 0.1, rprop.Epsilon{1e-12})
   r.SetValues(x)
 ```
 
@@ -68,5 +68,5 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
   }
 
   x0    := NewVector(RealType, []float64{1,1})
-  xn, _ := Newton(f, x0, 1e-8)
+  xn, _ := newton.Run(f, x0, newton.Epsilon{1e-8})
 ```

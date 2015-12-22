@@ -119,31 +119,6 @@ func TestMatrixVxM(t *testing.T) {
   }
 }
 
-func TestMatrixInverse(t *testing.T) {
-
-  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
-  m2 := MInverse(m1)
-  m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
-
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
-    t.Error("Inverting matrix failed!")
-  }
-}
-
-func TestSubmatrixInverse(t *testing.T) {
-
-  // exclude the third row/column
-  submatrix := []bool{true, true, false}
-
-  m1 := NewMatrix(RealType, 3, 3, []float64{1,2,50,3,4,60,70,80,90})
-  m2 := MInverse(m1, submatrix)
-  m3 := NewMatrix(RealType, 3, 3, []float64{-2, 1, 0, 1.5, -0.5, 0, 0, 0, 1})
-
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
-    t.Error("Inverting matrix failed!")
-  }
-}
-
 func TestMatrixJacobian(t *testing.T) {
 
   f := func(x Vector) Vector {
@@ -166,42 +141,5 @@ func TestMatrixJacobian(t *testing.T) {
 
   if MNorm(MSub(m1, m2)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
-  }
-}
-
-func TestMatrixNewton(t *testing.T) {
-
-  f := func(x Vector) Vector {
-    if len(x) != 2 {
-      panic("Invalid input vector!")
-    }
-    y := NullVector(RealType, 2)
-    // y1 = x1^2 + x2^2 - 6
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewReal(6))
-    // y2 = x1^3 - x2^2
-    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
-
-    return y
-  }
-  v1 := NewVector(RealType, []float64{1,1})
-  v2 := Newton(f, v1, 1e-8)
-  v3 := NewVector(RealType, []float64{1.537656, 1.906728})
-
-  if VNorm(VSub(v2, v3)).Value() > 1e-6  {
-    t.Error("Newton method failed!")
-  }
-}
-
-func TestGaussJordan(t *testing.T) {
-  n := 3
-  a := NewMatrix(RealType, n, n, []float64{1, 1, 1, 2, 1, 1, 1, 2, 1})
-  x := IdentityMatrix(RealType, n)
-  b := NewVector(RealType, []float64{1,1,1})
-  r := NewMatrix(RealType, n, n, []float64{-1, 1, 0, -1, 0, 1, 3, -1, -1})
-
-  GaussJordan(a, x, b)
-
-  if !MEqual(x, r)  {
-    t.Error("Gauss-Jordan method failed!")
   }
 }

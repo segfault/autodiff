@@ -14,4 +14,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package autodiff
+package gaussJordan
+
+/* -------------------------------------------------------------------------- */
+
+import   "testing"
+import . "github.com/pbenner/autodiff"
+
+/* -------------------------------------------------------------------------- */
+
+func TestGaussJordan(t *testing.T) {
+  n := 3
+  a := NewMatrix(RealType, n, n, []float64{1, 1, 1, 2, 1, 1, 1, 2, 1})
+  x := IdentityMatrix(RealType, n)
+  b := NewVector(RealType, []float64{1,1,1})
+  r := NewMatrix(RealType, n, n, []float64{-1, 1, 0, -1, 0, 1, 3, -1, -1})
+
+  Run(a, x, b)
+
+  if !MEqual(x, r)  {
+    t.Error("Gauss-Jordan method failed!")
+  }
+}

@@ -20,7 +20,9 @@ package main
 
 import   "math"
 import . "github.com/pbenner/autodiff"
-import . "github.com/pbenner/autodiff/demo/blahut"
+import   "github.com/pbenner/autodiff/algorithm/newton"
+import   "github.com/pbenner/autodiff/algorithm/rprop"
+import   "github.com/pbenner/autodiff/algorithm/blahut"
 
 import   "github.com/gonum/plot"
 import   "github.com/gonum/plot/plotter"
@@ -259,10 +261,19 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   g := func(px Vector) Scalar { return objective_g(active1, channelm, px) }
 
   // execute algorithms
-  Rprop (g, px0m, epsilon, step, 0.01, hook1)
-  Newton(f, px0m, epsilon, hook2, submatrix)
-  BlahutNaive(channel, px0, 500, HookNaive{hook3}, Lambda{1.0})
-  BlahutNaive(channel, px0,  40, HookNaive{hook4}, Lambda{8.0})
+  rprop .Run(g, px0m, step, 0.01,
+    rprop.Hook{hook1},
+    rprop.Epsilon{epsilon})
+  newton.Run(f, px0m,
+    newton.Submatrix{submatrix},
+    newton.Hook{hook2},
+    newton.Epsilon{epsilon})
+  blahut.RunNaive(channel, px0, 500,
+    blahut.HookNaive{hook3},
+    blahut.Lambda{1.0})
+  blahut.RunNaive(channel, px0,  40,
+    blahut.HookNaive{hook4},
+    blahut.Lambda{8.0})
 
   return trace
 }

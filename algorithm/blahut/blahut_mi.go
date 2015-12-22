@@ -14,4 +14,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package autodiff
+package blahut
+
+/* -------------------------------------------------------------------------- */
+
+import . "github.com/pbenner/autodiff"
+
+/* -------------------------------------------------------------------------- */
+
+func mi_hook(result *Scalar, p Vector, J Scalar) bool {
+  *result = J
+  return false
+}
+
+/* mutual information
+ * -------------------------------------------------------------------------- */
+
+func MI(channel Matrix, p Vector) Scalar {
+  // resulting mutual information
+  var result Scalar
+  // create hook
+  h := func(p Vector, J Scalar) bool { return mi_hook(&result, p, J) }
+  // call blahut for one iteration
+  Run(channel, p, 1, Hook{h})
+
+  return result
+}

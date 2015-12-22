@@ -99,7 +99,9 @@ func blahutNaive(channel [][]float64, p_init []float64, steps int,
   return p
 }
 
-func BlahutNaive(channel [][]float64, p_init []float64, steps int, args ...interface{}) []float64 {
+/* -------------------------------------------------------------------------- */
+
+func RunNaive(channel [][]float64, p_init []float64, steps int, args ...interface{}) []float64 {
   // default values for optional parameters
   hook   := HookNaive{nil}.Value
   lambda := Lambda   {1.0}.Value

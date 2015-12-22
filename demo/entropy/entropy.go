@@ -31,6 +31,8 @@ package main
 
 import   "fmt"
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/newton"
+import   "github.com/pbenner/autodiff/algorithm/rprop"
 
 /* gradient based optimization
  * -------------------------------------------------------------------------- */
@@ -82,9 +84,13 @@ func main() {
   px0m := NewVector(RealType, append(px0v, 1))
 
   fmt.Println("Rprop optimization:")
-  pxn1, _ := Rprop (objective_g, px0m, epsilon, step, 0.5, hook_g)
+  pxn1 := rprop.Run (objective_g, px0m, step, 0.5,
+    rprop.Hook{hook_g},
+    rprop.Epsilon{epsilon})
   fmt.Println("Newton optimization:")
-  pxn2, _ := Newton(objective_f, px0m, epsilon, hook_f)
+  pxn2 := newton.Run(objective_f, px0m,
+    newton.Hook{hook_f},
+    newton.Epsilon{epsilon})
 
   fmt.Println("Rprop  p(x): ", pxn1)
   fmt.Println("Newton p(x): ", pxn2)

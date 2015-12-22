@@ -27,7 +27,7 @@ import   "os"
 import   "code.google.com/p/getopt"
 
 import . "github.com/pbenner/autodiff"
-import . "github.com/pbenner/autodiff/demo/blahut"
+import   "github.com/pbenner/autodiff/algorithm/blahut"
 
 /* -------------------------------------------------------------------------- */
 
@@ -152,7 +152,9 @@ func main() {
     h = nil
   }
 
-  pxn := Blahut(channel, px_init, n, Lambda{lambda}, Hook{h})
+  pxn := blahut.Run(channel, px_init, n,
+    blahut.Lambda{lambda},
+    blahut.Hook{h})
 
   printVector(pxn)
 }

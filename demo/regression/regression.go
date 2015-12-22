@@ -21,7 +21,7 @@ package main
 import   "fmt"
 import   "math/rand"
 import . "github.com/pbenner/autodiff"
-import . "github.com/pbenner/autodiff/demo/regression/line"
+import   "github.com/pbenner/autodiff/algorithm/rprop"
 
 
 /* -------------------------------------------------------------------------- */
@@ -56,7 +56,8 @@ func gradientDescent(x, y Vector, l *Line) *Line {
     return sumOfSquares(x, y, l)
   }
 //  GradientDescent(f, variables, step, epsilon)
-  Rprop(f, variables, epsilon, step, 0.2)
+  rprop.Run(f, variables, step, 0.2,
+    rprop.Epsilon{epsilon})
 
   return l
 }
