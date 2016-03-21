@@ -56,6 +56,5 @@ func Determinant(a Matrix) Scalar {
       }
     }
   }
-
   return det
 }
