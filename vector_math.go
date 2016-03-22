@@ -59,3 +59,11 @@ func VNorm(a Vector) Scalar {
   }
   return Sqrt(r)
 }
+
+func VxV(a, b Vector) Scalar {
+  r := ZeroScalar(a.ElementType())
+  for i := 0; i < len(a); i++ {
+    r = Add(r, Mul(a[i], b[i]))
+  }
+  return r
+}

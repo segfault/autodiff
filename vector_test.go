@@ -40,3 +40,14 @@ func TestVectorToMatrix(t *testing.T) {
     t.Error("Vector to matrix conversion failed!")
   }
 }
+
+func TestVxV(t *testing.T) {
+
+  a := NewVector(RealType, []float64{1, 2,3,4})
+  b := NewVector(RealType, []float64{2,-1,1,7})
+  r := VxV(a, b)
+
+  if r.Value() != 31 {
+    t.Error("VxV() failed!")
+  }
+}
