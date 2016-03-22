@@ -126,6 +126,18 @@ func (matrix *Matrix) Col(j int) Vector {
   return v
 }
 
+func (matrix *Matrix) Diag() Vector {
+  n, m := matrix.Dims()
+  if n != m {
+    panic("Diag(): not a square matrix!")
+  }
+  v := NilVector(n)
+  for i := 0; i < n; i++ {
+    v[i] = matrix.values[matrix.index(i, i)]
+  }
+  return v
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 

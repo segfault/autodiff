@@ -18,6 +18,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+//import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -52,6 +53,18 @@ func TestMatrixRowCol(t *testing.T) {
   }
   if len(v2) != 2 {
     t.Error("Matrix Col() test failed!")
+  }
+}
+
+func TestMatrixDiag(t *testing.T) {
+
+  m := NewMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
+  v := m.Diag()
+
+  if v[0].Value() != 1 ||
+     v[1].Value() != 5 ||
+     v[2].Value() != 9 {
+    t.Error("Matrix diag failed!")
   }
 }
 
