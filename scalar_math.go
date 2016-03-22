@@ -34,6 +34,10 @@ func Neg(a Scalar) Scalar {
   return a.Neg()
 }
 
+func Abs(a Scalar) Scalar {
+  return Sqrt(Pow(a, 2.0))
+}
+
 func Add(a, b Scalar) Scalar {
   return a.Add(b)
 }
@@ -85,6 +89,7 @@ func Tanh(a Scalar) Scalar {
 func Exp(a Scalar) Scalar {
   return a.Exp()
 }
+
 func Log(a Scalar) Scalar {
   return a.Log()
 }
