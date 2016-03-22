@@ -23,7 +23,7 @@ import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func Determinant(a Matrix) Scalar {
+func determinant(a Matrix) Scalar {
 
   n, _ := a.Dims()
   det  := ZeroScalar(a.ElementType())
@@ -50,11 +50,17 @@ func Determinant(a Matrix) Scalar {
         }
       }
       if (j1+1.0) % 2 == 0 {
-        det = Add(det,  Mul(a.At(0, j1), Determinant(m)))
+        det = Add(det,  Mul(a.At(0, j1), determinant(m)))
       } else {
-        det = Sub(det,  Mul(a.At(0, j1), Determinant(m)))
+        det = Sub(det,  Mul(a.At(0, j1), determinant(m)))
       }
     }
   }
   return det
+}
+
+/* -------------------------------------------------------------------------- */
+
+func Run(a Matrix) Scalar {
+  return determinant(a)
 }
