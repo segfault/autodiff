@@ -95,6 +95,16 @@ func MxV(a Matrix, b Vector) Vector {
   return r
 }
 
+func MxS(a Matrix, s Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  for i := 0; i < a.rows; i++ {
+    for j := 0; j < a.cols; j++ {
+      r.Set(Mul(a.At(i,j), s), i, j)
+    }
+  }
+  return r
+}
+
 func VxM(a Vector, b Matrix) Vector {
   if len(a) != b.rows {
     panic("VxM(): Matrix/Vector dimensions do not match!")
