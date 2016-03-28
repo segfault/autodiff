@@ -40,6 +40,6 @@ func TestMSqrt(t *testing.T) {
      9.89949, 1.62455, 1.84971, 1.39262 })
 
   if MNorm(MSub(x, r)).Value() > 1e-8 {
-    t.Error("MSqrt failed!")
+    t.Error("Cholesky failed!")
   }
 }
