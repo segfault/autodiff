@@ -19,7 +19,9 @@ package determinant
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "math"
 import   "testing"
+
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
@@ -49,6 +51,19 @@ func TestDeterminant3(t *testing.T) {
   m := NewMatrix(RealType, 4, 4, []float64{3,2,0,1, 4,0,1,2, 3,0,2,1, 9,2,3,1})
 
   if Run(m).Value() != 24 {
+    t.Error("Matrix determinant failed!")
+  }
+
+}
+
+func TestDeterminant4(t *testing.T) {
+
+  m := NewMatrix(RealType, 3, 3, []float64{2, -1, 0, -1, 2, -1, 0, -1, 2})
+
+  if math.Abs(Run(m).Value() - Run(m, PositiveDefinite{true}).Value()) > 1e-4 {
+    t.Error("Matrix determinant failed!")
+  }
+  if math.Abs(Log(Run(m)).Value() - Run(m, PositiveDefinite{true}, LogScale{true}).Value()) > 1e-4 {
     t.Error("Matrix determinant failed!")
   }
 

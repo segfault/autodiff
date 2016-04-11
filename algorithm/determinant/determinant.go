@@ -18,13 +18,24 @@ package determinant
 
 /* -------------------------------------------------------------------------- */
 
+//import   "fmt"
 //import   "math"
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/cholesky"
 
 /* -------------------------------------------------------------------------- */
 
-func determinant(a Matrix) Scalar {
+type PositiveDefinite struct {
+  Value bool
+}
 
+type LogScale struct {
+  Value bool
+}
+
+/* -------------------------------------------------------------------------- */
+
+func determinantNaive(a Matrix) Scalar {
   n, _ := a.Dims()
   det  := ZeroScalar(a.ElementType())
 
@@ -49,18 +60,66 @@ func determinant(a Matrix) Scalar {
           j2++;
         }
       }
-      if (j1+1.0) % 2 == 0 {
-        det = Add(det,  Mul(a.At(0, j1), determinant(m)))
+      if j1 % 2 == 0 {
+        det = Add(det,  Mul(a.At(0, j1), determinantNaive(m)))
       } else {
-        det = Sub(det,  Mul(a.At(0, j1), determinant(m)))
+        det = Sub(det,  Mul(a.At(0, j1), determinantNaive(m)))
       }
     }
   }
   return det
 }
 
+func determinantPD(a Matrix, logScale bool) Scalar {
+  var result Scalar
+  n, m := a.Dims()
+  if n != m {
+    panic("Matrix is not a square matrix!")
+  }
+  L := cholesky.Run(a)
+  if logScale {
+    result = NewScalar(a.ElementType(), 0.0)
+    for i := 0; i < n; i++ {
+      result = Add(result, Log(L.At(i, i)))
+    }
+    result = Add(result, result)
+  } else {
+    result = NewScalar(a.ElementType(), 1.0)
+    for i := 0; i < n; i++ {
+      result = Mul(result, L.At(i, i))
+    }
+    result = Mul(result, result)
+  }
+  return result
+}
+
+func determinant(a Matrix, positiveDefinite, logScale bool) Scalar {
+  if positiveDefinite {
+    return determinantPD(a, logScale)
+  } else {
+    return determinantNaive(a)
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
-func Run(a Matrix) Scalar {
-  return determinant(a)
+func Run(a Matrix, args ...interface{}) Scalar {
+  positiveDefinite := false
+  logScale := false
+
+  // loop over optional arguments
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case PositiveDefinite:
+      positiveDefinite = a.Value
+    case LogScale:
+      logScale = a.Value
+    default:
+      panic("Determinant(): Invalid optional argument!")
+    }
+  }
+  if logScale && !positiveDefinite {
+    panic("Parameter LogScale is valid only for positive definite matrices!")
+  }
+  return determinant(a, positiveDefinite, logScale)
 }
