@@ -18,7 +18,9 @@ package gaussJordan
 
 /* -------------------------------------------------------------------------- */
 
+//import   "fmt"
 import   "math"
+
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
@@ -29,6 +31,10 @@ type Epsilon struct {
 
 type Submatrix struct {
   Value []bool
+}
+
+type Triangular struct {
+  Value bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -147,12 +153,69 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
   b.Permute(p)
 }
 
+func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
+  // number of rows
+  n, _ := a.Dims()
+  // x and b should have the same number of rows
+  if m, _ := x.Dims(); m != n {
+    panic("GaussJordan(): x has invalid dimension!")
+  }
+  if len(b) != n {
+    panic("GaussJordan(): b has invalid dimension!")
+  }
+  // backsubstitute
+  for i := n-1; i >= 0; i-- {
+    if !submatrix[i] {
+      continue
+    }
+    c := a.At(i, i)
+    for j := 0; j < i; j++ {
+      if !submatrix[j] {
+        continue
+      }
+      // b[j] -= a[j,i]*b[i]/c
+      b[j] = Sub(b[j], Div(Mul(a.At(j, i), b[i]), c))
+      // loop over colums in x
+      for k := n-1; k >= 0; k-- {
+        if !submatrix[k] {
+          continue
+        }
+        // x[j,k] -= a[j,i]*x[i,k]/c
+        x.Set(Sub(x.At(j, k), Div(Mul(a.At(j, i), x.At(i, k)), c)),
+          j, k)
+      }
+      // loop over colums in a
+      for k := n-1; k >= 0; k-- {
+        if !submatrix[k] {
+          continue
+        }
+        // a[j,k] -= a[j,i]*a[i,k]/c
+        a.Set(Sub(a.At(j, k), Div(Mul(a.At(j, i), a.At(i, k)), c)),
+          j, k)
+      }
+    }
+    a.Set(Div(a.At(i, i), c),
+      i, i)
+    // normalize ith row in x
+    for k := i; k < n; k++ {
+      if !submatrix[k] {
+        continue
+      }
+      x.Set(Div(x.At(i, k), c),
+        i, k)
+    }
+    // normalize ith element in b
+    b[i] = Div(b[i], c)
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 
 func Run(a, x Matrix, b Vector, args ...interface{}) {
 
-  epsilon   := Epsilon  {1e-120}.Value
-  submatrix := Submatrix{   nil}.Value
+  epsilon    := Epsilon  {1e-120}.Value
+  submatrix  := Submatrix{   nil}.Value
+  triangular := false
 
   // loop over optional arguments
   for _, arg := range args {
@@ -161,6 +224,8 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
       submatrix = a.Value
     case Epsilon:
       epsilon = a.Value
+    case Triangular:
+      triangular = a.Value
     default:
       panic("GaussJordan(): Invalid optional argument!")
     }
@@ -173,5 +238,9 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
       submatrix[i] = true
     }
   }
-  gaussJordan(a, x, b, submatrix, epsilon)
+  if triangular {
+    gaussJordanTriangular(a, x, b, submatrix)
+  } else {
+    gaussJordan(a, x, b, submatrix, epsilon)
+  }
 }

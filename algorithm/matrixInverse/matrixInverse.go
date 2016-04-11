@@ -18,15 +18,24 @@ package matrixInverse
 
 /* -------------------------------------------------------------------------- */
 
+//import   "fmt"
+
 import . "github.com/pbenner/autodiff"
+import   "github.com/pbenner/autodiff/algorithm/cholesky"
 import   "github.com/pbenner/autodiff/algorithm/gaussJordan"
 import   "github.com/pbenner/autodiff/algorithm/rprop"
 
 /* -------------------------------------------------------------------------- */
 
+type PositiveDefinite struct {
+  Value bool
+}
+
+/* -------------------------------------------------------------------------- */
+
 // compute the inverse of a matrix with a
 // gradient descent method
-func mInverse(matrix Matrix) Matrix {
+func mInverseGradient(matrix Matrix) Matrix {
   rows, cols := matrix.Dims()
   if rows != cols {
     panic("MInverse(): Not a square matrix!")
@@ -44,20 +53,12 @@ func mInverse(matrix Matrix) Matrix {
   return r
 }
 
-/* -------------------------------------------------------------------------- */
-
-func Run(matrix Matrix, args ...interface{}) Matrix {
-  rows, cols := matrix.Dims()
-  if rows != cols {
-    panic("MInverse(): Not a square matrix!")
-  }
-  if rows == 0 {
-    panic("MInverse(): Empty matrix!")
-  }
+func mInverse(matrix Matrix, args ...interface{}) Matrix {
+  rows, _ := matrix.Dims()
   t := matrix.ElementType()
   a := matrix.Clone()
   x := IdentityMatrix(t, rows)
-  b := NullVector(t, rows) 
+  b := NullVector(t, rows)
   // initialize b with ones
   for i, _ := range b {
     b[i] = NewScalar(t, 1.0)
@@ -65,4 +66,51 @@ func Run(matrix Matrix, args ...interface{}) Matrix {
   // call Gauss-Jordan algorithm
   gaussJordan.Run(a, x, b, args...)
   return x
+}
+
+func mInversePD(matrix Matrix, args ...interface{}) Matrix {
+  rows, _ := matrix.Dims()
+  t := matrix.ElementType()
+  a := cholesky.Run(matrix).T()
+  x := IdentityMatrix(t, rows)
+  b := NullVector(t, rows)
+  // initialize b with ones
+  for i, _ := range b {
+    b[i] = NewScalar(t, 1.0)
+  }
+  args = append(args, gaussJordan.Triangular{true})
+  // call Gauss-Jordan algorithm
+  gaussJordan.Run(a, x, b, args...)
+  return MMul(x, x.T())
+}
+
+/* -------------------------------------------------------------------------- */
+
+func Run(matrix Matrix, args ...interface{}) Matrix {
+  rows, cols := matrix.Dims()
+  gArgs := []interface{}{}
+  if rows != cols {
+    panic("MInverse(): Not a square matrix!")
+  }
+  if rows == 0 {
+    panic("MInverse(): Empty matrix!")
+  }
+  positiveDefinite := false
+
+  // loop over optional arguments
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case PositiveDefinite:
+      positiveDefinite = a.Value
+    default:
+      // all other arguments are passed to the
+      // Gauss-Jordan algorithm
+      gArgs = append(gArgs, arg)
+    }
+  }
+  if positiveDefinite {
+    return mInversePD(matrix, gArgs...)
+  } else {
+    return mInverse(matrix, gArgs...)
+  }
 }
