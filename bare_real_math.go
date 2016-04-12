@@ -22,6 +22,14 @@ import "math"
 
 /* -------------------------------------------------------------------------- */
 
+func checkBare(b Scalar) {
+  if b.Order() > 0 {
+    panic("BareReal cannot carry any derivates!")
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *BareReal) Equals(b Scalar) bool {
   epsilon := 1e-12
   return math.Abs(a.Value() - b.Value()) < epsilon
@@ -40,18 +48,22 @@ func (a *BareReal) Neg() Scalar {
 }
 
 func (a *BareReal) Add(b Scalar) Scalar {
+  checkBare(b)
   return NewBareReal(a.Value() + b.Value())
 }
 
 func (a *BareReal) Sub(b Scalar) Scalar {
+  checkBare(b)
   return NewBareReal(a.Value() - b.Value())
 }
 
 func (a *BareReal) Mul(b Scalar) Scalar {
+  checkBare(b)
   return NewBareReal(a.Value()*b.Value())
 }
 
 func (a *BareReal) Div(b Scalar) Scalar {
+  checkBare(b)
   return NewBareReal(a.Value()/b.Value())
 }
 
