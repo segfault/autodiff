@@ -27,18 +27,18 @@ import "reflect"
 type ScalarType reflect.Type
 
 type ScalarState interface {
-  Copy         (Scalar)
+  Copy          (Scalar)
   // read access
-  Order        ()             int
-  Value        ()             float64
-  LogValue     ()             float64
-  Derivative   (int)          float64
+  Order         ()             int
+  Value         ()             float64
+  LogValue      ()             float64
+  Derivative    (int, int)     float64
+  N             ()             int
   // write access
-  Set          (Scalar)
-  SetValue     (float64)
-  SetDerivative(int, float64)
-  Constant     ()
-  Variable     (int)
+  Set           (Scalar)
+  SetValue      (float64)
+  SetDerivative (int, int, float64)
+  SetVariable   (int, int, int)
 }
 
 type Scalar interface {
@@ -101,4 +101,12 @@ func ZeroScalar(t ScalarType) Scalar {
     panic("NewScalar(): Invalid scalar type!")
   }
   return f(0.0)
+}
+
+/* -------------------------------------------------------------------------- */
+
+func Variables(order int, reals ...Scalar) {
+  for i, _ := range reals {
+    reals[i].SetVariable(i, len(reals), order)
+  }
 }

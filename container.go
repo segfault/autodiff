@@ -26,8 +26,7 @@ type ScalarContainer interface {
   At (...int)         Scalar
   Set(Scalar, ...int)
   ElementType() ScalarType
-  Constant(...int)
-  Variable(int, ...int)
+  Variables(int)
   // nice printing
   fmt.Stringer
 }

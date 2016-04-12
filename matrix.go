@@ -175,20 +175,6 @@ func (matrix Matrix) ElementType() ScalarType {
   return nil
 }
 
-func (matrix Matrix) Constant(args ...int) {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  matrix.values[k].Constant()
-}
-
-func (matrix Matrix) Variable(order int, args ...int) {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  matrix.values[k].Variable(order)
-}
-
 /* type conversion
  * -------------------------------------------------------------------------- */
 

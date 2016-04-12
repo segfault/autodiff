@@ -18,6 +18,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+//import "fmt"
 import "math"
 import "testing"
 
@@ -143,54 +144,54 @@ func TestProbabilityDiff1(t *testing.T) {
   {
     a := NewProbability(2.0)
     b := NewProbability(3.0)
-    a.Variable(1)
+    Variables(1, a)
 
     c := Add(a, b)
 
-    if math.Abs(c.Derivative(1) - 1.0) > 1e-8 {
+    if math.Abs(c.Derivative(1, 0) - 1.0) > 1e-8 {
       t.Error("Probability differentiation test 1 failed")
     }
   }
   {
     a := NewProbability(2.0)
     b := NewProbability(3.0)
-    a.Variable(1)
+    Variables(1, a)
 
     c := Mul(a, b)
 
-    if math.Abs(c.Derivative(1) - 3.0) > 1e-8 {
+    if math.Abs(c.Derivative(1, 0) - 3.0) > 1e-8 {
       t.Error("Probability differentiation test 2 failed")
     }
   }
   {
     a := NewProbability(2.0)
-    a.Variable(1)
+    Variables(1, a)
 
     c := Neg(Mul(a, a))
 
-    if math.Abs(c.Derivative(1) + 4.0) > 1e-8 {
+    if math.Abs(c.Derivative(1, 0) + 4.0) > 1e-8 {
       t.Error("Probability differentiation test 3 failed")
     }
   }
   {
 
     a := NewProbability(2.0)
-    a.Variable(1)
+    Variables(1, a)
 
     c := Pow(a, 13)
 
-    if math.Abs(c.Derivative(1) - 13*math.Pow(2.0, 12)) > 1e-8 {
+    if math.Abs(c.Derivative(1, 0) - 13*math.Pow(2.0, 12)) > 1e-8 {
       t.Error("Probability differentiation test 4 failed")
     }
   }
   {
     a := NewProbability(2.0)
     b := NewProbability(3.0)
-    b.Variable(1)
+    Variables(1, b)
 
     c := Div(a, b)
 
-    if math.Abs(c.Derivative(1) + 2.0/math.Pow(3.0, 2)) > 1e-8 {
+    if math.Abs(c.Derivative(1, 0) + 2.0/math.Pow(3.0, 2)) > 1e-8 {
       t.Error("Probability differentiation test 5 failed")
     }
   }
@@ -204,15 +205,16 @@ func TestMultinomialLikelihood(t *testing.T) {
   }
   // evaluate the likelihood at the mode
   theta := NewProbability(13.0/(13.0+17.0))
-  theta.Variable(2)
   l := likelihood(theta, 13, 17)
 
+  Variables(2, theta)
+
   // first derivative at the mode should be zero
-  if math.Abs(l.Derivative(1)) > 1e-12 {
+  if math.Abs(l.Derivative(1, 0)) > 1e-12 {
     t.Error("l.Derivative(1) should be 0.0")
   }
   // second derivative at the mode should be negative
-  if l.Derivative(2) > 0.0 {
+  if l.Derivative(2, 0) > 0.0 {
     t.Error("l.Derivative(2) should be negative")
   }
 }
@@ -227,15 +229,16 @@ func TestEntropy(t *testing.T) {
   }
   // evaluate the likelihood at the mode
   theta := NewProbability(1.0/2.0)
-  theta.Variable(2)
   e := entropy(theta)
 
+  Variables(2, theta)
+
   // first derivative at the mode should be zero
-  if math.Abs(e.Derivative(1)) > 1e-12 {
+  if math.Abs(e.Derivative(1, 0)) > 1e-12 {
     t.Error("l.Derivative(1) should be 0.0")
   }
   // second derivative at the mode should be negative
-  if e.Derivative(2) > 0.0 {
+  if e.Derivative(2, 0) > 0.0 {
     t.Error("l.Derivative(2) should be negative")
   }
 }

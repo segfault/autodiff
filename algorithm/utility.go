@@ -19,21 +19,8 @@ package algorithm
 /* -------------------------------------------------------------------------- */
 
 import   "math"
-import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
-
-func SetConstant(variables Vector) {
-  for i, _ := range variables {
-    variables.Constant(i)
-  }
-}
-
-func SetVariable(variables Vector, order int) {
-  for i, _ := range variables {
-    variables.Variable(order, i)
-  }
-}
 
 func Norm(v []float64) float64 {
   sum := 0.0

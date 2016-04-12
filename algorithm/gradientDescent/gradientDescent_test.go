@@ -14,32 +14,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cholesky
+package gradientDescent
 
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
-
 import   "testing"
+
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func TestMSqrt(t *testing.T) {
-  n := 4
-  a := NewMatrix(RealType, n, n, []float64{
-    18, 22,  54,  42,
-    22, 70,  86,  62,
-    54, 86, 174, 134,
-    42, 62, 134, 106 })
-  x := Run(a)
-  r := NewMatrix(RealType, n, n, []float64{
-     4.24264, 0.00000, 0.00000, 0.00000,
-     5.18545, 6.56591, 0.00000, 0.00000,
-    12.72792, 3.04604, 1.64974, 0.00000,
-     9.89949, 1.62455, 1.84971, 1.39262 })
+func TestRProp(t *testing.T) {
+  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
+  m2 := m1.Clone()
+  m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
 
-  if MNorm(MSub(x, r)).Value() > 1e-8 {
-    t.Error("Cholesky failed!")
+  rows, cols := m1.Dims()
+  if rows != cols {
+    panic("MInverse(): Not a square matrix!")
+  }
+  I := IdentityMatrix(m1.ElementType(), rows)
+  // objective function
+  f := func(x Vector) Scalar {
+    m2.SetValues(x)
+    s := MNorm(MSub(MMul(m1, m2), I))
+    return s
+  }
+  x := Run(f, m2.Values(), 0.01)
+  m2.SetValues(x)
+
+  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+    t.Error("Inverting matrix failed!")
   }
 }

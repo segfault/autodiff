@@ -41,11 +41,11 @@ func init() {
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewProbability(value float64) *Probability {
+func NewProbability(value float64, args ...int) *Probability {
   if value < 0.0 {
     panic("NewProbability(): Value should be positive!")
   }
-  return &Probability{*NewBasicState(math.Log(value))}
+  return &Probability{*NewBasicState(math.Log(value), args...)}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -56,8 +56,10 @@ func (a *Probability) Copy(b Scalar) {
   }
   a.order = b.Order()
   a.value = b.LogValue()
-  a.derivative[0] = b.Derivative(1)
-  a.derivative[1] = b.Derivative(2)
+  for i := 0; i < b.N(); i++ {
+    a.derivative[i][0] = b.Derivative(1, i)
+    a.derivative[i][1] = b.Derivative(2, i)
+  }
 }
 
 func (a *Probability) Clone() Scalar {
@@ -90,14 +92,5 @@ func (a *Probability) Real() *Real {
 }
 
 func (a *Probability) String() string {
-  switch a.order {
-  case 0:
-    return fmt.Sprintf("<exp(%e)>", a.LogValue())
-  case 1:
-    return fmt.Sprintf("<exp(%e),%e>", a.LogValue(), a.Derivative(1))
-  case 2:
-    return fmt.Sprintf("<exp(%e),%e,%e>", a.LogValue(), a.Derivative(1), a.Derivative(2))
-  default:
-    panic("Invalid order!")
-  }
+  return fmt.Sprintf("exp(%e)", a.LogValue())
 }

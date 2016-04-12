@@ -145,31 +145,24 @@ func MNorm(matrix Matrix) Scalar {
   return s
 }
 
-func Jacobian(f func(Vector) Vector, x Vector) Matrix {
-  n := 0
+func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
+  x := x_.Clone()
+  t := x_.ElementType()
+  x.Variables(1)
+  // compute Jacobian
+  y := f(x)
+  n := len(y)
   m := len(x)
-  t := x.ElementType()
-  r := Matrix{}
-  for j := 0; j < m; j++ {
-    x[j].Constant()
+  r := NullMatrix(x.ElementType(), n, m)
+  if n != len(y) {
+    panic("Jacobian(): dimensions do not match!")
   }
-  for j := 0; j < m; j++ {
-    // differentiate with respect to the ith variable
-    x[j].Variable(1)
-    y := f(x)
-    if j == 0 {
-      n = len(y)
-      r = NullMatrix(x.ElementType(), n, m)
-    }
-    if n != len(y) {
-      panic("Jacobian(): dimensions do not match!")
-    }
-    // copy derivatives
-    for i := 0; i < n; i++ {
-      r.Set(NewScalar(t, y[i].Derivative(1)),
+  // copy derivatives
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.Set(NewScalar(t, y[i].Derivative(1, j)),
         i, j)
     }
-    x[j].Constant()
   }
   return r
 }

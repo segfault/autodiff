@@ -18,48 +18,63 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-import "fmt"
-import "reflect"
+import "math"
 
 /* -------------------------------------------------------------------------- */
 
-type Real struct {
-  BasicState
-}
-
-/* register scalar type
- * -------------------------------------------------------------------------- */
-
-var RealType ScalarType = NewReal(0.0).Type()
-
-func init() {
-  f := func(value float64) Scalar { return NewReal(value) }
-  RegisterScalar(RealType, f)
+type BareState struct {
+  value float64
 }
 
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewReal(v float64, args ...int) *Real {
-  s := Real{*NewBasicState(v, args...)}
-  return &s
+func NewBareState(v float64) *BareState {
+  return &BareState{v}
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (a *Real) Clone() Scalar {
-  r := NewReal(0.0, a.N())
-  r.Copy(a)
-  return r
+func (a *BareReal) Copy(b Scalar) {
+  a.value = b.Value()
 }
 
-func (a *Real) Type() ScalarType {
-  return reflect.TypeOf(a)
-}
-
-/* type conversion
+/* read access
  * -------------------------------------------------------------------------- */
 
-func (a *Real) String() string {
-  return fmt.Sprintf("%e", a.Value())
+func (a *BareReal) Order() int {
+  return 0
+}
+
+func (a *BareReal) Value() float64 {
+  return a.value
+}
+
+func (a *BareReal) LogValue() float64 {
+  return math.Log(a.Value())
+}
+
+func (a *BareReal) Derivative(i, j int) float64 {
+  return 0.0
+}
+
+func (a *BareReal) N() int {
+  return 0
+}
+
+/* write access
+ * -------------------------------------------------------------------------- */
+
+func (a *BareReal) Set(b Scalar) {
+  a.value = b.Value()
+}
+
+func (a *BareReal) SetValue(v float64) {
+  a.value = v
+}
+
+func (a *BareReal) SetDerivative(i, j int, v float64) {
+}
+
+func (a *BareReal) SetVariable(i, n, order int) {
 }

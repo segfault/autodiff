@@ -32,10 +32,12 @@ func TestBareDiff1(t *testing.T) {
   }()
 
   x := NewReal(9)
-  x.Variable(1)
   y := NewBareReal(3)
+
+  Variables(1, x)
+
   // this should panic
-  Mul(y,x)
+  Mul(y, x)
 }
 
 func TestBareDiff2(t *testing.T) {
@@ -47,8 +49,10 @@ func TestBareDiff2(t *testing.T) {
   }()
 
   x := NewReal(9)
-  x.Variable(1)
   y := NewBareReal(3)
+
+  Variables(1, x)
+
   // this should be ok
-  Mul(x,y)
+  Mul(x, y)
 }

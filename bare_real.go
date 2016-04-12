@@ -19,13 +19,12 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "fmt"
-import "math"
 import "reflect"
 
 /* -------------------------------------------------------------------------- */
 
 type BareReal struct {
-  value float64
+  BareState
 }
 
 /* register scalar type
@@ -42,7 +41,7 @@ func init() {
  * -------------------------------------------------------------------------- */
 
 func NewBareReal(v float64) *BareReal {
-  return &BareReal{v}
+  return &BareReal{*NewBareState(v)}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -60,49 +59,4 @@ func (a *BareReal) Type() ScalarType {
 
 func (a *BareReal) String() string {
   return fmt.Sprintf("%e", a.Value())
-}
-
-/* -------------------------------------------------------------------------- */
-
-func (a *BareReal) Copy(b Scalar) {
-  a.value = b.Value()
-}
-
-/* read access
- * -------------------------------------------------------------------------- */
-
-func (a *BareReal) Order() int {
-  return 0
-}
-
-func (a *BareReal) Value() float64 {
-  return a.value
-}
-
-func (a *BareReal) LogValue() float64 {
-  return math.Log(a.Value())
-}
-
-func (a *BareReal) Derivative(i int) float64 {
-  return 0.0
-}
-
-/* write access
- * -------------------------------------------------------------------------- */
-
-func (a *BareReal) Set(b Scalar) {
-  a.value = b.Value()
-}
-
-func (a *BareReal) SetValue(v float64) {
-  a.value = v
-}
-
-func (a *BareReal) SetDerivative(i int, v float64) {
-}
-
-func (a *BareReal) Variable(order int) {
-}
-
-func (a *BareReal) Constant() {
 }

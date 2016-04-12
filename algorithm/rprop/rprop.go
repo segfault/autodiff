@@ -46,8 +46,6 @@ func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
   t := x0.ElementType()
   // copy variables
   x := x0.Clone()
-  // initialize all x as constants
-  SetConstant(x)
   // step size for each variable
   step := make([]float64, len(x))
   // gradients
@@ -59,20 +57,18 @@ func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
     gradient_new[i] = 1
     gradient_old[i] = 1
   }
+  x.Variables(1)
 
   for {
     for i, _ := range x {
       gradient_old[i] = gradient_new[i]
     }
+    // evaluate objective function
+    s = f(x)
     // compute partial derivatives and update x
     for i, _ := range x {
-      // differentiate with respect to the ith variable
-      x[i].Variable(1)
-      s = f(x)
       // save derivative
-      gradient_new[i] = s.Derivative(1)
-      // set variable back to constant
-      x[i].Constant()
+      gradient_new[i] = s.Derivative(1, i)
     }
     // execute hook if available
     if hook != nil && hook(gradient_new, x, s) {

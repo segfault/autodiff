@@ -9,7 +9,7 @@ Compute the derivative of a function *f* at *x = 9*
     return Add(Mul(NewReal(2), Pow(x, 3)), NewReal(4))
   }
   x := NewReal(9)
-  x.Variable(1)
+  Variables(1, x)
   y := f(x)
 ```
 where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.

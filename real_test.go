@@ -18,6 +18,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+//import "fmt"
 import "math"
 import "testing"
 
@@ -38,13 +39,15 @@ func TestDiff(t *testing.T) {
     return NewReal(2).Mul(x.Pow(3)).Add(NewReal(4))
   }
   x := NewReal(9)
-  x.Variable(2)
+
+  Variables(2, x)
+
   y := f(x)
 
-  if y.Derivative(1) != 486 {
+  if y.Derivative(1, 0) != 486 {
     t.Error("Differentiation failed!")
   }
-  if y.Derivative(2) != 108 {
+  if y.Derivative(2, 0) != 108 {
     t.Error("Differentiation failed!")
   }
 }
@@ -52,21 +55,23 @@ func TestDiff(t *testing.T) {
 func TestTan(t *testing.T) {
 
   a := NewReal(4.321)
-  a.Variable(1)
+  Variables(1, a)
+
   s := Tan(a)
 
-  if math.Abs(s.Derivative(1) - 6.87184) > 0.0001 {
-    t.Error("Incorrect derivative for Tan()!", s.Derivative(1))
+  if math.Abs(s.Derivative(1, 0) - 6.87184) > 0.0001 {
+    t.Error("Incorrect derivative for Tan()!", s.Derivative(1, 0))
   }
 }
 
 func TestTanh(t *testing.T) {
 
   a := NewReal(4.321)
-  a.Variable(1)
+  Variables(1, a)
+
   s := Tanh(a)
 
-  if math.Abs(s.Derivative(1) - 0.00070588) > 0.0000001 {
+  if math.Abs(s.Derivative(1, 0) - 0.00070588) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
 }

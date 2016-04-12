@@ -41,21 +41,17 @@ func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
   t := x0.ElementType()
   // copy variables
   x := x0.Clone()
-  // initialize all variables as constants
-  SetConstant(x)
+  x.Variables(1)
   // slice containing the gradient
   gradient := make([]float64, len(x))
 
   for {
+    // evaluate objective function
+    s = f(x)
     // compute partial derivatives and update variables
     for i, _ := range x {
-      // differentiate once with respect to the ith variable
-      x[i].Variable(1)
-      s = f(x)
       // save partial derivative
-      gradient[i] = s.Derivative(1)
-      // set variables constant again
-      x[i].Constant()
+      gradient[i] = s.Derivative(1, i)
     }
     // execute hook if available
     if hook != nil && hook(gradient, x, s) {
@@ -68,7 +64,7 @@ func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
     }
     // update variables
     for i, _ := range x {
-      x[i] = Sub(x[i], NewScalar(t, step*s.Derivative(1)))
+      x[i] = Sub(x[i], NewScalar(t, step*s.Derivative(1, i)))
       if math.IsNaN(x[i].Value()) {
         panic("Gradient descent diverged!")
       }

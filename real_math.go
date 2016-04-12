@@ -18,6 +18,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+//import "fmt"
 import "math"
 
 /* -------------------------------------------------------------------------- */
@@ -36,73 +37,101 @@ func (a *Real) Smaller(b Scalar) bool {
 }
 
 func (a *Real) Neg() Scalar {
-  c := NewReal(-a.Value())
+  c := NewReal(-a.Value(), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = -a.Derivative(1)
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, -a.Derivative(1, i))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = -a.Derivative(2)
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, -a.Derivative(2, i))
+    }
   }
   return c
 }
 
 func (a *Real) Add(b Scalar) Scalar {
-  c := NewReal(a.Value() + b.Value())
+  n := iMax(a.N(), b.N())
+  c := NewReal(a.Value() + b.Value(), n)
   c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1) + b.Derivative(1)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i) + b.Derivative(1, i))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Derivative(2) + b.Derivative(2)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i) + b.Derivative(2, i))
+    }
   }
   return c
 }
 
 func (a *Real) Sub(b Scalar) Scalar {
-  c := NewReal(a.Value() - b.Value())
+  n := iMax(a.N(), b.N())
+  c := NewReal(a.Value() - b.Value(), n)
   c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1) - b.Derivative(1)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i) - b.Derivative(1, i))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Derivative(2) - b.Derivative(2)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i) - b.Derivative(2, i))
+    }
   }
   return c
 }
 
 func (a *Real) Mul(b Scalar) Scalar {
-  c := NewReal(a.Value()*b.Value())
+  n := iMax(a.N(), b.N())
+  c := NewReal(a.Value()*b.Value(), n)
   c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
-    c.derivative[0] = a.Value()*b.Derivative(1) + a.Derivative(1)*b.Value()
+    for i := 0; i < n; i++ {
+      c.SetDerivative(1, i, a.Value()*b.Derivative(1, i) + a.Derivative(1, i)*b.Value())
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Value()*b.Derivative(2) + a.Derivative(2)*b.Value() + 2*a.Derivative(1)*b.Derivative(1)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(2, i, a.Value()*b.Derivative(2, i) + a.Derivative(2, i)*b.Value() + 2*a.Derivative(1, i)*b.Derivative(1, i))
+    }
   }
   return c
 }
 
 func (a *Real) Div(b Scalar) Scalar {
-  c := NewReal(a.Value()/b.Value())
+  n := iMax(a.N(), b.N())
+  c := NewReal(a.Value()/b.Value(), n)
   c.order = iMax(a.Order(), b.Order())
   if c.order >= 1 {
-    c.derivative[0] = (a.Derivative(1)*b.Value() - a.Value()*b.Derivative(1))/(b.Value()*b.Value())
+    for i := 0; i < n; i++ {
+      c.SetDerivative(1, i, (a.Derivative(1, i)*b.Value() - a.Value()*b.Derivative(1, i))/(b.Value()*b.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = (2*a.Value()*math.Pow(b.Derivative(1), 2) + math.Pow(b.Value(), 2)*a.Derivative(2) - b.Value()*(2*a.Derivative(1)*b.Derivative(1) + a.Value()*b.Derivative(2)))/math.Pow(b.Value(), 3)
+    for i := 0; i < n; i++ {
+      c.SetDerivative(2, i, (2*a.Value()*math.Pow(b.Derivative(1, i), 2) + math.Pow(b.Value(), 2)*a.Derivative(2, i) - b.Value()*(2*a.Derivative(1, i)*b.Derivative(1, i) + a.Value()*b.Derivative(2, i)))/math.Pow(b.Value(), 3))
+    }
   }
   return c
 }
 
 func (a *Real) Pow(k float64) Scalar {
-  c := NewReal(math.Pow(a.Value(), k))
+  c := NewReal(math.Pow(a.Value(), k), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = k*math.Pow(a.Value(), k-1)*a.Derivative(1)
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, k*math.Pow(a.Value(), k-1)*a.Derivative(1, i))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = k*math.Pow(a.Value(), k-1)*a.Derivative(2) + k*(k-1)*math.Pow(a.Value(), k-2)*math.Pow(a.Derivative(1), 2)
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, k*math.Pow(a.Value(), k-1)*a.Derivative(2, i) + k*(k-1)*math.Pow(a.Value(), k-2)*math.Pow(a.Derivative(1, i), 2))
+    }
   }
   return c
 }
@@ -114,97 +143,129 @@ func (a *Real) Sqrt() Scalar {
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Sin() Scalar {
-  c := NewReal(math.Sin(a.Value()))
+  c := NewReal(math.Sin(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*math.Cos(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*math.Cos(a.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Derivative(2)*math.Cos(a.Value()) - math.Pow(a.Derivative(1), 2)*math.Sin(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i)*math.Cos(a.Value()) - math.Pow(a.Derivative(1, i), 2)*math.Sin(a.Value()))
+    }
   }
   return c
 }
 
 func (a *Real) Sinh() Scalar {
-  c := NewReal(math.Sinh(a.Value()))
+  c := NewReal(math.Sinh(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*math.Cosh(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*math.Cosh(a.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Derivative(2)*math.Cosh(a.Value()) + math.Pow(a.Derivative(1), 2)*math.Sinh(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i)*math.Cosh(a.Value()) + math.Pow(a.Derivative(1, i), 2)*math.Sinh(a.Value()))
+    }
   }
   return c
 }
 
 func (a *Real) Cos() Scalar {
-  c := NewReal(math.Cos(a.Value()))
+  c := NewReal(math.Cos(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = -a.Derivative(1)*math.Sin(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, -a.Derivative(1, i)*math.Sin(a.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = -a.Derivative(2)*math.Sin(a.Value()) - math.Pow(a.Derivative(1), 2)*math.Cos(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, -a.Derivative(2, i)*math.Sin(a.Value()) - math.Pow(a.Derivative(1, i), 2)*math.Cos(a.Value()))
+    }
   }
   return c
 }
 
 func (a *Real) Cosh() Scalar {
-  c := NewReal(math.Cosh(a.Value()))
+  c := NewReal(math.Cosh(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*math.Sin(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*math.Sin(a.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = a.Derivative(2)*math.Sin(a.Value()) + math.Pow(a.Derivative(1), 2)*math.Cos(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i)*math.Sin(a.Value()) + math.Pow(a.Derivative(1, i), 2)*math.Cos(a.Value()))
+    }
   }
   return c
 }
 
 func (a *Real) Tan() Scalar {
-  c := NewReal(math.Tan(a.Value()))
+  c := NewReal(math.Tan(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*(1.0+math.Pow(math.Tan(a.Value()), 2))
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*(1.0+math.Pow(math.Tan(a.Value()), 2)))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = (1.0+math.Pow(math.Tan(a.Value()), 2))*(a.Derivative(2) + 2*math.Tan(a.Value())*math.Pow(a.Derivative(1), 2))
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, (1.0+math.Pow(math.Tan(a.Value()), 2))*(a.Derivative(2, i) + 2*math.Tan(a.Value())*math.Pow(a.Derivative(1, i), 2)))
+    }
   }
   return c
 }
 
 func (a *Real) Tanh() Scalar {
-  c := NewReal(math.Tanh(a.Value()))
+  c := NewReal(math.Tanh(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*(1.0-math.Pow(math.Tanh(a.Value()), 2))
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*(1.0-math.Pow(math.Tanh(a.Value()), 2)))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = (1.0-math.Pow(math.Tanh(a.Value()), 2))*(a.Derivative(2) - 2*math.Tanh(a.Value())*math.Pow(a.Derivative(1), 2))
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, (1.0-math.Pow(math.Tanh(a.Value()), 2))*(a.Derivative(2, i) - 2*math.Tanh(a.Value())*math.Pow(a.Derivative(1, i), 2)))
+    }
   }
   return c
 }
 
 func (a *Real) Exp() Scalar {
-  c := NewReal(math.Exp(a.Value()))
+  c := NewReal(math.Exp(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)*math.Exp(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)*math.Exp(a.Value()))
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = (a.Derivative(2) + math.Pow(a.Derivative(1), 2))*math.Exp(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, (a.Derivative(2, i) + math.Pow(a.Derivative(1, i), 2))*math.Exp(a.Value()))
+    }
   }
   return c
 }
 
 func (a *Real) Log() Scalar {
-  c := NewReal(math.Log(a.Value()))
+  c := NewReal(math.Log(a.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
-    c.derivative[0] = a.Derivative(1)/a.Value()
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i)/a.Value())
+    }
   }
   if c.order >= 2 {
-    c.derivative[1] = (a.Derivative(2)*a.Value() - a.Derivative(1)*a.Derivative(1))/(a.Value()*a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, (a.Derivative(2, i)*a.Value() - a.Derivative(1, i)*a.Derivative(1, i))/(a.Value()*a.Value()))
+    }
   }
   return c
 }
