@@ -165,11 +165,12 @@ func (a *Probability) Div(b Scalar) Scalar {
 }
 
 func (a *Probability) Pow(k Scalar) Scalar {
-  c := NewProbability(1.0, a.N())
+  n := iMax(a.N(), k.N())
+  c := NewProbability(1.0, n)
   c.order = a.Order()
   c.value = k.Value()*a.LogValue()
   if c.order >= 1 {
-    for i := 0; i < a.N(); i++ {
+    for i := 0; i < n; i++ {
       if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
         c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*(
           k.Value()*a.Derivative(1, i) + a.Value()*math.Log(a.Value())*k.Derivative(1, i)))
@@ -179,7 +180,7 @@ func (a *Probability) Pow(k Scalar) Scalar {
     }
   }
   if c.order >= 2 {
-    for i := 0; i < a.N(); i++ {
+    for i := 0; i < n; i++ {
       if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
         c.SetDerivative(2, i,
           math.Pow(a.Value(), k.Value())*(
