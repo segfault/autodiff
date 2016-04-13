@@ -6,7 +6,7 @@ Compute the derivative of a function *f* at *x = 9*
 
 ```go
   f := func(x Scalar) Scalar {
-    return Add(Mul(NewReal(2), Pow(x, 3)), NewReal(4))
+    return Add(Mul(NewReal(2), Pow(x, NewBareReal(3))), NewReal(4))
   }
   x := NewReal(9)
   Variables(1, x)
@@ -20,7 +20,7 @@ Compare vanilla gradient descent with resilient backpropagation
 ```go
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
-    return Add(Sub(Pow(x[0], 4), Mul(NewReal(3), Pow(x[0], 3))), NewReal(2))
+    return Add(Sub(Pow(x[0], NewBareReal(4)), Mul(NewReal(3), Pow(x[0], NewBareReal(3)))), NewReal(2))
   }
   x0 := NewVector(RealType, []float64{8})
   // vanilla gradient descent
@@ -61,8 +61,8 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
     y := MakeVector(2)
     // y1 = x1^2 + x2^2 - 6
     // y2 = x1^3 - x2^2
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewReal(6))
-    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
+    y[0] = Sub(Add(Pow(x[0], NewBareReal(2)), Pow(x[1], NewBareReal(2))), NewReal(6))
+    y[1] = Sub(Pow(x[0], NewBareReal(3)), Pow(x[1], NewBareReal(2)))
 
     return y
   }
