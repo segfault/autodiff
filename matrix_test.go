@@ -132,6 +132,21 @@ func TestMatrixVxM(t *testing.T) {
   }
 }
 
+func TestOuter(t *testing.T) {
+  a := NewVector(RealType, []float64{1,3,2})
+  b := NewVector(RealType, []float64{2,1,0,3})
+  r := Outer(a,b)
+  m := NewMatrix(RealType, 3, 4, []float64{
+    2,1,0,3,
+    6,3,0,9,
+    4,2,0,6 })
+
+  if MNorm(MSub(r, m)).Value() > 1e-8  {
+    t.Error("Outer product multiplication failed!")
+  }
+
+}
+
 func TestMatrixJacobian(t *testing.T) {
 
   f := func(x Vector) Vector {

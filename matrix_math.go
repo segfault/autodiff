@@ -118,6 +118,16 @@ func VxM(a Vector, b Matrix) Vector {
   return r
 }
 
+func Outer(a, b Vector) Matrix {
+  r := NullMatrix(a.ElementType(), len(a), len(b))
+  for i := 0; i < len(a); i++ {
+    for j := 0; j < len(b); j++ {
+      r.Set(Mul(a[i],b[j]), i, j)
+    }
+  }
+  return r
+}
+
 /* -------------------------------------------------------------------------- */
 
 func MTrace(matrix Matrix) Scalar {
