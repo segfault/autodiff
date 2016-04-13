@@ -148,9 +148,9 @@ func MNorm(matrix Matrix) Scalar {
   if matrix.rows == 0 && matrix.cols == 0 {
     return nil
   }
-  s := Pow(matrix.values[0], 2.0)
+  s := Pow(matrix.values[0], NewBareReal(2.0))
   for i := 1; i < len(matrix.values); i++ {
-    s = Add(s, Pow(matrix.values[i], 2.0))
+    s = Add(s, Pow(matrix.values[i], NewBareReal(2.0)))
   }
   return s
 }

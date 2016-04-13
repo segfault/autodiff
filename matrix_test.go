@@ -155,9 +155,9 @@ func TestMatrixJacobian(t *testing.T) {
     }
     y := NullVector(RealType, 3)
     // x1^2 + y^2 - 6
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewReal(6))
+    y[0] = Sub(Add(Pow(x[0], NewBareReal(2)), Pow(x[1], NewBareReal(2))), NewBareReal(6))
     // x^3 - y^2
-    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
+    y[1] = Sub(Pow(x[0], NewBareReal(3)), Pow(x[1], NewBareReal(2)))
     y[2] = NewReal(2)
 
     return y

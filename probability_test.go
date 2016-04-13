@@ -178,7 +178,7 @@ func TestProbabilityDiff1(t *testing.T) {
     a := NewProbability(2.0)
     Variables(1, a)
 
-    c := Pow(a, 13)
+    c := Pow(a, NewBareReal(13))
 
     if math.Abs(c.Derivative(1, 0) - 13*math.Pow(2.0, 12)) > 1e-8 {
       t.Error("Probability differentiation test 4 failed")
@@ -201,7 +201,7 @@ func TestMultinomialLikelihood(t *testing.T) {
   likelihood := func(theta Scalar, c1, c2 float64) Scalar {
     theta1 := theta
     theta2 := Sub(NewProbability(1), theta)
-    return Mul(Pow(theta1, c1), Pow(theta2, c2))
+    return Mul(Pow(theta1, NewBareReal(c1)), Pow(theta2, NewBareReal(c2)))
   }
   // evaluate the likelihood at the mode
   theta := NewProbability(13.0/(13.0+17.0))

@@ -32,7 +32,7 @@ func sumOfSquares(x, y Vector, l *Line) Scalar {
   n := NewScalar(RealType, float64(len(x)))
 
   for i,_ := range x {
-    s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), 2))
+    s = Add(s, Pow(Sub(l.Eval(x[i]), y[i]), NewBareReal(2)))
   }
   return Div(s, n)
 }

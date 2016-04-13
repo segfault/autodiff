@@ -120,24 +120,37 @@ func (a *Real) Div(b Scalar) Scalar {
   return c
 }
 
-func (a *Real) Pow(k float64) Scalar {
-  c := NewReal(math.Pow(a.Value(), k), a.N())
+func (a *Real) Pow(k Scalar) Scalar {
+  c := NewReal(math.Pow(a.Value(), k.Value()), a.N())
   c.order = a.Order()
   if c.order >= 1 {
     for i := 0; i < a.N(); i++ {
-      c.SetDerivative(1, i, k*math.Pow(a.Value(), k-1)*a.Derivative(1, i))
+      if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
+        c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*(
+          k.Value()*a.Derivative(1, i) + a.Value()*math.Log(a.Value())*k.Derivative(1, i)))
+      } else {
+        c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*k.Value()*a.Derivative(1, i))
+      }
     }
   }
   if c.order >= 2 {
     for i := 0; i < a.N(); i++ {
-      c.SetDerivative(2, i, k*math.Pow(a.Value(), k-1)*a.Derivative(2, i) + k*(k-1)*math.Pow(a.Value(), k-2)*math.Pow(a.Derivative(1, i), 2))
+      if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
+        c.SetDerivative(2, i,
+          math.Pow(a.Value(), k.Value())*(
+            (k.Value()-1.0)*k.Value()*math.Pow(a.Derivative(1, i), 2)/math.Pow(a.Value(), 2) +
+              (2.0*(1.0 + k.Value()*math.Log(a.Value()))*a.Derivative(1, i)*k.Derivative(1, i) + k.Value()*a.Derivative(2, i))/a.Value() +
+              math.Log(a.Value())*(math.Log(a.Value())*math.Pow(k.Derivative(1, i), 2.0) + k.Derivative(2, i))))
+      } else {
+        c.SetDerivative(2, i, k.Value()*math.Pow(a.Value(), k.Value()-1)*a.Derivative(2, i) + k.Value()*(k.Value()-1)*math.Pow(a.Value(), k.Value()-2)*math.Pow(a.Derivative(1, i), 2))
+      }
     }
   }
   return c
 }
 
 func (a *Real) Sqrt() Scalar {
-  return a.Pow(1.0/2.0)
+  return a.Pow(NewBareReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */

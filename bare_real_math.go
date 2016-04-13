@@ -67,12 +67,12 @@ func (a *BareReal) Div(b Scalar) Scalar {
   return NewBareReal(a.Value()/b.Value())
 }
 
-func (a *BareReal) Pow(k float64) Scalar {
-  return NewBareReal(math.Pow(a.Value(), k))
+func (a *BareReal) Pow(k Scalar) Scalar {
+  return NewBareReal(math.Pow(a.Value(), k.Value()))
 }
 
 func (a *BareReal) Sqrt() Scalar {
-  return a.Pow(1.0/2.0)
+  return a.Pow(NewBareReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */

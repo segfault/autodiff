@@ -202,7 +202,7 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
 }
 
 func objective_g(active []bool, channel Matrix, px Vector) Scalar {
-  return Pow(VNorm(objective_f(active, channel, px)), 2.0)
+  return Pow(VNorm(objective_f(active, channel, px)), NewBareReal(2.0))
 }
 
 /* main function

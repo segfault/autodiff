@@ -36,7 +36,7 @@ func TestReal(t *testing.T) {
 func TestDiff(t *testing.T) {
 
   f := func(x Scalar) Scalar {
-    return NewReal(2).Mul(x.Pow(3)).Add(NewReal(4))
+    return NewReal(2).Mul(x.Pow(NewBareReal(3))).Add(NewReal(4))
   }
   x := NewReal(9)
 
@@ -49,6 +49,42 @@ func TestDiff(t *testing.T) {
   }
   if y.Derivative(2, 0) != 108 {
     t.Error("Differentiation failed!")
+  }
+}
+
+func TestPow1(t *testing.T) {
+  x := NewReal(3.4)
+  k := NewReal(4.1)
+
+  Variables(2, x, k)
+
+  r := Pow(x, k)
+
+  if math.Abs(r.Derivative(1, 0) - 182.124553) > 1e-4  ||
+    (math.Abs(r.Derivative(1, 1) - 184.826947) > 1e-4) {
+    t.Error("Pow failed!")
+  }
+  if math.Abs(r.Derivative(2, 0) - 166.054739) > 1e-4  ||
+    (math.Abs(r.Derivative(2, 1) - 226.186676) > 1e-4) {
+    t.Error("Pow failed!")
+  }
+}
+
+func TestPow2(t *testing.T) {
+  x := NewReal(-3.4)
+  k := NewReal( 4.0)
+
+  Variables(2, x, k)
+
+  r := Pow(x, k)
+
+  if math.Abs(r.Derivative(1, 0) - -157.216) > 1e-4  ||
+    (math.Abs(r.Derivative(2, 0) -  138.720) > 1e-4) {
+    t.Error("Pow failed!")
+  }
+  if !math.IsNaN(r.Derivative(1, 1))  ||
+    (!math.IsNaN(r.Derivative(2, 1))) {
+    t.Error("Pow failed!")
   }
 }
 

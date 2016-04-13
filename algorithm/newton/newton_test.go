@@ -31,9 +31,9 @@ func TestNewton(t *testing.T) {
     }
     y := NullVector(RealType, 2)
     // y1 = x1^2 + x2^2 - 6
-    y[0] = Sub(Add(Pow(x[0], 2), Pow(x[1], 2)), NewReal(6))
+    y[0] = Sub(Add(Pow(x[0], NewReal(2)), Pow(x[1], NewReal(2))), NewReal(6))
     // y2 = x1^3 - x2^2
-    y[1] = Sub(Pow(x[0], 3), Pow(x[1], 2))
+    y[1] = Sub(Pow(x[0], NewReal(3)), Pow(x[1], NewReal(2)))
 
     return y
   }

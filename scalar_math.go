@@ -35,7 +35,7 @@ func Neg(a Scalar) Scalar {
 }
 
 func Abs(a Scalar) Scalar {
-  return Sqrt(Pow(a, 2.0))
+  return Sqrt(Pow(a, NewBareReal(2.0)))
 }
 
 func Add(a, b Scalar) Scalar {
@@ -54,7 +54,7 @@ func Div(a, b Scalar) Scalar {
   return a.Div(b)
 }
 
-func Pow(a Scalar, k float64) Scalar {
+func Pow(a Scalar, k Scalar) Scalar {
   return a.Pow(k)
 }
 

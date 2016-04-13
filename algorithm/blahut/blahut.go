@@ -67,7 +67,7 @@ func blahut_compute_J(r Vector, J Scalar) {
   J.Set(Div(Log(sum), NewScalar(r.ElementType(), math.Log(2.0))))
 }
 
-func blahut_compute_p(r Vector, lambda float64, p Vector) {
+func blahut_compute_p(r Vector, lambda Scalar, p Vector) {
   for i, _ := range p {
     if math.IsInf(p.At(i).LogValue(), -1) {
       // p[i] = r[i]
@@ -75,7 +75,7 @@ func blahut_compute_p(r Vector, lambda float64, p Vector) {
         i)
     } else {
       // p[i] = p[i]^(1-lambda) * r[i]^lambda
-      p.Set(Mul(Pow(p.At(i), 1.0 - lambda), Pow(r.At(i), lambda)),
+      p.Set(Mul(Pow(p.At(i), Sub(NewBareReal(1.0), lambda)), Pow(r.At(i), lambda)),
         i)
     }
   }
@@ -84,7 +84,7 @@ func blahut_compute_p(r Vector, lambda float64, p Vector) {
 
 func blahut(channel Matrix, p_init Vector, steps int,
   hook func(Vector, Scalar) bool,
-  lambda float64) Vector {
+  lambda Scalar) Vector {
 
   n, m := channel.Dims()
   p := p_init.Clone()
@@ -124,5 +124,5 @@ func Run(channel Matrix, p_init Vector, steps int, args ...interface{}) Vector {
       panic("blahut(): Invalid optional argument!")
     }
   }
-  return blahut(channel, p_init, steps, hook, lambda)
+  return blahut(channel, p_init, steps, hook, NewBareReal(lambda))
 }

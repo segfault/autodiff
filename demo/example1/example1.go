@@ -91,7 +91,7 @@ func hook(err *[]float64, gradient []float64, px Vector, s Scalar) bool {
 func main() {
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
-    return Add(Sub(Pow(x[0], 4), Mul(NewReal(3), Pow(x[0], 3))), NewReal(2))
+    return Add(Sub(Pow(x[0], NewBareReal(4)), Mul(NewReal(3), Pow(x[0], NewBareReal(3)))), NewReal(2))
   }
   err1 := make([]float64, 0)
   err2 := make([]float64, 0)

@@ -53,9 +53,9 @@ func VSub(a, b Vector) Vector {
 }
 
 func VNorm(a Vector) Scalar {
-  r := Pow(a[0], 2)
+  r := Pow(a[0], NewBareReal(2))
   for i := 1; i < len(a); i++ {
-    r = Add(r, Pow(a[i], 2))
+    r = Add(r, Pow(a[i], NewBareReal(2)))
   }
   return Sqrt(r)
 }

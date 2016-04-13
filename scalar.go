@@ -55,7 +55,7 @@ type Scalar interface {
   Sub       (Scalar)  Scalar
   Mul       (Scalar)  Scalar
   Div       (Scalar)  Scalar
-  Pow       (float64) Scalar
+  Pow       (Scalar)  Scalar
   Sqrt      ()        Scalar
   Sin       ()        Scalar
   Sinh      ()        Scalar
