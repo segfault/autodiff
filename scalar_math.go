@@ -93,3 +93,7 @@ func Exp(a Scalar) Scalar {
 func Log(a Scalar) Scalar {
   return a.Log()
 }
+
+func Gamma(a Scalar) Scalar {
+  return a.Gamma()
+}

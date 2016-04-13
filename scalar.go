@@ -65,6 +65,7 @@ type Scalar interface {
   Tanh      ()        Scalar
   Exp       ()        Scalar
   Log       ()        Scalar
+  Gamma     ()        Scalar
   // nice printing
   fmt.Stringer
 }

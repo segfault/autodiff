@@ -108,3 +108,7 @@ func (a *BareReal) Exp() Scalar {
 func (a *BareReal) Log() Scalar {
   return NewBareReal(math.Log(a.Value()))
 }
+
+func (a *BareReal) Gamma() Scalar {
+  return NewBareReal(math.Gamma(a.Value()))
+}

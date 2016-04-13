@@ -111,3 +111,16 @@ func TestTanh(t *testing.T) {
     t.Error("Incorrect derivative for Tanh()!")
   }
 }
+
+func TestGamma(t *testing.T) {
+
+  a := NewReal(4.321)
+  Variables(2, a)
+
+  s := Gamma(a)
+
+  if math.Abs(s.Derivative(1, 0) - 12.2353264) > 1e-6 ||
+    (math.Abs(s.Derivative(2, 0) - 18.8065398) > 1e-6) {
+    t.Error("Incorrect derivative for Gamma()!")
+  }
+}

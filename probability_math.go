@@ -20,6 +20,8 @@ package autodiff
 
 import "math"
 
+import "github.com/pbenner/autodiff/special"
+
 /* -------------------------------------------------------------------------- */
 
 func (a *Probability) Equals(b Scalar) bool {
@@ -326,6 +328,26 @@ func (a *Probability) Log() Scalar {
   if c.Order() >= 2 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(2, i, (a.Derivative(2, i)*a.Value() - a.Derivative(1, i)*a.Derivative(1, i))/(a.Value()*a.Value()))
+    }
+  }
+  return c
+}
+
+func (a *Probability) Gamma() Scalar {
+  c := NewReal(math.Gamma(a.Value()), a.N())
+  c.order = a.Order()
+  // preevaluate some expressions
+  v1 := c.Value()
+  if c.order >= 1 {
+    v2 := special.Digamma(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, v1*v2*a.Derivative(1, i))
+    }
+    if c.order >= 2 {
+      v3 := special.Trigamma(a.Value())
+      for i := 0; i < a.N(); i++ {
+        c.SetDerivative(2, i, v1*((v2*v2 + v3)*math.Pow(a.Derivative(1, i), 2.0) + v1*a.Derivative(2, i)))
+      }
     }
   }
   return c
