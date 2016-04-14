@@ -197,6 +197,22 @@ func TestProbabilityDiff1(t *testing.T) {
   }
 }
 
+func TestTypes(t *testing.T) {
+
+  a := NewProbability(2)
+  b := NewReal(3)
+
+  c1 := Add(a,b)
+  c2 := Add(b,a)
+
+  if c1.Type() != ProbabilityType {
+    t.Error("TestTypes() failed!")
+  }
+  if c2.Type() != RealType {
+    t.Error("TestTypes() failed!")
+  }
+}
+
 func TestMultinomialLikelihood(t *testing.T) {
   likelihood := func(theta Scalar, c1, c2 float64) Scalar {
     theta1 := theta
