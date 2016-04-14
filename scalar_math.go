@@ -94,6 +94,10 @@ func Log(a Scalar) Scalar {
   return a.Log()
 }
 
+func Erf(a Scalar) Scalar {
+  return a.Erf()
+}
+
 func Gamma(a Scalar) Scalar {
   return a.Gamma()
 }

@@ -65,6 +65,7 @@ type Scalar interface {
   Tanh      ()        Scalar
   Exp       ()        Scalar
   Log       ()        Scalar
+  Erf       ()        Scalar
   Gamma     ()        Scalar
   Mlgamma   (int)     Scalar // multivariate log gamma
   // nice printing
