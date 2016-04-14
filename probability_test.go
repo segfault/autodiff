@@ -221,40 +221,19 @@ func TestMultinomialLikelihood(t *testing.T) {
   }
   // evaluate the likelihood at the mode
   theta := NewProbability(13.0/(13.0+17.0))
-  l := likelihood(theta, 13, 17)
-
   Variables(2, theta)
 
+  l := likelihood(theta, 13, 17)
+
+  if math.IsNaN(l.Value()) {
+    t.Error("result is NaN")
+  }
   // first derivative at the mode should be zero
   if math.Abs(l.Derivative(1, 0)) > 1e-12 {
     t.Error("l.Derivative(1) should be 0.0")
   }
   // second derivative at the mode should be negative
-  if l.Derivative(2, 0) > 0.0 {
-    t.Error("l.Derivative(2) should be negative")
-  }
-}
-
-func TestEntropy(t *testing.T) {
-  entropy := func(theta Scalar) Scalar {
-    theta1 := theta
-    theta2 := Sub(NewProbability(1), theta)
-    c1 := Mul(theta1, Log(theta1))
-    c2 := Mul(theta2, Log(theta2))
-    return Neg(Add(c1, c2))
-  }
-  // evaluate the likelihood at the mode
-  theta := NewProbability(1.0/2.0)
-  e := entropy(theta)
-
-  Variables(2, theta)
-
-  // first derivative at the mode should be zero
-  if math.Abs(e.Derivative(1, 0)) > 1e-12 {
-    t.Error("l.Derivative(1) should be 0.0")
-  }
-  // second derivative at the mode should be negative
-  if e.Derivative(2, 0) > 0.0 {
+  if l.Derivative(2, 0) >= 0.0 {
     t.Error("l.Derivative(2) should be negative")
   }
 }
