@@ -20,6 +20,8 @@ package autodiff
 
 import "math"
 
+import "github.com/pbenner/autodiff/special"
+
 /* -------------------------------------------------------------------------- */
 
 func checkBare(b Scalar) {
@@ -111,4 +113,8 @@ func (a *BareReal) Log() Scalar {
 
 func (a *BareReal) Gamma() Scalar {
   return NewBareReal(math.Gamma(a.Value()))
+}
+
+func (a *BareReal) Mlgamma(k int) Scalar {
+  return NewBareReal(special.Mlgamma(a.Value(), k))
 }

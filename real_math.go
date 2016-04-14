@@ -305,3 +305,28 @@ func (a *Real) Gamma() Scalar {
   }
   return c
 }
+
+func (a *Real) Mlgamma(k int) Scalar {
+  c := NewReal(special.Mlgamma(a.Value(), k), a.N())
+  c.order = a.Order()
+  // preevaluate some expressions
+  if c.order >= 1 {
+    for i := 0; i < a.N(); i++ {
+      sum := 0.0
+      for j := 1; j <= k; j++ {
+        sum += special.Digamma(a.Value() + float64(1-j)/2.0)
+      }
+      c.SetDerivative(1, i, sum)
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < a.N(); i++ {
+      sum := 0.0
+      for j := 1; j <= k; j++ {
+        sum += special.Trigamma(a.Value() + float64(1-j)/2.0)
+      }
+      c.SetDerivative(2, i, sum)
+    }
+  }
+  return c
+}
