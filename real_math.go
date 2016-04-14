@@ -302,6 +302,22 @@ func (a *Real) Erf() Scalar {
   return c
 }
 
+func (a *Real) Erfc() Scalar {
+  c := NewReal(math.Erfc(a.Value()), a.N())
+  c.order = a.Order()
+  if c.order >= 1 {
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, -2.0*a.Derivative(1, i)/(math.Exp(a.Value()*a.Value())*math.Sqrt(math.Pi)))
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, -(2.0*a.Derivative(2, i) - 4.0*a.Value()*a.Derivative(1, i)*a.Derivative(1, i))/(math.Exp(a.Value()*a.Value())*math.Sqrt(math.Pi)))
+    }
+  }
+  return c
+}
+
 func (a *Real) Gamma() Scalar {
   c := NewReal(math.Gamma(a.Value()), a.N())
   c.order = a.Order()

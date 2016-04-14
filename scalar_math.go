@@ -98,6 +98,10 @@ func Erf(a Scalar) Scalar {
   return a.Erf()
 }
 
+func Erfc(a Scalar) Scalar {
+  return a.Erfc()
+}
+
 func Gamma(a Scalar) Scalar {
   return a.Gamma()
 }

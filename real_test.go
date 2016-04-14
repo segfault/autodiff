@@ -121,7 +121,20 @@ func TestErf(t *testing.T) {
 
   if math.Abs(s.Derivative(1, 0) -  1.07023926) > 1e-6 ||
     (math.Abs(s.Derivative(2, 0) - -0.49231006) > 1e-6) {
-    t.Error("Incorrect derivative for Gamma()!")
+    t.Error("Incorrect derivative for Erf()!")
+  }
+}
+
+func TestErfc(t *testing.T) {
+
+  a := NewReal(0.23)
+  Variables(2, a)
+
+  s := Erfc(a)
+
+  if math.Abs(s.Derivative(1, 0) - -1.07023926) > 1e-6 ||
+    (math.Abs(s.Derivative(2, 0) -  0.49231006) > 1e-6) {
+    t.Error("Incorrect derivative for Erfc()!")
   }
 }
 

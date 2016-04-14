@@ -66,6 +66,7 @@ type Scalar interface {
   Exp       ()        Scalar
   Log       ()        Scalar
   Erf       ()        Scalar
+  Erfc      ()        Scalar
   Gamma     ()        Scalar
   Mlgamma   (int)     Scalar // multivariate log gamma
   // nice printing

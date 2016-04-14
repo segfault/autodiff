@@ -115,6 +115,10 @@ func (a *BareReal) Erf() Scalar {
   return NewBareReal(math.Erf(a.Value()))
 }
 
+func (a *BareReal) Erfc() Scalar {
+  return NewBareReal(math.Erfc(a.Value()))
+}
+
 func (a *BareReal) Gamma() Scalar {
   return NewBareReal(math.Gamma(a.Value()))
 }
