@@ -97,3 +97,7 @@ func Log(a Scalar) Scalar {
 func Gamma(a Scalar) Scalar {
   return a.Gamma()
 }
+
+func Mlamma(a Scalar, k int) Scalar {
+  return a.Mlgamma(k)
+}
