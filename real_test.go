@@ -31,6 +31,12 @@ func TestReal(t *testing.T) {
   if a.Value() != 1.0 {
     t.Error("a.Value() should be 1.0")
   }
+
+  a.Add(a, NewReal(2.0))
+
+  if a.Value() != 3.0 {
+    t.Error("a.Value() should be 3.0")
+  }
 }
 
 func TestDiff(t *testing.T) {
