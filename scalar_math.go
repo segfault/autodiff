@@ -31,81 +31,102 @@ func Smaller(a, b Scalar) bool {
 }
 
 func Neg(a Scalar) Scalar {
-  return a.Neg()
+  c := a.Clone()
+  return c.Neg(a)
 }
 
 func Abs(a Scalar) Scalar {
-  return Sqrt(Pow(a, NewBareReal(2.0)))
+  c := a.Clone()
+  c.Pow(a, NewBareReal(2.0))
+  return c.Sqrt(c)
 }
 
 func Add(a, b Scalar) Scalar {
-  return a.Add(b)
+  c := a.Clone()
+  return c.Add(a, b)
 }
 
 func Sub(a, b Scalar) Scalar {
-  return a.Sub(b)
+  c := a.Clone()
+  return c.Sub(a, b)
 }
 
 func Mul(a, b Scalar) Scalar {
-  return a.Mul(b)
+  c := a.Clone()
+  return c.Mul(a, b)
 }
 
 func Div(a, b Scalar) Scalar {
-  return a.Div(b)
+  c := a.Clone()
+  return c.Div(a, b)
 }
 
 func Pow(a Scalar, k Scalar) Scalar {
-  return a.Pow(k)
+  c := a.Clone()
+  return c.Pow(a, k)
 }
 
 func Sqrt(a Scalar) Scalar {
-  return a.Sqrt()
+  c := a.Clone()
+  return c.Sqrt(a)
 }
 
 func Sin(a Scalar) Scalar {
-  return a.Sin()
+  c := a.Clone()
+  return c.Sin(a)
 }
 
 func Sinh(a Scalar) Scalar {
-  return a.Sinh()
+  c := a.Clone()
+  return c.Sinh(a)
 }
 
 func Cos(a Scalar) Scalar {
-  return a.Cos()
+  c := a.Clone()
+  return c.Cos(a)
 }
 
 func Cosh(a Scalar) Scalar {
-  return a.Cosh()
+  c := a.Clone()
+  return c.Cosh(a)
 }
 
 func Tan(a Scalar) Scalar {
-  return a.Tan()
+  c := a.Clone()
+  return c.Tan(a)
 }
 
 func Tanh(a Scalar) Scalar {
-  return a.Tanh()
+  c := a.Clone()
+  return c.Tanh(a)
 }
 
 func Exp(a Scalar) Scalar {
-  return a.Exp()
+  c := a.Clone()
+  return c.Exp(a)
 }
 
 func Log(a Scalar) Scalar {
-  return a.Log()
+  c := a.Clone()
+  return c.Log(a)
 }
 
 func Erf(a Scalar) Scalar {
-  return a.Erf()
+  c := a.Clone()
+  return c.Erf(a)
 }
 
 func Erfc(a Scalar) Scalar {
-  return a.Erfc()
+  c := a.Clone()
+  return c.Erfc(a)
 }
 
 func Gamma(a Scalar) Scalar {
-  return a.Gamma()
+  c := a.Clone()
+  return c.Gamma(a)
 }
 
 func Mlgamma(a Scalar, k int) Scalar {
-  return a.Mlgamma(k)
+  c := a.Clone()
+  return c.Mlgamma(a, k)
 }

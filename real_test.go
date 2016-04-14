@@ -36,7 +36,7 @@ func TestReal(t *testing.T) {
 func TestDiff(t *testing.T) {
 
   f := func(x Scalar) Scalar {
-    return NewReal(2).Mul(x.Pow(NewBareReal(3))).Add(NewReal(4))
+    return Add(Mul(NewReal(2), Pow(x, NewBareReal(3))), NewReal(4))
   }
   x := NewReal(9)
 
