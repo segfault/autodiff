@@ -28,6 +28,11 @@ type ScalarType reflect.Type
 
 type ScalarState interface {
   Copy          (Scalar)
+  // allocate memory for derivatives of n variables
+  Alloc         (int)
+  // allocate enough memory for the derivatives of the given
+  // variable(s) and copy the order
+  AllocFor      (...Scalar)
   // read access
   Order         ()             int
   Value         ()             float64
@@ -43,32 +48,32 @@ type ScalarState interface {
 
 type Scalar interface {
   ScalarState
-  Clone     ()        Scalar
+  Clone     ()                Scalar
   // type reflections
-  Type      ()        ScalarType
+  Type      ()                ScalarType
   // some basic operations on scalars
-  Equals    (Scalar)  bool
-  Greater   (Scalar)  bool
-  Smaller   (Scalar)  bool
-  Neg       ()        Scalar
-  Add       (Scalar)  Scalar
-  Sub       (Scalar)  Scalar
-  Mul       (Scalar)  Scalar
-  Div       (Scalar)  Scalar
-  Pow       (Scalar)  Scalar
-  Sqrt      ()        Scalar
-  Sin       ()        Scalar
-  Sinh      ()        Scalar
-  Cos       ()        Scalar
-  Cosh      ()        Scalar
-  Tan       ()        Scalar
-  Tanh      ()        Scalar
-  Exp       ()        Scalar
-  Log       ()        Scalar
-  Erf       ()        Scalar
-  Erfc      ()        Scalar
-  Gamma     ()        Scalar
-  Mlgamma   (int)     Scalar // multivariate log gamma
+  Equals    (Scalar)          bool
+  Greater   (Scalar)          bool
+  Smaller   (Scalar)          bool
+  Neg       (Scalar)          Scalar
+  Add       (Scalar, Scalar)  Scalar
+  Sub       (Scalar, Scalar)  Scalar
+  Mul       (Scalar, Scalar)  Scalar
+  Div       (Scalar, Scalar)  Scalar
+  Pow       (Scalar, Scalar)  Scalar
+  Sqrt      (Scalar)          Scalar
+  Sin       (Scalar)          Scalar
+  Sinh      (Scalar)          Scalar
+  Cos       (Scalar)          Scalar
+  Cosh      (Scalar)          Scalar
+  Tan       (Scalar)          Scalar
+  Tanh      (Scalar)          Scalar
+  Exp       (Scalar)          Scalar
+  Log       (Scalar)          Scalar
+  Erf       (Scalar)          Scalar
+  Erfc      (Scalar)          Scalar
+  Gamma     (Scalar)          Scalar
+  Mlgamma   (Scalar, int)     Scalar // multivariate log gamma
   // nice printing
   fmt.Stringer
 }

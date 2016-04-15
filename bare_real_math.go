@@ -45,84 +45,122 @@ func (a *BareReal) Smaller(b Scalar) bool {
   return a.Value() < b.Value()
 }
 
-func (a *BareReal) Neg() Scalar {
-  return NewBareReal(-a.Value())
+func (c *BareReal) Neg(a Scalar) Scalar {
+  checkBare(a)
+  c.value = -a.Value()
+  return c
 }
 
-func (a *BareReal) Add(b Scalar) Scalar {
+func (c *BareReal) Add(a, b Scalar) Scalar {
+  checkBare(a)
   checkBare(b)
-  return NewBareReal(a.Value() + b.Value())
+  c.value = a.Value() + b.Value()
+  return c
 }
 
-func (a *BareReal) Sub(b Scalar) Scalar {
+func (c *BareReal) Sub(a, b Scalar) Scalar {
+  checkBare(a)
   checkBare(b)
-  return NewBareReal(a.Value() - b.Value())
+  c.value = a.Value() - b.Value()
+  return c
 }
 
-func (a *BareReal) Mul(b Scalar) Scalar {
+func (c *BareReal) Mul(a, b Scalar) Scalar {
+  checkBare(a)
   checkBare(b)
-  return NewBareReal(a.Value()*b.Value())
+  c.value = a.Value() * b.Value()
+  return c
 }
 
-func (a *BareReal) Div(b Scalar) Scalar {
+func (c *BareReal) Div(a, b Scalar) Scalar {
+  checkBare(a)
   checkBare(b)
-  return NewBareReal(a.Value()/b.Value())
+  c.value = a.Value() / b.Value()
+  return c
 }
 
-func (a *BareReal) Pow(k Scalar) Scalar {
-  return NewBareReal(math.Pow(a.Value(), k.Value()))
+func (c *BareReal) Pow(a, k Scalar) Scalar {
+  checkBare(a)
+  checkBare(k)
+  c.value = math.Pow(a.Value(), k.Value())
+  return c
 }
 
-func (a *BareReal) Sqrt() Scalar {
-  return a.Pow(NewBareReal(1.0/2.0))
+func (c *BareReal) Sqrt(a Scalar) Scalar {
+  checkBare(a)
+  return c.Pow(a, NewBareReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (a *BareReal) Sin() Scalar {
-  return NewBareReal(math.Sin(a.Value()))
+func (c *BareReal) Sin(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Sin(a.Value())
+  return c
 }
 
-func (a *BareReal) Sinh() Scalar {
-  return NewBareReal(math.Sinh(a.Value()))
+func (c *BareReal) Sinh(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Sinh(a.Value())
+  return c
 }
 
-func (a *BareReal) Cos() Scalar {
-  return NewBareReal(math.Cos(a.Value()))
+func (c *BareReal) Cos(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Cos(a.Value())
+  return c
 }
 
-func (a *BareReal) Cosh() Scalar {
-  return NewBareReal(math.Cosh(a.Value()))
+func (c *BareReal) Cosh(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Cosh(a.Value())
+  return c
 }
 
-func (a *BareReal) Tan() Scalar {
-  return NewBareReal(math.Tan(a.Value()))
+func (c *BareReal) Tan(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Tan(a.Value())
+  return c
 }
 
-func (a *BareReal) Tanh() Scalar {
-  return NewBareReal(math.Tanh(a.Value()))
+func (c *BareReal) Tanh(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Tanh(a.Value())
+  return c
 }
 
-func (a *BareReal) Exp() Scalar {
-  return NewBareReal(math.Exp(a.Value()))
+func (c *BareReal) Exp(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Exp(a.Value())
+  return c
 }
 
-func (a *BareReal) Log() Scalar {
-  return NewBareReal(math.Log(a.Value()))
+func (c *BareReal) Log(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Log(a.Value())
+  return c
 }
 
-func (a *BareReal) Erf() Scalar {
-  return NewBareReal(math.Erf(a.Value()))
+func (c *BareReal) Erf(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Erf(a.Value())
+  return c
 }
 
-func (a *BareReal) Erfc() Scalar {
-  return NewBareReal(math.Erfc(a.Value()))
+func (c *BareReal) Erfc(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Erfc(a.Value())
+  return c
 }
 
-func (a *BareReal) Gamma() Scalar {
-  return NewBareReal(math.Gamma(a.Value()))
+func (c *BareReal) Gamma(a Scalar) Scalar {
+  checkBare(a)
+  c.value = math.Gamma(a.Value())
+  return c
 }
 
-func (a *BareReal) Mlgamma(k int) Scalar {
-  return NewBareReal(special.Mlgamma(a.Value(), k))
+func (c *BareReal) Mlgamma(a Scalar, k int) Scalar {
+  checkBare(a)
+  c.value = special.Mlgamma(a.Value(), k)
+  return c
 }

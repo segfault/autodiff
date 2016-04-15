@@ -63,7 +63,7 @@ func (a *Probability) Copy(b Scalar) {
 }
 
 func (a *Probability) Clone() Scalar {
-  r := NewProbability(0.0)
+  r := NewProbability(0.0, a.N())
   r.Copy(a)
   return r
 }
@@ -88,7 +88,9 @@ func (a *Probability) Type() ScalarType {
  * -------------------------------------------------------------------------- */
 
 func (a *Probability) Real() *Real {
-  return NewReal(math.Exp(a.Value()))
+  r := NewReal(0.0, a.N())
+  r.Copy(a)
+  return r
 }
 
 func (a *Probability) String() string {

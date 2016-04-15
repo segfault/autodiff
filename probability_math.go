@@ -46,9 +46,9 @@ func (a *Probability) Smaller(b Scalar) bool {
   return a.LogValue() < b.LogValue()
 }
 
-func (a *Probability) Neg() Scalar {
-  c := NewReal(-a.Value(), a.N())
-  c.order = a.Order()
+func (c *Probability) Neg(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(-a.Value())
   if c.order >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, -a.Derivative(1, i))
@@ -62,117 +62,75 @@ func (a *Probability) Neg() Scalar {
   return c
 }
 
-func (a *Probability) Add(b Scalar) Scalar {
-  var c Scalar
-  n := iMax(a.N(), b.N())
-  if Smaller(b, NewReal(0.0)) {
-    // b < 0.0
-    c = NewReal(0.0, n)
-    c.(*Real).order = iMax(a.Order(), b.Order())
-    c.(*Real).value = a.Value() + b.Value()
-  } else {
-    // b >= 0.0
-    c = NewProbability(0.0, n)
-    c.(*Probability).order = iMax(a.Order(), b.Order())
-    c.(*Probability).value = logAdd(a.LogValue(), b.LogValue())
-  }
+func (c *Probability) Add(a, b Scalar) Scalar {
+  c.AllocFor(a, b)
+  c.value = logAdd(a.LogValue(), b.LogValue())
   if c.Order() >= 1 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i) + b.Derivative(1, i))
     }
   }
   if c.Order() >= 2 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(2, i, a.Derivative(2, i) + b.Derivative(2, i))
     }
   }
   return c
 }
 
-func (a *Probability) Sub(b Scalar) Scalar {
-  var c Scalar
-  n := iMax(a.N(), b.N())
-  if Smaller(b, NewReal(0.0)) {
-    // b < 0.0
-    c = NewProbability(0.0, n)
-    c.(*Probability).order = iMax(a.Order(), b.Order())
-    c.(*Probability).value = logAdd(a.LogValue(), b.Neg().LogValue())
-  } else {
-    // b >= 0.0
-    c = NewReal(0.0, n)
-    c.(*Real).order = iMax(a.Order(), b.Order())
-    c.(*Real).value = a.Value() - b.Value()
-  }
+func (c *Probability) Sub(a, b Scalar) Scalar {
+  c.AllocFor(a, b)
+  c.value = logSub(a.LogValue(), b.LogValue())
   if c.Order() >= 1 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i) - b.Derivative(1, i))
     }
   }
   if c.Order() >= 2 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(2, i, a.Derivative(2, i) - b.Derivative(2, i))
     }
   }
   return c
 }
 
-func (a *Probability) Mul(b Scalar) Scalar {
-  var c Scalar
-  n := iMax(a.N(), b.N())
-  if Smaller(b, NewReal(0.0)) {
-    c = NewReal(0.0, n)
-    c.(*Real).order = iMax(a.Order(), b.Order())
-    c.(*Real).value = -math.Exp(a.LogValue() + Neg(b).LogValue())
-  } else {
-    c = NewProbability(0.0, n)
-    c.(*Probability).order = iMax(a.Order(), b.Order())
-    c.(*Probability).value = a.LogValue() + b.LogValue()
-  }
+func (c *Probability) Mul(a, b Scalar) Scalar {
+  c.AllocFor(a, b)
+  c.value = a.LogValue() + b.LogValue()
   if c.Order() >= 1 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(1, i, a.Value()*b.Derivative(1, i) + a.Derivative(1, i)*b.Value())
     }
   }
   if c.Order() >= 2 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(2, i, a.Value()*b.Derivative(2, i) + a.Derivative(2, i)*b.Value() + 2*a.Derivative(1, i)*b.Derivative(1, i))
     }
   }
   return c
 }
 
-func (a *Probability) Div(b Scalar) Scalar {
-  var c Scalar
-  n := iMax(a.N(), b.N())
-  if Smaller(b, NewReal(0.0)) {
-    c = NewReal(0.0, n)
-    c.(*Real).order = iMax(a.Order(), b.Order())
-    c.(*Real).value = -math.Exp(a.LogValue() - Neg(b).LogValue())
-  } else {
-    c = NewProbability(0.0, n)
-    c.(*Probability).order = iMax(a.Order(), b.Order())
-    c.(*Probability).value = a.LogValue() - b.LogValue()
-  }
+func (c *Probability) Div(a, b Scalar) Scalar {
+  c.AllocFor(a, b)
+  c.value = a.LogValue() - b.LogValue()
   if c.Order() >= 1 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(1, i, (a.Derivative(1, i)*b.Value() - a.Value()*b.Derivative(1, i))/(b.Value()*b.Value()))
     }
   }
   if c.Order() >= 2 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       c.SetDerivative(2, i, (2*a.Value()*math.Pow(b.Derivative(1, i), 2) + math.Pow(b.Value(), 2)*a.Derivative(2, i) - b.Value()*(2*a.Derivative(1, i)*b.Derivative(1, i) + a.Value()*b.Derivative(2, i)))/math.Pow(b.Value(), 3))
     }
   }
   return c
 }
 
-func (a *Probability) Pow(k Scalar) Scalar {
-  n := iMax(a.N(), k.N())
-  c := NewProbability(1.0, n)
-  c.order = a.Order()
+func (c *Probability) Pow(a, k Scalar) Scalar {
+  c.AllocFor(a, k)
   c.value = k.Value()*a.LogValue()
   if c.order >= 1 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
         c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*(
           k.Value()*a.Derivative(1, i) + a.Value()*math.Log(a.Value())*k.Derivative(1, i)))
@@ -182,7 +140,7 @@ func (a *Probability) Pow(k Scalar) Scalar {
     }
   }
   if c.order >= 2 {
-    for i := 0; i < n; i++ {
+    for i := 0; i < c.N(); i++ {
       if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
         c.SetDerivative(2, i,
           math.Pow(a.Value(), k.Value())*(
@@ -197,15 +155,15 @@ func (a *Probability) Pow(k Scalar) Scalar {
   return c
 }
 
-func (a *Probability) Sqrt() Scalar {
-  return a.Pow(NewBareReal(1.0/2.0))
+func (c *Probability) Sqrt(a Scalar) Scalar {
+  return c.Pow(a, NewBareReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */
 
-func (a *Probability) Sin() Scalar {
-  c := NewProbability(math.Sin(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Sin(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Sin(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)*math.Cos(a.Value()))
@@ -219,9 +177,9 @@ func (a *Probability) Sin() Scalar {
   return c
 }
 
-func (a *Probability) Sinh() Scalar {
-  c := NewProbability(math.Sinh(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Sinh(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Sinh(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)*math.Cosh(a.Value()))
@@ -235,9 +193,9 @@ func (a *Probability) Sinh() Scalar {
   return c
 }
 
-func (a *Probability) Cos() Scalar {
-  c := NewProbability(math.Cos(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Cos(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Cos(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, -a.Derivative(1, i)*math.Sin(a.Value()))
@@ -251,9 +209,9 @@ func (a *Probability) Cos() Scalar {
   return c
 }
 
-func (a *Probability) Cosh() Scalar {
-  c := NewProbability(math.Cosh(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Cosh(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Cosh(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)*math.Sin(a.Value()))
@@ -267,9 +225,9 @@ func (a *Probability) Cosh() Scalar {
   return c
 }
 
-func (a *Probability) Tan() Scalar {
-  c := NewProbability(math.Tan(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Tan(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Tan(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)*(1.0+math.Pow(math.Tan(a.Value()), 2)))
@@ -283,9 +241,9 @@ func (a *Probability) Tan() Scalar {
   return c
 }
 
-func (a *Probability) Tanh() Scalar {
-  c := NewProbability(math.Tanh(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Tanh(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Tanh(a.Value()))
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)*(1.0-math.Pow(math.Tanh(a.Value()), 2)))
@@ -299,9 +257,8 @@ func (a *Probability) Tanh() Scalar {
   return c
 }
 
-func (a *Probability) Exp() Scalar {
-  c := NewProbability(1.0, a.N())
-  c.order = a.Order()
+func (c *Probability) Exp(a Scalar) Scalar {
+  c.AllocFor(a)
   c.value = a.Value()
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
@@ -316,10 +273,9 @@ func (a *Probability) Exp() Scalar {
   return c
 }
 
-func (a *Probability) Log() Scalar {
-  c := NewReal(1.0, a.N())
-  c.order = a.Order()
-  c.value = a.LogValue()
+func (c *Probability) Log(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.value = math.Log(a.LogValue())
   if c.Order() >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, a.Derivative(1, i)/a.Value())
@@ -333,9 +289,9 @@ func (a *Probability) Log() Scalar {
   return c
 }
 
-func (a *Probability) Erf() Scalar {
-  c := NewReal(math.Erf(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Erf(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Erf(a.Value()))
   if c.order >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, 2.0*a.Derivative(1, i)/(math.Exp(a.Value()*a.Value())*math.Sqrt(math.Pi)))
@@ -349,9 +305,9 @@ func (a *Probability) Erf() Scalar {
   return c
 }
 
-func (a *Probability) Erfc() Scalar {
-  c := NewReal(math.Erfc(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Erfc(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Erfc(a.Value()))
   if c.order >= 1 {
     for i := 0; i < a.N(); i++ {
       c.SetDerivative(1, i, -2.0*a.Derivative(1, i)/(math.Exp(a.Value()*a.Value())*math.Sqrt(math.Pi)))
@@ -365,9 +321,9 @@ func (a *Probability) Erfc() Scalar {
   return c
 }
 
-func (a *Probability) Gamma() Scalar {
-  c := NewReal(math.Gamma(a.Value()), a.N())
-  c.order = a.Order()
+func (c *Probability) Gamma(a Scalar) Scalar {
+  c.AllocFor(a)
+  c.SetValue(math.Gamma(a.Value()))
   // preevaluate some expressions
   v1 := c.Value()
   if c.order >= 1 {
@@ -385,9 +341,9 @@ func (a *Probability) Gamma() Scalar {
   return c
 }
 
-func (a *Probability) Mlgamma(k int) Scalar {
-  c := NewReal(special.Mlgamma(a.Value(), k), a.N())
-  c.order = a.Order()
+func (c *Probability) Mlgamma(a Scalar, k int) Scalar {
+  c.AllocFor(a)
+  c.SetValue(special.Mlgamma(a.Value(), k))
   // preevaluate some expressions
   if c.order >= 1 {
     for i := 0; i < a.N(); i++ {

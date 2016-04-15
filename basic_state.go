@@ -24,38 +24,53 @@ import "math"
 
 type BasicState struct {
   value            float64
-  derivative  [][2]float64
   order            int
+  derivative  [][2]float64
 }
 
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewBasicState(v float64, args ...int) *BasicState {
-  // length of the gradient
-  length := 0
+func NewBasicState(value float64, args ...int) *BasicState {
+  // number of variables for the gradient
+  n := 0
   // get optional gradient length
   if len(args) >= 1 {
-    length = args[0]
+    n = args[0]
   }
-  s := BasicState{
-    value     : v,
-    derivative: make([][2]float64, length),
-    order     : 0 }
-  return &s
+  a := BasicState{}
+  a.value = value
+  a.order = 0
+  a.Alloc(n)
+  return &a
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (a *BasicState) Copy(b Scalar) {
-  a.order = b.Order()
   a.value = b.Value()
-  if len(a.derivative) != b.N() {
-    a.derivative = make([][2]float64, b.N())
-  }
+  a.order = b.Order()
+  a.Alloc(b.N())
   for i := 0; i < b.N(); i++ {
     a.derivative[i][0] = b.Derivative(1, i)
     a.derivative[i][1] = b.Derivative(2, i)
+  }
+}
+
+func (a *BasicState) Alloc(n int) {
+  if len(a.derivative) != n {
+    a.derivative = make([][2]float64, n)
+  }
+}
+
+func (c *BasicState) AllocFor(args ...Scalar) {
+  switch len(args) {
+  case 1:
+    c.Alloc(args[0].N())
+    c.order = args[0].Order()
+  case 2:
+    c.Alloc(iMax(args[0].N(), args[1].N()))
+    c.order = iMax(args[0].Order(), args[1].Order())
   }
 }
 

@@ -35,46 +35,52 @@ func NewBareState(v float64) *BareState {
 
 /* -------------------------------------------------------------------------- */
 
-func (a *BareReal) Copy(b Scalar) {
+func (a *BareState) Copy(b Scalar) {
   a.value = b.Value()
+}
+
+func (a *BareState) Alloc(n int) {
+}
+
+func (c *BareState) AllocFor(args ...Scalar) {
 }
 
 /* read access
  * -------------------------------------------------------------------------- */
 
-func (a *BareReal) Order() int {
+func (a *BareState) Order() int {
   return 0
 }
 
-func (a *BareReal) Value() float64 {
+func (a *BareState) Value() float64 {
   return a.value
 }
 
-func (a *BareReal) LogValue() float64 {
+func (a *BareState) LogValue() float64 {
   return math.Log(a.Value())
 }
 
-func (a *BareReal) Derivative(i, j int) float64 {
+func (a *BareState) Derivative(i, j int) float64 {
   return 0.0
 }
 
-func (a *BareReal) N() int {
+func (a *BareState) N() int {
   return 0
 }
 
 /* write access
  * -------------------------------------------------------------------------- */
 
-func (a *BareReal) Set(b Scalar) {
+func (a *BareState) Set(b Scalar) {
   a.value = b.Value()
 }
 
-func (a *BareReal) SetValue(v float64) {
+func (a *BareState) SetValue(v float64) {
   a.value = v
 }
 
-func (a *BareReal) SetDerivative(i, j int, v float64) {
+func (a *BareState) SetDerivative(i, j int, v float64) {
 }
 
-func (a *BareReal) SetVariable(i, n, order int) {
+func (a *BareState) SetVariable(i, n, order int) {
 }
