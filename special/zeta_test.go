@@ -436,3 +436,9 @@ func TestZeta(t *testing.T) {
     }
   }
 }
+
+func TestZetaErrors(t *testing.T) {
+  if !math.IsNaN(Zeta(1.0)) {
+    t.Error("TestZetaErrors() failed!")
+  }
+}

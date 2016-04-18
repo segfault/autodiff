@@ -226,7 +226,8 @@ func zeta_imp(s, sc float64) float64 {
   const log_root_two_pi = 9.189385332046727417803297364056176398e-01
 
   if sc == 0 {
-    panic("pole error")
+    // lim_{x->1} Zeta[x] = +/-Inf
+    return math.NaN()
   }
   result := 0.0
   //
@@ -286,7 +287,7 @@ func zeta_imp(s, sc float64) float64 {
   } else {
     result = zeta_imp_prec(s, sc)
   }
-  return result;
+  return result
 }
 
 /* -------------------------------------------------------------------------- */
