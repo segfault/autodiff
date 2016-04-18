@@ -3132,3 +3132,42 @@ func TestPolygamma(t *testing.T) {
     }
   }
 }
+
+func TestPolygammaErrors(t *testing.T) {
+  if !math.IsInf(Polygamma(500, 0.5), -1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  // test polygamma_imp for negative values
+  if !math.IsInf(Polygamma(5, -2), 1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsInf(Polygamma(5, -3), 1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsNaN(Polygamma(6, -2)) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsNaN(Polygamma(6, -3)) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  // test polygamma_nearzero
+  if !math.IsInf(Polygamma(5, 1e-100), 1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsNaN(Polygamma(6, 1e-100)) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  // test poly_cot_pi
+  if !math.IsNaN(Polygamma(100, -0.99)) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsNaN(Polygamma(100, -1.01)) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsInf(Polygamma(101, -0.99), +1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+  if !math.IsInf(Polygamma(101, -1.01), +1) {
+    t.Error("TestPolygammaErrors() failed!")
+  }
+}

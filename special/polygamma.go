@@ -114,7 +114,7 @@ func polygamma_atinfinityplus(n int, x float64) float64 {
     // Emergency get out termination condition:
     //
     if(k > SeriesIterationsMax) {
-      panic("series did not converge")
+      panic("exceeded maximum series evaluations")
     }
   }
   if (n - 1) & 1 == 1 {
@@ -169,6 +169,7 @@ func polygamma_attransitionplus(n int, x float64) float64 {
 }
 
 func polygamma_nearzero(n int, x float64) float64 {
+  sum := 0.0
   //
   // If we take this expansion for polygamma: http://functions.wolfram.com/06.15.06.0003.02
   // and substitute in this expression for polygamma(n, 1): http://functions.wolfram.com/06.15.03.0009.01
@@ -196,7 +197,7 @@ func polygamma_nearzero(n int, x float64) float64 {
   //
   if prefix > 2.0/EpsilonFloat64 {
     if math.MaxFloat64 / prefix < scale {
-      panic("overflow error")
+      goto overflow
     }
     if n & 1 == 1 {
       return prefix * scale
@@ -211,7 +212,7 @@ func polygamma_nearzero(n int, x float64) float64 {
   // In practice however, it appears not to make any difference to the number of terms
   // required except in some edge cases which are filtered out anyway before we get here.
   //
-  sum := prefix
+  sum = prefix
   for k := 0;; {
     // Get the k'th term:
     term := factorial_part * Zeta(float64(k + n + 1))
@@ -229,14 +230,14 @@ func polygamma_nearzero(n int, x float64) float64 {
     // Last chance exit:
     //
     if(k > SeriesIterationsMax) {
-      panic("series did not converge")
+      panic("exceeded maximum series evaluations")
     }
   }
      //
   // We need to multiply by the scale, at each stage checking for oveflow:
   //
   if math.MaxFloat64 / scale < sum {
-    panic("overflow error")
+    goto overflow
   }
   sum *= scale;
 
@@ -245,9 +246,18 @@ func polygamma_nearzero(n int, x float64) float64 {
   } else {
     return -sum
   }
+overflow:
+  if n & 1 == 1 {
+    // n is odd integer => lim_{t->0} Polygamma(n, t) = +Inf (from below and above)
+    return math.Inf(1)
+  } else {
+    // n is even integer => lim_{t->0} Polygamma(n, t) = +/-Inf (sign depends on direction)
+    return math.NaN()
+  }
 }
 
 func poly_cot_pi(n int, x, xc float64) float64 {
+  result := 0.0
   // Return n'th derivative of cot(pi*x) at x, these are simply
   // tabulated for up to n = 9, beyond that it is possible to
   // calculate coefficients as follows:
@@ -403,18 +413,18 @@ func poly_cot_pi(n int, x, xc float64) float64 {
   // get real large real quick:
   //
   power_terms := float64(n) * math.Log(math.Pi)
+  v, _        := math.Lgamma(float64(n))
   if s == 0 {
-    panic("overflow error")
+    goto overflow
   }
-  v, _ := math.Lgamma(float64(n))
   power_terms -= math.Log(math.Abs(s)) * float64(n + 1)
   power_terms += v
   power_terms += math.Log(math.Abs(sum))
 
   if power_terms > MaxLogFloat64 {
-    panic("overflow error")
+    goto overflow
   }
-  result := math.Exp(power_terms)
+  result = math.Exp(power_terms)
 
   if math.Signbit(sum) {
     result *= -1
@@ -423,6 +433,14 @@ func poly_cot_pi(n int, x, xc float64) float64 {
     result *= -1
   }
   return result
+overflow:
+  if n & 1 == 1 {
+    // n is odd integer => lim_{t->x} Polygamma(n, t) = -Inf (from below and above)
+    return math.Inf(-1)
+  } else {
+    // n is even integer => lim_{t->x} Polygamma(n, t) = +/-Inf (sign depends on direction)
+    return math.NaN()
+  }
 }
 
 func polygamma_imp(n int, x float64) float64 {
@@ -433,13 +451,12 @@ func polygamma_imp(n int, x float64) float64 {
   }
   if(x < 0.0) {
     if(math.Floor(x) == x) {
-      //
-      // Result is infinity if x is odd, and a pole error if x is even.
-      //
-      if int(math.Trunc(x)) & 1 == 1 {
-        panic("overflow error")
+      if n & 1 == 1 {
+        // n is odd integer => lim_{t->x} Polygamma(n, t) = +Inf (from below and above)
+        return math.Inf(1)
       } else {
-        panic("pole error")
+        // n is even integer => lim_{t->x} Polygamma(n, t) = +/-Inf (sign depends on direction)
+        return math.NaN()
       }
     }
     z      := 1.0 - x
@@ -475,7 +492,7 @@ func polygamma_imp(n int, x float64) float64 {
       result = -result
     }
     if math.Abs(result) >= math.MaxFloat64*math.Pow(2.0, float64(-n-1)) {
-      panic("overflow error")
+      return math.Inf(-1)
     }
     result *= math.Pow(2.0,  float64(n + 1)) - 1.0
 
