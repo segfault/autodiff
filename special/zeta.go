@@ -273,13 +273,21 @@ func zeta_imp(s, sc float64) float64 {
         result  = v
         result -= s * math.Log(2.0*math.Pi)
         if result > MaxLogFloat64 {
-          panic("overflow error")
+          if math.Signbit(mult) {
+            return math.Inf(-1)
+          } else {
+            return math.Inf(+1)
+          }
         }
         result = math.Exp(result)
         if math.MaxFloat64 / math.Abs(mult) < result {
-          panic("overflow error")
+          if math.Signbit(mult) {
+            return math.Inf(-1)
+          } else {
+            return math.Inf(+1)
+          }
         }
-        result *= mult;
+        result *= mult
       } else {
         result = math.Sin(math.Pi*0.5*sc) * 2 * math.Pow(2.0*math.Pi, -s) * math.Gamma(s) * zeta_imp(s, sc)
       }

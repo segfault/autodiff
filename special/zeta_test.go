@@ -441,4 +441,10 @@ func TestZetaErrors(t *testing.T) {
   if !math.IsNaN(Zeta(1.0)) {
     t.Error("TestZetaErrors() failed!")
   }
+  if !math.IsInf(Zeta(-299.99), +1) {
+    t.Error("TestZetaErrors() failed!")
+  }
+  if !math.IsInf(Zeta(-300.01), -1) {
+    t.Error("TestZetaErrors() failed!")
+  }
 }
