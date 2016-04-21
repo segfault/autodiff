@@ -126,6 +126,11 @@ func Gamma(a Scalar) Scalar {
   return c.Gamma(a)
 }
 
+func Lgamma(a Scalar) Scalar {
+  c := a.Clone()
+  return c.Lgamma(a)
+}
+
 func Mlgamma(a Scalar, k int) Scalar {
   c := a.Clone()
   return c.Mlgamma(a, k)
