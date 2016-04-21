@@ -159,6 +159,16 @@ func (c *BareReal) Gamma(a Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) Lgamma(a Scalar) Scalar {
+  checkBare(a)
+  v, s := math.Lgamma(a.Value())
+  if s == -1 {
+    v = math.NaN()
+  }
+  c.value = v
+  return c
+}
+
 func (c *BareReal) Mlgamma(a Scalar, k int) Scalar {
   checkBare(a)
   c.value = special.Mlgamma(a.Value(), k)

@@ -73,6 +73,7 @@ type Scalar interface {
   Erf       (Scalar)          Scalar
   Erfc      (Scalar)          Scalar
   Gamma     (Scalar)          Scalar
+  Lgamma    (Scalar)          Scalar
   Mlgamma   (Scalar, int)     Scalar // multivariate log gamma
   // nice printing
   fmt.Stringer

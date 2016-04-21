@@ -333,6 +333,28 @@ func (c *Real) Gamma(a Scalar) Scalar {
   return c
 }
 
+func (c *Real) Lgamma(a Scalar) Scalar {
+  v1, s := math.Lgamma(a.Value())
+  if s == -1 {
+    v1 = math.NaN()
+  }
+  c.AllocFor(a)
+  c.SetValue(v1)
+  if c.order >= 1 {
+    v2 := special.Digamma(a.Value())
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(1, i, v2*a.Derivative(1, i))
+    }
+    if c.order >= 2 {
+      v3 := special.Trigamma(a.Value())
+      for i := 0; i < a.N(); i++ {
+        c.SetDerivative(2, i, v3*math.Pow(a.Derivative(1, i), 2.0) + v2*a.Derivative(2, i))
+      }
+    }
+  }
+  return c
+}
+
 func (c *Real) Mlgamma(a Scalar, k int) Scalar {
   c.AllocFor(a)
   c.SetValue(special.Mlgamma(a.Value(), k))
