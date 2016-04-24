@@ -45,9 +45,9 @@ func TestVxV(t *testing.T) {
 
   a := NewVector(RealType, []float64{1, 2,3,4})
   b := NewVector(RealType, []float64{2,-1,1,7})
-  r := VxV(a, b)
+  r := VmulV(a, b)
 
   if r.Value() != 31 {
-    t.Error("VxV() failed!")
+    t.Error("VmulV() failed!")
   }
 }

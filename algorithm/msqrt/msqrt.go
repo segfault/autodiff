@@ -35,13 +35,13 @@ func mSqrt(matrix Matrix) Matrix {
   c  := NewScalar(matrix.ElementType(), 0.5)
   Y0 := matrix
   Z0 := IdentityMatrix(matrix.ElementType(), n)
-  Y1 := MxS(MAdd(Y0, matrixInverse.Run(Z0)), c)
-  Z1 := MxS(MAdd(Z0, matrixInverse.Run(Y0)), c)
-  for MNorm(MSub(Y0, Y1)).Value() > 1e-8 {
+  Y1 := MmulS(MaddM(Y0, matrixInverse.Run(Z0)), c)
+  Z1 := MmulS(MaddM(Z0, matrixInverse.Run(Y0)), c)
+  for Mnorm(MsubM(Y0, Y1)).Value() > 1e-8 {
     Y0 = Y1
     Z0 = Z1
-    Y1 = MxS(MAdd(Y0, matrixInverse.Run(Z0)), c)
-    Z1 = MxS(MAdd(Z0, matrixInverse.Run(Y0)), c)
+    Y1 = MmulS(MaddM(Y0, matrixInverse.Run(Z0)), c)
+    Z1 = MmulS(MaddM(Z0, matrixInverse.Run(Y0)), c)
   }
   return Y1
 }

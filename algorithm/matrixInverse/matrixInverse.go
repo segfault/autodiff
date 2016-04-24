@@ -45,7 +45,7 @@ func mInverseGradient(matrix Matrix) Matrix {
   // objective function
   f := func(x Vector) Scalar {
     r.SetValues(x)
-    s := MNorm(MSub(MMul(matrix, r), I))
+    s := Mnorm(MsubM(MmulM(matrix, r), I))
     return s
   }
   x := rprop.Run(f, r.Values(), 0.01, 0.1)
@@ -81,7 +81,7 @@ func mInversePD(matrix Matrix, args ...interface{}) Matrix {
   args = append(args, gaussJordan.Triangular{true})
   // call Gauss-Jordan algorithm
   gaussJordan.Run(a, x, b, args...)
-  return MMul(x, x.T())
+  return MmulM(x, x.T())
 }
 
 /* -------------------------------------------------------------------------- */

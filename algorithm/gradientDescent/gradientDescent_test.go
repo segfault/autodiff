@@ -38,13 +38,13 @@ func TestRProp(t *testing.T) {
   // objective function
   f := func(x Vector) Scalar {
     m2.SetValues(x)
-    s := MNorm(MSub(MMul(m1, m2), I))
+    s := Mnorm(MsubM(MmulM(m1, m2), I))
     return s
   }
   x := Run(f, m2.Values(), 0.01)
   m2.SetValues(x)
 
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }

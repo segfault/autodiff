@@ -30,7 +30,7 @@ func VEqual(a, b Vector) bool {
   return true
 }
 
-func VAdd(a, b Vector) Vector {
+func VaddV(a, b Vector) Vector {
   if len(a) != len(b) {
     panic("VAdd(): Vector dimensions do not match!")
   }
@@ -41,7 +41,15 @@ func VAdd(a, b Vector) Vector {
   return r
 }
 
-func VSub(a, b Vector) Vector {
+func VaddS(a Vector, b Scalar) Vector {
+  r := NullVector(a.ElementType(), len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Add(a[i], b)
+  }
+  return r
+}
+
+func VsubV(a, b Vector) Vector {
   if len(a) != len(b) {
     panic("VSub(): Vector dimensions do not match!")
   }
@@ -52,7 +60,15 @@ func VSub(a, b Vector) Vector {
   return r
 }
 
-func VNorm(a Vector) Scalar {
+func VsubS(a Vector, b Scalar) Vector {
+  r := NullVector(a.ElementType(), len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Sub(a[i], b)
+  }
+  return r
+}
+
+func Vnorm(a Vector) Scalar {
   r := Pow(a[0], NewBareReal(2))
   for i := 1; i < len(a); i++ {
     r = Add(r, Pow(a[i], NewBareReal(2)))
@@ -60,7 +76,7 @@ func VNorm(a Vector) Scalar {
   return Sqrt(r)
 }
 
-func VxV(a, b Vector) Scalar {
+func VmulV(a, b Vector) Scalar {
   r := ZeroScalar(a.ElementType())
   for i := 0; i < len(a); i++ {
     r = Add(r, Mul(a[i], b[i]))
@@ -68,7 +84,7 @@ func VxV(a, b Vector) Scalar {
   return r
 }
 
-func VxS(a Vector, s Scalar) Vector {
+func VmulS(a Vector, s Scalar) Vector {
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
     r[i] = Mul(a[i], s)

@@ -69,7 +69,7 @@ func objective_f(px Vector) Vector {
 
 /* Norm of the gradient of L(p) */
 func objective_g(px Vector) Scalar {
-  return Pow(VNorm(objective_f(px)), NewBareReal(2.0))
+  return Pow(Vnorm(objective_f(px)), NewBareReal(2.0))
 }
 
 func main() {

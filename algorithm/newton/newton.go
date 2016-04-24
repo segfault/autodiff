@@ -42,13 +42,13 @@ func newton(f func(Vector) Vector, x Vector, epsilon float64,
     y  := f(x1)
     J  := Jacobian(f, x1)
     Q  := matrixInverse.Run(J, options...)
-    x2  = VSub(x1, MxV(Q, y))
+    x2  = VsubV(x1, MmulV(Q, y))
     // execute hook if available
     if hook != nil && hook(J, x2, y) {
       break;
     }
     // evaluate stop criterion
-    if VNorm(y).Value() < epsilon {
+    if Vnorm(y).Value() < epsilon {
       break
     }
     x1.Copy(x2)

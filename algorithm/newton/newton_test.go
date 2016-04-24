@@ -41,7 +41,7 @@ func TestNewton(t *testing.T) {
   v2 := Run(f, v1, Epsilon{1e-8})
   v3 := NewVector(RealType, []float64{1.537656, 1.906728})
 
-  if VNorm(VSub(v2, v3)).Value() > 1e-6  {
+  if Vnorm(VsubV(v2, v3)).Value() > 1e-6  {
     t.Error("Newton method failed!")
   }
 }

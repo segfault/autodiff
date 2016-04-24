@@ -32,7 +32,7 @@ func TestMatrixInverse(t *testing.T) {
   m2 := Run(m1)
   m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
 
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }
@@ -46,7 +46,7 @@ func TestSubmatrixInverse(t *testing.T) {
   m2 := Run(m1, gaussJordan.Submatrix{submatrix})
   m3 := NewMatrix(RealType, 3, 3, []float64{-2, 1, 0, 1.5, -0.5, 0, 0, 0, 1})
 
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }
@@ -65,7 +65,7 @@ func TestMatrixInversePD(t *testing.T) {
     -1.296875e+00, -3.281250e-01,  1.015625e+00, -5.781250e-01,
      3.593750e-01,  1.406250e-01, -5.781250e-01,  5.156250e-01 })
 
-  if MNorm(MSub(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }

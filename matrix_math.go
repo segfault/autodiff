@@ -22,7 +22,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-func MEqual(a, b Matrix) bool {
+func Mequal(a, b Matrix) bool {
   if a.rows != b.rows || a.cols != b.cols {
     panic("MEqual(): matrix dimensions do not match!")
   }
@@ -34,7 +34,7 @@ func MEqual(a, b Matrix) bool {
   return true
 }
 
-func MAdd(a, b Matrix) Matrix {
+func MaddM(a, b Matrix) Matrix {
   if a.rows != b.rows || a.cols != b.cols {
     panic("MAdd(): Matrix dimensions do not match!")
   }
@@ -50,7 +50,18 @@ func MAdd(a, b Matrix) Matrix {
   return r
 }
 
-func MSub(a, b Matrix) Matrix {
+func MaddS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  for i := 0; i < a.rows; i++ {
+    for j := 0; j < a.cols; j++ {
+      r.Set(Add(a.At(i, j), b),
+        i, j)
+    }
+  }
+  return r
+}
+
+func MsubM(a, b Matrix) Matrix {
   if a.rows != b.rows || a.cols != b.cols {
     panic("MSub(): Matrix dimensions do not match!")
   }
@@ -66,7 +77,18 @@ func MSub(a, b Matrix) Matrix {
   return r
 }
 
-func MMul(a, b Matrix) Matrix {
+func MsubS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  for i := 0; i < a.rows; i++ {
+    for j := 0; j < a.cols; j++ {
+      r.Set(Sub(a.At(i, j), b),
+        i, j)
+    }
+  }
+  return r
+}
+
+func MmulM(a, b Matrix) Matrix {
   if a.cols != b.rows {
     panic("MMul(): Matrix dimensions do not match!")
   }
@@ -82,7 +104,7 @@ func MMul(a, b Matrix) Matrix {
   return r
 }
 
-func MxV(a Matrix, b Vector) Vector {
+func MmulV(a Matrix, b Vector) Vector {
   if a.cols != len(b) {
     panic("MxV(): Matrix/Vector dimensions do not match!")
   }
@@ -95,7 +117,7 @@ func MxV(a Matrix, b Vector) Vector {
   return r
 }
 
-func MxS(a Matrix, s Scalar) Matrix {
+func MmulS(a Matrix, s Scalar) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
   for i := 0; i < a.rows; i++ {
     for j := 0; j < a.cols; j++ {
@@ -105,7 +127,7 @@ func MxS(a Matrix, s Scalar) Matrix {
   return r
 }
 
-func VxM(a Vector, b Matrix) Vector {
+func VmulM(a Vector, b Matrix) Vector {
   if len(a) != b.rows {
     panic("VxM(): Matrix/Vector dimensions do not match!")
   }
@@ -130,7 +152,7 @@ func Outer(a, b Vector) Matrix {
 
 /* -------------------------------------------------------------------------- */
 
-func MTrace(matrix Matrix) Scalar {
+func Mtrace(matrix Matrix) Scalar {
   if matrix.rows != matrix.cols {
     panic("MTrace(): Not a square matrix!")
   }
@@ -144,7 +166,7 @@ func MTrace(matrix Matrix) Scalar {
   return t
 }
 
-func MNorm(matrix Matrix) Scalar {
+func Mnorm(matrix Matrix) Scalar {
   if matrix.rows == 0 && matrix.cols == 0 {
     return nil
   }
