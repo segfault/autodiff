@@ -113,14 +113,12 @@ func (a *BasicState) Set(b Scalar) {
 
 func (a *BasicState) SetValue(v float64) {
   a.value = v
-  for i := 0; i < len(a.derivative); i++ {
-    if a.order == 0 {
-      a.derivative[i][0] = 0
-    } else {
-      a.derivative[i][0] = 1
-    }
-    a.derivative[i][1] = 0
-  }
+  // for i := 0; i < len(a.derivative); i++ {
+  //   if a.derivative[i][0] != 0.0 {
+  //     a.derivative[i][0] = 1
+  //   }
+  //   a.derivative[i][1] = 0
+  // }
 }
 
 func (a *BasicState) SetDerivative(i, j int, v float64) {
