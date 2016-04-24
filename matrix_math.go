@@ -127,6 +127,16 @@ func MmulS(a Matrix, s Scalar) Matrix {
   return r
 }
 
+func MdivS(a Matrix, s Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  for i := 0; i < a.rows; i++ {
+    for j := 0; j < a.cols; j++ {
+      r.Set(Div(a.At(i,j), s), i, j)
+    }
+  }
+  return r
+}
+
 func VmulM(a Vector, b Matrix) Vector {
   if len(a) != b.rows {
     panic("VxM(): Matrix/Vector dimensions do not match!")

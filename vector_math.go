@@ -91,3 +91,11 @@ func VmulS(a Vector, s Scalar) Vector {
   }
   return r
 }
+
+func VdivS(a Vector, s Scalar) Vector {
+  r := NullVector(a.ElementType(), len(a))
+  for i := 0; i < len(a); i++ {
+    r[i] = Div(a[i], s)
+  }
+  return r
+}
