@@ -42,7 +42,7 @@ Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb -
   // objective function
   f := func(x Vector) Scalar {
     r.SetValues(x)
-    s := MNorm(MSub(MMul(matrix, r), I))
+    s := Mnorm(MsubM(MmulM(matrix, r), I))
     return s
   }
   x, _ := rprop.Run(f, r.Values(), 0.01, 0.1, rprop.Epsilon{1e-12})
