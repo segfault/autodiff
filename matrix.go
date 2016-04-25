@@ -19,7 +19,13 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "bytes"
+import "bufio"
+import "compress/gzip"
+import "errors"
 import "reflect"
+import "strconv"
+import "strings"
+import "os"
 
 /* matrix type declaration
  * -------------------------------------------------------------------------- */
@@ -216,4 +222,58 @@ func (m Matrix) ToTable() string {
   }
 
   return buffer.String()
+}
+
+func ReadMatrix(t ScalarType, filename string) (Matrix, error) {
+  result := NewMatrix(t, 0, 0, []float64{})
+  data   := []float64{}
+  rows   := 0
+  cols   := 0
+
+  var scanner *bufio.Scanner
+  // open file
+  f, err := os.Open(filename)
+  if err != nil {
+    return result, err
+  }
+  defer f.Close()
+  isgzip, err := isGzip(filename)
+  if err != nil {
+    return result, err
+  }
+  // check if file is gzipped
+  if isgzip {
+    g, err := gzip.NewReader(f)
+    if err != nil {
+      return result, err
+    }
+    defer g.Close()
+    scanner = bufio.NewScanner(g)
+  } else {
+    scanner = bufio.NewScanner(f)
+  }
+
+  for scanner.Scan() {
+    fields := strings.Fields(scanner.Text())
+    if len(fields) == 0 {
+      continue
+    }
+    if cols == 0 {
+      cols = len(fields)
+    }
+    if cols != len(fields) {
+      return result, errors.New("invalid table")
+    }
+    for i := 0; i < len(fields); i++ {
+      value, err := strconv.ParseFloat(fields[i], 64)
+      if err != nil {
+        return result, errors.New("invalid table")
+      }
+      data = append(data, value)
+    }
+    rows++
+  }
+  result = NewMatrix(t, rows, cols, data)
+
+  return result, nil
 }
