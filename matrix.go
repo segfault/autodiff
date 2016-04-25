@@ -199,3 +199,21 @@ func (m Matrix) String() string {
 
   return buffer.String()
 }
+
+func (m Matrix) ToTable() string {
+  var buffer bytes.Buffer
+
+  for i := 0; i < m.rows; i++ {
+    if i != 0 {
+      buffer.WriteString(",\n ")
+    }
+    for j := 0; j < m.cols; j++ {
+      if j != 0 {
+        buffer.WriteString(", ")
+      }
+      buffer.WriteString(m.At(i,j).String())
+    }
+  }
+
+  return buffer.String()
+}

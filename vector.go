@@ -126,3 +126,16 @@ func (v Vector) String() string {
 
   return buffer.String()
 }
+
+func (v Vector) ToTable() string {
+  var buffer bytes.Buffer
+
+  for i, _ := range v {
+    if i != 0 {
+      buffer.WriteString(", ")
+    }
+    buffer.WriteString(v[i].String())
+  }
+
+  return buffer.String()
+}
