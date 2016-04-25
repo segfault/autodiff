@@ -138,6 +138,19 @@ func (matrix *Matrix) Diag() Vector {
   return v
 }
 
+func (matrix *Matrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
+  t := matrix.ElementType()
+  n := rto-rfrom+1
+  m := cto-cfrom+1
+  r := NullMatrix(t, n, m)
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.Set(matrix.At(rfrom+i, cfrom+j), i, j)
+    }
+  }
+  return r
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 

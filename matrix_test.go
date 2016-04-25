@@ -88,6 +88,17 @@ func TestMatrixReference(t *testing.T) {
   }
 }
 
+func TestSubmatrix(t *testing.T) {
+
+  a := NewMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
+  m := a.Submatrix(1,2,0,1)
+  r := NewMatrix(RealType, 2, 2, []float64{4,5,7,8})
+
+  if Mnorm(MsubM(r, m)).Value() > 1e-8  {
+    t.Error("Submatrix failed!")
+  }
+}
+
 func TestMatrixTrace(t *testing.T) {
 
   m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
