@@ -132,7 +132,7 @@ func (v Vector) ToTable() string {
 
   for i, _ := range v {
     if i != 0 {
-      buffer.WriteString(", ")
+      buffer.WriteString(" ")
     }
     buffer.WriteString(v[i].String())
   }
