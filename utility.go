@@ -19,6 +19,7 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "math"
+import "os"
 
 /* -------------------------------------------------------------------------- */
 
@@ -44,4 +45,24 @@ func sign(a float64) int {
   } else {
     return 1
   }
+}
+
+func isGzip(filename string) (bool, error) {
+
+  f, err := os.Open(filename)
+  if err != nil {
+    return false, err
+  }
+  defer f.Close()
+
+  b := make([]byte, 2)
+  n, err := f.Read(b)
+  if err != nil {
+    return false, err
+  }
+
+  if n == 2 && b[0] == 31 && b[1] == 139 {
+    return true, nil
+  }
+  return false, nil
 }

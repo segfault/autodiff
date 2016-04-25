@@ -18,6 +18,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+//import "fmt"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -49,5 +50,18 @@ func TestVxV(t *testing.T) {
 
   if r.Value() != 31 {
     t.Error("VmulV() failed!")
+  }
+}
+
+func TestReadVector(t *testing.T) {
+
+  v, err := ReadVector(RealType, "vector_test.table")
+  if err != nil {
+    panic(err)
+  }
+  r := NewVector(RealType, []float64{1,2,3,4,5,6})
+
+  if Vnorm(VsubV(v, r)).Value() != 0.0 {
+    t.Error("Read vector failed!")
   }
 }

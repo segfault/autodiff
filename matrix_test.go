@@ -182,3 +182,16 @@ func TestMatrixJacobian(t *testing.T) {
     t.Error("Inverting matrix failed!")
   }
 }
+
+func TestReadMatrix(t *testing.T) {
+
+  m, err := ReadMatrix(RealType, "matrix_test.table")
+  if err != nil {
+    panic(err)
+  }
+  r := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+
+  if Mnorm(MsubM(m, r)).Value() != 0.0 {
+    t.Error("Read matrix failed!")
+  }
+}

@@ -19,7 +19,13 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 import "bytes"
+import "bufio"
+import "compress/gzip"
+import "errors"
 import "reflect"
+import "strconv"
+import "strings"
+import "os"
 
 /* vector type declaration
  * -------------------------------------------------------------------------- */
@@ -138,4 +144,49 @@ func (v Vector) ToTable() string {
   }
 
   return buffer.String()
+}
+
+func ReadVector(t ScalarType, filename string) (Vector, error) {
+  result := NewVector(t, []float64{})
+
+  var scanner *bufio.Scanner
+  // open file
+  f, err := os.Open(filename)
+  if err != nil {
+    return result, err
+  }
+  defer f.Close()
+  isgzip, err := isGzip(filename)
+  if err != nil {
+    return result, err
+  }
+  // check if file is gzipped
+  if isgzip {
+    g, err := gzip.NewReader(f)
+    if err != nil {
+      return result, err
+    }
+    defer g.Close()
+    scanner = bufio.NewScanner(g)
+  } else {
+    scanner = bufio.NewScanner(f)
+  }
+
+  for scanner.Scan() {
+    fields := strings.Fields(scanner.Text())
+    if len(fields) == 0 {
+      continue
+    }
+    if len(result) != 0 {
+      return result, errors.New("invalid table")
+    }
+    for i := 0; i < len(fields); i++ {
+      value, err := strconv.ParseFloat(fields[i], 64)
+      if err != nil {
+        return result, errors.New("invalid table")
+      }
+      result = append(result, NewScalar(t, value))
+    }
+  }
+  return result, nil
 }
