@@ -205,7 +205,7 @@ func (m Matrix) ToTable() string {
 
   for i := 0; i < m.rows; i++ {
     if i != 0 {
-      buffer.WriteString("\n ")
+      buffer.WriteString("\n")
     }
     for j := 0; j < m.cols; j++ {
       if j != 0 {
