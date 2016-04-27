@@ -25,7 +25,8 @@ import "fmt"
 type ScalarContainer interface {
   At (...int) Scalar
   Set(Scalar, ...int)
-  Map(f func(Scalar) Scalar)
+  Map(f func(Scalar) Scalar) ScalarContainer
+  Reduce(f func(Scalar, Scalar) Scalar) Scalar
   ElementType() ScalarType
   Variables(int)
   // nice printing

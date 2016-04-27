@@ -88,10 +88,19 @@ func (v Vector) Set(value Scalar, args ...int) {
   v[args[0]].Copy(value)
 }
 
-func (v Vector) Map(f func(Scalar) Scalar) {
+func (v Vector) Map(f func(Scalar) Scalar) ScalarContainer {
   for i := 0; i < len(v); i++ {
     v[i] = f(v[i])
   }
+  return v
+}
+
+func (v Vector) Reduce(f func(Scalar, Scalar) Scalar) Scalar {
+  r := v[0]
+  for i := 1; i < len(v); i++ {
+    r = f(r, v[i])
+  }
+  return r
 }
 
 func (v Vector) ElementType() ScalarType {

@@ -19,6 +19,7 @@ package autodiff
 /* -------------------------------------------------------------------------- */
 
 //import "fmt"
+import "math"
 import "testing"
 
 /* -------------------------------------------------------------------------- */
@@ -140,6 +141,21 @@ func TestMatrixVxM(t *testing.T) {
 
   if Vnorm(VsubV(v2, v3)).Value() > 1e-8  {
     t.Error("Matrix/Vector multiplication failed!")
+  }
+}
+
+func TestMatrixMapReduce(t *testing.T) {
+
+  r1 := NewMatrix(RealType, 2, 2, []float64{2.718282e+00, 7.389056e+00, 2.008554e+01, 5.459815e+01})
+  r2 := 84.79103
+  m := NewMatrix(RealType, 2, 2, []float64{1, 2,3,4})
+  a := m.Map(Exp).Reduce(Add)
+
+  if Mnorm(MsubM(m, r1)).Value() > 1e-8  {
+    t.Error("Matrix/Vector multiplication failed!")
+  }
+  if math.Abs(a.Value() - r2) > 1e-2 {
+    t.Error("Vector map/reduce failed!")
   }
 }
 

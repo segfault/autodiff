@@ -187,20 +187,41 @@ func (matrix Matrix) Set(s Scalar, args ...int) {
   matrix.values[k].Copy(s)
 }
 
-func (matrix *Matrix) Map(f func(Scalar) Scalar) {
+func (matrix *Matrix) Map(f func(Scalar) Scalar) ScalarContainer {
   n, m := matrix.Dims()
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
       matrix.Set(f(matrix.At(i, j)), i, j)
     }
   }
+  return matrix
 }
 
-func (matrix Matrix) ElementType() ScalarType {
+func (matrix *Matrix) Reduce(f func(Scalar, Scalar) Scalar) Scalar {
+  n, m := matrix.Dims()
+  r := matrix.At(0, 0)
+  // first row
+  for j := 1; j < m; j++ {
+    r = f(r, matrix.At(0, j))
+  }
+  // all other rows
+  for i := 1; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r = f(r, matrix.At(i, j))
+    }
+  }
+  return r
+}
+
+func (matrix *Matrix) ElementType() ScalarType {
   if matrix.rows > 0 && matrix.cols > 0 {
     return reflect.TypeOf(matrix.values[0])
   }
   return nil
+}
+
+func (matrix *Matrix) Variables(order int) {
+  Variables(order, matrix.values...)
 }
 
 /* type conversion
