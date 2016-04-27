@@ -187,6 +187,15 @@ func (matrix Matrix) Set(s Scalar, args ...int) {
   matrix.values[k].Copy(s)
 }
 
+func (matrix *Matrix) Map(f func(Scalar) Scalar) {
+  n, m := matrix.Dims()
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      matrix.Set(f(matrix.At(i, j)), i, j)
+    }
+  }
+}
+
 func (matrix Matrix) ElementType() ScalarType {
   if matrix.rows > 0 && matrix.cols > 0 {
     return reflect.TypeOf(matrix.values[0])

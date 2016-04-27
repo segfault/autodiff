@@ -88,6 +88,12 @@ func (v Vector) Set(value Scalar, args ...int) {
   v[args[0]].Copy(value)
 }
 
+func (v Vector) Map(f func(Scalar) Scalar) {
+  for i := 0; i < len(v); i++ {
+    v[i] = f(v[i])
+  }
+}
+
 func (v Vector) ElementType() ScalarType {
   if len(v) > 0 {
     return reflect.TypeOf(v[0])
