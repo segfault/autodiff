@@ -40,6 +40,7 @@ func init() {
 /* constructors
  * -------------------------------------------------------------------------- */
 
+// Create a new real constant or variable.
 func NewReal(v float64, args ...int) *Real {
   s := Real{*NewBasicState(v, args...)}
   return &s

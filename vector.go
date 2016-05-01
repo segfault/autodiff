@@ -35,6 +35,7 @@ type Vector []Scalar
 /* constructors
  * -------------------------------------------------------------------------- */
 
+// Allocate a vector for scalars of type t (i.e. RealType, or ProbabilityType).
 func NewVector(t ScalarType, values []float64) Vector {
   v := NilVector(len(values))
 
@@ -44,6 +45,7 @@ func NewVector(t ScalarType, values []float64) Vector {
   return v
 }
 
+// Allocate an empty vector of type t. All values are initialized to zero.
 func NullVector(t ScalarType, length int) Vector {
   v := NilVector(length)
 
@@ -53,12 +55,14 @@ func NullVector(t ScalarType, length int) Vector {
   return v
 }
 
+// Create a vector without allocating memory for the scalar variables.
 func NilVector(length int) Vector {
   return make(Vector, length)
 }
 
 /* -------------------------------------------------------------------------- */
 
+// Create a deep copy of the vector.
 func (v Vector) Clone() Vector {
   result := make(Vector, len(v))
 
@@ -68,6 +72,8 @@ func (v Vector) Clone() Vector {
   return result
 }
 
+// Copy scalars from w into this vector. The lengths of both vectors must
+// match.
 func (v Vector) Copy(w Vector) {
   if len(v) != len(w) {
     panic("CopyFrom(): Vector dimensions do not match!")
@@ -80,6 +86,8 @@ func (v Vector) Copy(w Vector) {
 /* imlement ScalarContainer
  * -------------------------------------------------------------------------- */
 
+// Return the scalar at the given position. For vectors only a single
+// argument should be passed.
 func (v Vector) At(args ...int) Scalar {
   return v[args[0]].Clone()
 }
