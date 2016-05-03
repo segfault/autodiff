@@ -37,7 +37,11 @@ func cholesky(A Matrix) Matrix {
         s = Add(s, Mul(L.At(i,k), L.At(j,k)))
       }
       if i == j {
-        L.Set(Sqrt(Sub(A.At(i,i), s)), i, j)
+        t := Sub(A.At(i,i), s)
+        if t.Value() < 0.0 {
+          panic("matrix is not positive definite")
+        }
+        L.Set(Sqrt(t), i, j)
       } else {
         L.Set(Mul(Div(c, L.At(j, j)), Sub(A.At(i, j), s)), i, j)
       }
