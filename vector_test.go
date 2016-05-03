@@ -33,6 +33,22 @@ func TestVector(t *testing.T) {
   }
 }
 
+func TestVectorSort(t *testing.T) {
+
+  v1 := NewVector(RealType, []float64{4,3,7,4,1,29,6})
+  v2 := NewVector(RealType, []float64{4,3,7,4,1,29,6})
+
+  v1.Sort(false)
+  v2.Sort(true)
+
+  if v1[6].Value() != 29.0 {
+    t.Error("Vector sorting failed!")
+  }
+  if v2[6].Value() != 1.0 {
+    t.Error("Vector sorting failed!")
+  }
+}
+
 func TestVectorToMatrix(t *testing.T) {
 
   v := NewVector(RealType, []float64{1,2,3,4,5,6})

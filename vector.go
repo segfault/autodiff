@@ -23,6 +23,7 @@ import "bufio"
 import "compress/gzip"
 import "errors"
 import "reflect"
+import "sort"
 import "strconv"
 import "strings"
 import "os"
@@ -120,6 +121,24 @@ func (v Vector) ElementType() ScalarType {
 
 func (v Vector) Variables(order int) {
   Variables(order, v...)
+}
+
+/* sorting
+ * -------------------------------------------------------------------------- */
+
+type sortVectorByValue Vector
+
+func (v sortVectorByValue) Len() int           { return len(v) }
+func (v sortVectorByValue) Swap(i, j int)      { v[i], v[j] = v[j], v[i] }
+func (v sortVectorByValue) Less(i, j int) bool { return v[i].Value() < v[j].Value() }
+
+func (v Vector) Sort(reverse bool) Vector {
+  if reverse {
+    sort.Sort(sort.Reverse(sortVectorByValue(v)))
+  } else {
+    sort.Sort(sortVectorByValue(v))
+  }
+  return v
 }
 
 /* type conversion
