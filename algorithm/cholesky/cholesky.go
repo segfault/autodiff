@@ -25,24 +25,27 @@ import . "github.com/pbenner/autodiff"
 /* -------------------------------------------------------------------------- */
 
 func cholesky(A Matrix) Matrix {
-  n, _ := A.Dims()
-  t    := A.ElementType()
-  L    := NullMatrix(t, n, n)
+  n, _  := A.Dims()
+  eType := A.ElementType()
+  t     := NewScalar(eType, 0.0)
+  s     := NewScalar(eType, 0.0)
+  L     := NullMatrix(eType, n, n)
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {
-      s := NewScalar(t, 0.0)
-      for k := 0; k < j; k++ {
-        s = Add(s, Mul(L.ReferenceAt(i,k), L.ReferenceAt(j,k)))
+      s.Mul(L.ReferenceAt(i,0), L.ReferenceAt(j,0))
+      for k := 1; k < j; k++ {
+        t.Mul(L.ReferenceAt(i,k), L.ReferenceAt(j,k))
+        s.Add(s, t)
       }
-      b := Sub(A.ReferenceAt(i, j), s)
+      t.Sub(A.ReferenceAt(i, j), s)
       if i == j {
-        if b.Value() < 0.0 {
+        if t.Value() < 0.0 {
           panic("matrix is not positive definite")
         }
-        L.Set(Sqrt(b), i, j)
+        L.ReferenceAt(i, j).Sqrt(t)
       } else {
-        L.Set(Div(b, L.ReferenceAt(j, j)), i, j)
+        L.ReferenceAt(i, j).Div(t, L.ReferenceAt(j, j))
       }
     }
   }

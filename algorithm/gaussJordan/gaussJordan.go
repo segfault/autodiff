@@ -169,6 +169,7 @@ singular:
 }
 
 func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
+  t := NewScalar(a.ElementType(), 0.0)
   // number of rows
   n, _ := a.Dims()
   // x and b should have the same number of rows
@@ -189,7 +190,9 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
         continue
       }
       // b[j] -= a[j,i]*b[i]/c
-      b[j] = Sub(b[j], Div(Mul(a.ReferenceAt(j, i), b[i]), c))
+      t.Mul(a.ReferenceAt(j, i), b[i])
+      t.Div(t, c)
+      b[j].Sub(b[j], t)
       if math.IsNaN(b[j].Value()) {
         goto singular
       }
@@ -199,8 +202,9 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
           continue
         }
         // x[j,k] -= a[j,i]*x[i,k]/c
-        x.Set(Sub(x.ReferenceAt(j, k), Div(Mul(a.ReferenceAt(j, i), x.ReferenceAt(i, k)), c)),
-          j, k)
+        t.Mul(a.ReferenceAt(j, i), x.ReferenceAt(i, k))
+        t.Div(t, c)
+        x.ReferenceAt(j, k).Sub(x.ReferenceAt(j, k), t)
         if math.IsNaN(x.ReferenceAt(j, k).Value()) {
           goto singular
         }
@@ -211,15 +215,15 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
           continue
         }
         // a[j,k] -= a[j,i]*a[i,k]/c
-        a.Set(Sub(a.ReferenceAt(j, k), Div(Mul(a.ReferenceAt(j, i), a.ReferenceAt(i, k)), c)),
-          j, k)
+        t.Mul(a.ReferenceAt(j, i), a.ReferenceAt(i, k))
+        t.Div(t, c)
+        a.ReferenceAt(j, k).Sub(a.ReferenceAt(j, k),t)
         if math.IsNaN(a.ReferenceAt(j, k).Value()) {
           goto singular
         }
       }
     }
-    a.Set(Div(a.ReferenceAt(i, i), c),
-      i, i)
+    a.ReferenceAt(i, i).Div(a.ReferenceAt(i, i), c)
     if math.IsNaN(a.ReferenceAt(i, i).Value()) {
       goto singular
     }
@@ -228,11 +232,10 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
       if !submatrix[k] {
         continue
       }
-      x.Set(Div(x.ReferenceAt(i, k), c),
-        i, k)
+      x.ReferenceAt(i, k).Div(x.ReferenceAt(i, k), c)
     }
     // normalize ith element in b
-    b[i] = Div(b[i], c)
+    b[i].Div(b[i], c)
   }
   return
 singular:
