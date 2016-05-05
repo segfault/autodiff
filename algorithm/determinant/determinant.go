@@ -44,7 +44,7 @@ func determinantNaive(a Matrix) Scalar {
   if (n < 1) {
     /* nothing to do */
   } else if n == 1 {
-    det = a.At(0, 0)
+    det.Copy(a.ReferenceAt(0, 0))
   } else if n == 2 {
     t1.Mul(a.ReferenceAt(0, 0), a.ReferenceAt(1, 1))
     t2.Mul(a.ReferenceAt(1, 0), a.ReferenceAt(0, 1))
@@ -63,9 +63,11 @@ func determinantNaive(a Matrix) Scalar {
         }
       }
       if j1 % 2 == 0 {
-        det = Add(det,  Mul(a.ReferenceAt(0, j1), determinantNaive(m)))
+        t1.Mul(a.ReferenceAt(0, j1), determinantNaive(m))
+        det.Add(det, t1)
       } else {
-        det = Sub(det,  Mul(a.ReferenceAt(0, j1), determinantNaive(m)))
+        t1.Mul(a.ReferenceAt(0, j1), determinantNaive(m))
+        det.Sub(det, t1)
       }
     }
   }
