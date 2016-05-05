@@ -93,6 +93,10 @@ func (v Vector) At(args ...int) Scalar {
   return v[args[0]].Clone()
 }
 
+func (v Vector) ReferenceAt(args ...int) Scalar {
+  return v[args[0]]
+}
+
 func (v Vector) Set(value Scalar, args ...int) {
   v[args[0]].Copy(value)
 }

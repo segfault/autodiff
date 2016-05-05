@@ -18,8 +18,10 @@ package matrixInverse
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
+import   "fmt"
 import   "testing"
+import   "time"
+import   "math"
 
 import . "github.com/pbenner/autodiff"
 import   "github.com/pbenner/autodiff/algorithm/gaussJordan"
@@ -68,4 +70,28 @@ func TestMatrixInversePD(t *testing.T) {
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
+}
+
+func TestMatrixPerformance(t *testing.T) {
+
+  kernelSquaredExponential := func(n int, t ScalarType, l, v Scalar) Matrix {
+    sigma := NullMatrix(t, n, n)
+    for i := 0; i < n; i++ {
+      for j := 0; j < n; j++ {
+        sigma.Set(Mul(v, Exp(Div(NewReal(-1.0/2.0*math.Pow(float64(i)-float64(j), 2.0)), Mul(l, l)))),
+          i, j)
+      }
+    }
+    return sigma
+  }
+
+  m1 := kernelSquaredExponential(100, RealType, NewReal(1.0), NewReal(1.0))
+
+  start := time.Now()
+
+  Run(m1, PositiveDefinite{true})
+
+  elapsed := time.Since(start)
+  fmt.Printf("Inverting a 100x100 positive definite matrix took %s.\n", elapsed)
+
 }

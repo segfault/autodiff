@@ -23,7 +23,8 @@ import "fmt"
 /* -------------------------------------------------------------------------- */
 
 type ScalarContainer interface {
-  At (...int) Scalar
+  At(...int) Scalar
+  ReferenceAt(...int) Scalar
   Set(Scalar, ...int)
   Map(f func(Scalar) Scalar) ScalarContainer
   Reduce(f func(Scalar, Scalar) Scalar) Scalar

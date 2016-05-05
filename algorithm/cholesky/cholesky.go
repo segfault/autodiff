@@ -33,16 +33,16 @@ func cholesky(A Matrix) Matrix {
     for j := 0; j < (i+1); j++ {
       s := NewScalar(t, 0.0)
       for k := 0; k < j; k++ {
-        s = Add(s, Mul(L.At(i,k), L.At(j,k)))
+        s = Add(s, Mul(L.ReferenceAt(i,k), L.ReferenceAt(j,k)))
       }
-      b := Sub(A.At(i, j), s)
+      b := Sub(A.ReferenceAt(i, j), s)
       if i == j {
         if b.Value() < 0.0 {
           panic("matrix is not positive definite")
         }
         L.Set(Sqrt(b), i, j)
       } else {
-        L.Set(Div(b, L.At(j, j)), i, j)
+        L.Set(Div(b, L.ReferenceAt(j, j)), i, j)
       }
     }
   }

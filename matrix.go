@@ -67,7 +67,7 @@ func NilMatrix(rows, cols int) Matrix {
 /* copy and cloning
  * -------------------------------------------------------------------------- */
 
-func (matrix Matrix) Clone() Matrix {
+func (matrix *Matrix) Clone() Matrix {
   return Matrix{
     values: matrix.values.Clone(),
     rows  : matrix.rows,
@@ -75,7 +75,7 @@ func (matrix Matrix) Clone() Matrix {
     t     : matrix.t}
 }
 
-func (m1 Matrix) Copy(m2 Matrix) {
+func (m1 *Matrix) Copy(m2 Matrix) {
   if m1.rows != m2.rows || m1.cols != m2.cols {
     panic("Copy(): Matrix dimension does not match!")
   }
@@ -96,7 +96,7 @@ func IdentityMatrix(t ScalarType, dim int) Matrix {
 /* field access
  * -------------------------------------------------------------------------- */
 
-func (matrix Matrix) index(i, j int) int {
+func (matrix *Matrix) index(i, j int) int {
   var k int
   if matrix.t {
     k = j*matrix.rows + i
@@ -106,11 +106,11 @@ func (matrix Matrix) index(i, j int) int {
   return k
 }
 
-func (matrix Matrix) Dims() (int, int) {
+func (matrix *Matrix) Dims() (int, int) {
   return matrix.rows, matrix.cols
 }
 
-func (matrix Matrix) Values() Vector {
+func (matrix *Matrix) Values() Vector {
   return matrix.values
 }
 
@@ -160,7 +160,7 @@ func (matrix *Matrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 
-func (matrix Matrix) At(args ...int) Scalar {
+func (matrix *Matrix) At(args ...int) Scalar {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
@@ -177,7 +177,17 @@ func (matrix Matrix) At(args ...int) Scalar {
   return matrix.values[k].Clone()
 }
 
-func (matrix Matrix) Set(s Scalar, args ...int) {
+func (matrix *Matrix) ReferenceAt(args ...int) Scalar {
+  i := args[0]
+  j := args[1]
+  k := matrix.index(i, j)
+  if k >= len(matrix.values) {
+    panic("At(): Index out of bounds!")
+  }
+  return matrix.values[k]
+}
+
+func (matrix *Matrix) Set(s Scalar, args ...int) {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
