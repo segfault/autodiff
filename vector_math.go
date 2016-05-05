@@ -36,7 +36,7 @@ func VaddV(a, b Vector) Vector {
   }
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Add(a[i], b[i])
+    r[i].Add(a[i], b[i])
   }
   return r
 }
@@ -44,7 +44,7 @@ func VaddV(a, b Vector) Vector {
 func VaddS(a Vector, b Scalar) Vector {
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Add(a[i], b)
+    r[i].Add(a[i], b)
   }
   return r
 }
@@ -55,7 +55,7 @@ func VsubV(a, b Vector) Vector {
   }
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Sub(a[i], b[i])
+    r[i].Sub(a[i], b[i])
   }
   return r
 }
@@ -63,23 +63,29 @@ func VsubV(a, b Vector) Vector {
 func VsubS(a Vector, b Scalar) Vector {
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Sub(a[i], b)
+    r[i].Sub(a[i], b)
   }
   return r
 }
 
 func Vnorm(a Vector) Scalar {
-  r := Pow(a[0], NewBareReal(2))
-  for i := 1; i < len(a); i++ {
-    r = Add(r, Pow(a[i], NewBareReal(2)))
+  c := NewBareReal(2.0)
+  t := ZeroScalar(a.ElementType())
+  r := ZeroScalar(a.ElementType())
+  for i := 0; i < len(a); i++ {
+    t.Pow(a[i], c)
+    r.Add(r, t)
   }
-  return Sqrt(r)
+  r.Sqrt(r)
+  return r
 }
 
 func VmulV(a, b Vector) Scalar {
+  t := ZeroScalar(a.ElementType())
   r := ZeroScalar(a.ElementType())
   for i := 0; i < len(a); i++ {
-    r = Add(r, Mul(a[i], b[i]))
+    t.Mul(a[i], b[i])
+    r.Add(r, t)
   }
   return r
 }
@@ -95,7 +101,7 @@ func VmulS(a Vector, s Scalar) Vector {
 func VdivS(a Vector, s Scalar) Vector {
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Div(a[i], s)
+    r[i].Div(a[i], s)
   }
   return r
 }
