@@ -37,6 +37,8 @@ type LogScale struct {
 
 func determinantNaive(a Matrix) Scalar {
   n, _ := a.Dims()
+  t1   := ZeroScalar(a.ElementType())
+  t2   := ZeroScalar(a.ElementType())
   det  := ZeroScalar(a.ElementType())
 
   if (n < 1) {
@@ -44,9 +46,9 @@ func determinantNaive(a Matrix) Scalar {
   } else if n == 1 {
     det = a.At(0, 0)
   } else if n == 2 {
-    det = Sub(
-      Mul(a.ReferenceAt(0, 0), a.ReferenceAt(1, 1)),
-      Mul(a.ReferenceAt(1, 0), a.ReferenceAt(0, 1)))
+    t1.Mul(a.ReferenceAt(0, 0), a.ReferenceAt(1, 1))
+    t2.Mul(a.ReferenceAt(1, 0), a.ReferenceAt(0, 1))
+    det.Sub(t1, t2)
   } else {
     m := NullMatrix(a.ElementType(), n-1, n-1)
     for j1 := 0; j1 < n; j1++ {
@@ -56,7 +58,7 @@ func determinantNaive(a Matrix) Scalar {
           if j == j1 {
             continue
           }
-          m.Set(a.ReferenceAt(i, j), i-1, j2);
+          m.ReferenceAt(i-1, j2).Copy(a.ReferenceAt(i, j))
           j2++;
         }
       }
@@ -71,26 +73,28 @@ func determinantNaive(a Matrix) Scalar {
 }
 
 func determinantPD(a Matrix, logScale bool) Scalar {
-  var result Scalar
   n, m := a.Dims()
+  r := ZeroScalar(a.ElementType())
+  t := ZeroScalar(a.ElementType())
   if n != m {
     panic("Matrix is not a square matrix!")
   }
   L := cholesky.Run(a)
   if logScale {
-    result = NewScalar(a.ElementType(), 0.0)
+    r.SetValue(0.0)
     for i := 0; i < n; i++ {
-      result = Add(result, Log(L.ReferenceAt(i, i)))
+      t.Log(L.ReferenceAt(i, i))
+      r.Add(r, t)
     }
-    result = Add(result, result)
+    r.Add(r, r)
   } else {
-    result = NewScalar(a.ElementType(), 1.0)
+    r.SetValue(1.0)
     for i := 0; i < n; i++ {
-      result = Mul(result, L.ReferenceAt(i, i))
+      r.Mul(r, L.ReferenceAt(i, i))
     }
-    result = Mul(result, result)
+    r.Mul(r, r)
   }
-  return result
+  return r
 }
 
 func determinant(a Matrix, positiveDefinite, logScale bool) Scalar {
