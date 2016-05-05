@@ -93,7 +93,7 @@ func VmulV(a, b Vector) Scalar {
 func VmulS(a Vector, s Scalar) Vector {
   r := NullVector(a.ElementType(), len(a))
   for i := 0; i < len(a); i++ {
-    r[i] = Mul(a[i], s)
+    r[i].Mul(a[i], s)
   }
   return r
 }
