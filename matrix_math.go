@@ -43,8 +43,7 @@ func MaddM(a, b Matrix) Matrix {
   r := NullMatrix(a.ElementType(), rows, cols)
   for i := 0; i < rows; i++ {
     for j := 0; j < cols; j++ {
-      r.Set(Add(a.ReferenceAt(i, j), b.ReferenceAt(i, j)),
-        i, j)
+      r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -54,8 +53,7 @@ func MaddS(a Matrix, b Scalar) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
   for i := 0; i < a.rows; i++ {
     for j := 0; j < a.cols; j++ {
-      r.Set(Add(a.ReferenceAt(i, j), b),
-        i, j)
+      r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -70,8 +68,7 @@ func MsubM(a, b Matrix) Matrix {
   r := NullMatrix(a.ElementType(), rows, cols)
   for i := 0; i < rows; i++ {
     for j := 0; j < cols; j++ {
-      r.Set(Sub(a.ReferenceAt(i, j), b.ReferenceAt(i, j)),
-        i, j)
+      r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -81,8 +78,7 @@ func MsubS(a Matrix, b Scalar) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
   for i := 0; i < a.rows; i++ {
     for j := 0; j < a.cols; j++ {
-      r.Set(Sub(a.ReferenceAt(i, j), b),
-        i, j)
+      r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -96,8 +92,7 @@ func MmulM(a, b Matrix) Matrix {
   for i := 0; i < r.rows; i++ {
     for j := 0; j < r.cols; j++ {
       for n := 0; n < a.cols; n++ {
-        r.Set(Add(r.ReferenceAt(i, j), Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j))),
-          i, j)
+        r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j)))
       }
     }
   }
@@ -111,7 +106,7 @@ func MmulV(a Matrix, b Vector) Vector {
   r := NullVector(a.ElementType(), a.rows)
   for i := 0; i < len(r); i++ {
     for n := 0; n < a.cols; n++ {
-      r[i] = Add(r[i], Mul(a.ReferenceAt(i, n), b[n]))
+      r[i].Add(r[i], Mul(a.ReferenceAt(i, n), b[n]))
     }
   }
   return r
@@ -121,7 +116,7 @@ func MmulS(a Matrix, s Scalar) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
   for i := 0; i < a.rows; i++ {
     for j := 0; j < a.cols; j++ {
-      r.Set(Mul(a.ReferenceAt(i,j), s), i, j)
+      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i,j), s)
     }
   }
   return r
@@ -131,7 +126,7 @@ func MdivS(a Matrix, s Scalar) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
   for i := 0; i < a.rows; i++ {
     for j := 0; j < a.cols; j++ {
-      r.Set(Div(a.ReferenceAt(i,j), s), i, j)
+      r.ReferenceAt(i, j).Div(a.ReferenceAt(i,j), s)
     }
   }
   return r
@@ -144,7 +139,7 @@ func VmulM(a Vector, b Matrix) Vector {
   r := NullVector(a.ElementType(), b.cols)
   for i := 0; i < len(r); i++ {
     for n := 0; n < b.rows; n++ {
-      r[i] = Add(r[i], Mul(a[n], b.ReferenceAt(n, i)))
+      r[i].Add(r[i], Mul(a[n], b.ReferenceAt(n, i)))
     }
   }
   return r
@@ -154,7 +149,7 @@ func Outer(a, b Vector) Matrix {
   r := NullMatrix(a.ElementType(), len(a), len(b))
   for i := 0; i < len(a); i++ {
     for j := 0; j < len(b); j++ {
-      r.Set(Mul(a[i],b[j]), i, j)
+      r.ReferenceAt(i, j).Mul(a[i], b[j])
     }
   }
   return r
@@ -171,7 +166,7 @@ func Mtrace(matrix Matrix) Scalar {
   }
   t := matrix.At(0, 0)
   for i := 1; i < matrix.rows; i++ {
-    t = Add(t, matrix.ReferenceAt(i,i))
+    t.Add(t, matrix.ReferenceAt(i,i))
   }
   return t
 }
@@ -180,16 +175,18 @@ func Mnorm(matrix Matrix) Scalar {
   if matrix.rows == 0 && matrix.cols == 0 {
     return nil
   }
+  c := NewBareReal(2.0)
+  t := NewScalar(matrix.ElementType(), 0.0)
   s := Pow(matrix.values[0], NewBareReal(2.0))
   for i := 1; i < len(matrix.values); i++ {
-    s = Add(s, Pow(matrix.values[i], NewBareReal(2.0)))
+    t.Pow(matrix.values[i], c)
+    s.Add(s, t)
   }
   return s
 }
 
 func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   x := x_.Clone()
-  t := x_.ElementType()
   x.Variables(1)
   // compute Jacobian
   y := f(x)
@@ -202,8 +199,7 @@ func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   // copy derivatives
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.Set(NewScalar(t, y[i].Derivative(1, j)),
-        i, j)
+      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
     }
   }
   return r
