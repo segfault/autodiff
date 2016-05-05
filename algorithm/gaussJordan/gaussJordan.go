@@ -40,6 +40,8 @@ type Triangular struct {
 /* -------------------------------------------------------------------------- */
 
 func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
+  t := NewScalar(a.ElementType(), 0.0)
+  c := NewScalar(a.ElementType(), 0.0)
   // number of rows
   n, _ := a.Dims()
   // permutation of the rows
@@ -81,27 +83,28 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
         continue
       }
       // c = a[j, i] / a[i, i]
-      c := Div(a.ReferenceAt(p[j], i), a.ReferenceAt(p[i], i))
+      c.Div(a.ReferenceAt(p[j], i), a.ReferenceAt(p[i], i))
       // loop over columns in a
       for k := i; k < n; k++ {
         if !submatrix[k] {
           continue
         }
         // a[j, k] -= a[i, k]*c
-        a.Set(Sub(a.ReferenceAt(p[j], k), Mul(a.ReferenceAt(p[i], k), c)),
-          p[j], k)
+        t.Mul(a.ReferenceAt(p[i], k), c)
+        a.ReferenceAt(p[j], k).Sub(a.ReferenceAt(p[j], k), t)
       }
       // loop over columns in x
       for k := 0; k < n; k++ {
         if !submatrix[k] {
           continue
         }
-        // a[j, k] -= a[i, k]*c
-        x.Set(Sub(x.ReferenceAt(p[j], k), Mul(x.ReferenceAt(p[i], k), c)),
-          p[j], k)
+        // x[j, k] -= x[i, k]*c
+        t.Mul(x.ReferenceAt(p[i], k), c)
+        x.ReferenceAt(p[j], k).Sub(x.ReferenceAt(p[j], k), t)
       }
       // same for b: b[j] -= b[j]*c
-      b[p[j]] = Sub(b[p[j]], Mul(b[p[i]], c))
+      t.Mul(b[p[i]], c)
+      b[p[j]].Sub(b[p[j]], t)
     }
   }
   // backsubstitute
@@ -109,13 +112,15 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
     if !submatrix[i] {
       continue
     }
-    c := a.At(p[i], i)
+    c.Copy(a.ReferenceAt(p[i], i))
     for j := 0; j < i; j++ {
       if !submatrix[j] {
         continue
       }
       // b[j] -= a[j,i]*b[i]/c
-      b[p[j]] = Sub(b[p[j]], Div(Mul(a.ReferenceAt(p[j], i), b[p[i]]), c))
+      t.Mul(a.ReferenceAt(p[j], i), b[p[i]])
+      t.Div(t, c)
+      b[p[j]].Sub(b[p[j]], t)
       if math.IsNaN(b[p[j]].Value()) {
         goto singular
       }
@@ -125,8 +130,9 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
           continue
         }
         // x[j,k] -= a[j,i]*x[i,k]/c
-        x.Set(Sub(x.ReferenceAt(p[j], k), Div(Mul(a.ReferenceAt(p[j], i), x.ReferenceAt(p[i], k)), c)),
-          p[j], k)
+        t.Mul(a.ReferenceAt(p[j], i), x.ReferenceAt(p[i], k))
+        t.Div(t, c)
+        x.ReferenceAt(p[j], k).Sub(x.ReferenceAt(p[j], k), t)
         if math.IsNaN(x.ReferenceAt(p[j], k).Value()) {
           goto singular
         }
@@ -137,15 +143,15 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
           continue
         }
         // a[j,k] -= a[j,i]*a[i,k]/c
-        a.Set(Sub(a.ReferenceAt(p[j], k), Div(Mul(a.ReferenceAt(p[j], i), a.ReferenceAt(p[i], k)), c)),
-          p[j], k)
+        t.Mul(a.ReferenceAt(p[j], i), a.ReferenceAt(p[i], k))
+        t.Div(t, c)
+        a.ReferenceAt(p[j], k).Sub(a.ReferenceAt(p[j], k), t)
         if math.IsNaN(a.ReferenceAt(p[j], k).Value()) {
           goto singular
         }
       }
     }
-    a.Set(Div(a.ReferenceAt(p[i], i), c),
-      p[i], i)
+    a.ReferenceAt(p[i], i).Div(a.ReferenceAt(p[i], i), c)
     if math.IsNaN(a.ReferenceAt(p[i], i).Value()) {
       goto singular
     }
@@ -154,11 +160,10 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
       if !submatrix[k] {
         continue
       }
-      x.Set(Div(x.ReferenceAt(p[i], k), c),
-        p[i], k)
+      x.ReferenceAt(p[i], k).Div(x.ReferenceAt(p[i], k), c)
     }
     // normalize ith element in b
-    b[p[i]] = Div(b[p[i]], c)
+    b[p[i]].Div(b[p[i]], c)
   }
   a.PermuteRows(p)
   x.PermuteRows(p)
@@ -170,6 +175,7 @@ singular:
 
 func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
   t := NewScalar(a.ElementType(), 0.0)
+  c := NewScalar(a.ElementType(), 0.0)
   // number of rows
   n, _ := a.Dims()
   // x and b should have the same number of rows
@@ -184,7 +190,7 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
     if !submatrix[i] {
       continue
     }
-    c := a.At(i, i)
+    c.Copy(a.ReferenceAt(i, i))
     for j := 0; j < i; j++ {
       if !submatrix[j] {
         continue
