@@ -61,7 +61,7 @@ func mInverse(matrix Matrix, args ...interface{}) Matrix {
   b := NullVector(t, rows)
   // initialize b with ones
   for i, _ := range b {
-    b[i] = NewScalar(t, 1.0)
+    b[i].SetValue(1.0)
   }
   // call Gauss-Jordan algorithm
   gaussJordan.Run(a, x, b, args...)
@@ -76,7 +76,7 @@ func mInversePD(matrix Matrix, args ...interface{}) Matrix {
   b := NullVector(t, rows)
   // initialize b with ones
   for i, _ := range b {
-    b[i] = NewScalar(t, 1.0)
+    b[i].SetValue(1.0)
   }
   args = append(args, gaussJordan.Triangular{true})
   // call Gauss-Jordan algorithm
