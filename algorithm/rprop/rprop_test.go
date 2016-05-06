@@ -38,7 +38,7 @@ func TestRProp(t *testing.T) {
   // objective function
   f := func(x Vector) Scalar {
     m2.SetValues(x)
-    s := Mnorm(MsubM(MmulM(m1, m2), I))
+    s := Mnorm(MsubM(MdotM(m1, m2), I))
     return s
   }
   x := Run(f, m2.Values(), 0.01, 0.1)

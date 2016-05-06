@@ -41,15 +41,15 @@ func init() {
  * -------------------------------------------------------------------------- */
 
 // Create a new real constant or variable.
-func NewReal(v float64, args ...int) *Real {
-  s := Real{*NewBasicState(v, args...)}
+func NewReal(v float64) *Real {
+  s := Real{*NewBasicState(v)}
   return &s
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Clone() Scalar {
-  r := NewReal(0.0, a.N())
+  r := NewReal(0.0)
   r.Copy(a)
   return r
 }

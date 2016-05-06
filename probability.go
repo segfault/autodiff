@@ -41,11 +41,11 @@ func init() {
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewProbability(value float64, args ...int) *Probability {
+func NewProbability(value float64) *Probability {
   if value < 0.0 {
     panic("NewProbability(): Value should be positive!")
   }
-  return &Probability{*NewBasicState(math.Log(value), args...)}
+  return &Probability{*NewBasicState(math.Log(value))}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -56,6 +56,7 @@ func (a *Probability) Copy(b Scalar) {
   }
   a.order = b.Order()
   a.value = b.LogValue()
+  a.Alloc(b.N())
   for i := 0; i < b.N(); i++ {
     a.derivative[i][0] = b.Derivative(1, i)
     a.derivative[i][1] = b.Derivative(2, i)
@@ -63,7 +64,7 @@ func (a *Probability) Copy(b Scalar) {
 }
 
 func (a *Probability) Clone() Scalar {
-  r := NewProbability(0.0, a.N())
+  r := NewProbability(0.0)
   r.Copy(a)
   return r
 }
@@ -88,7 +89,7 @@ func (a *Probability) Type() ScalarType {
  * -------------------------------------------------------------------------- */
 
 func (a *Probability) Real() *Real {
-  r := NewReal(0.0, a.N())
+  r := NewReal(0.0)
   r.Copy(a)
   return r
 }

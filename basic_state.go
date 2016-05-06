@@ -35,17 +35,11 @@ type BasicState struct {
 
 // Create a new basic state. As an optional argument the number of variables
 // for which derivatives are computed may be passed.
-func NewBasicState(value float64, args ...int) *BasicState {
-  // number of variables for the gradient
-  n := 0
-  // get optional gradient length
-  if len(args) >= 1 {
-    n = args[0]
-  }
+func NewBasicState(value float64) *BasicState {
   a := BasicState{}
   a.value = value
   a.order = 0
-  a.Alloc(n)
+  a.n     = 0
   return &a
 }
 
