@@ -97,13 +97,11 @@ func IdentityMatrix(t ScalarType, dim int) Matrix {
  * -------------------------------------------------------------------------- */
 
 func (matrix *Matrix) index(i, j int) int {
-  var k int
   if matrix.t {
-    k = j*matrix.rows + i
+    return j*matrix.rows + i
   } else {
-    k = i*matrix.cols + j
+    return i*matrix.cols + j
   }
-  return k
 }
 
 func (matrix *Matrix) Dims() (int, int) {
