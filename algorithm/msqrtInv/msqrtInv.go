@@ -34,10 +34,10 @@ func mSqrtInv(matrix Matrix) Matrix {
   A  := matrix
   I  := IdentityMatrix(matrix.ElementType(), n)
   X0 := IdentityMatrix(matrix.ElementType(), n)
-  X1 := MmulS(MmulM(X0, matrixInverse.Run(MaddM(I, MmulM(A, MmulM(X0, X0))))), c)
+  X1 := MmulS(MdotM(X0, matrixInverse.Run(MaddM(I, MdotM(A, MdotM(X0, X0))))), c)
   for Mnorm(MsubM(X0, X1)).Value() > 1e-8 {
     X0 = X1
-    X1 = MmulS(MmulM(X0, matrixInverse.Run(MaddM(I, MmulM(A, MmulM(X0, X0))))), c)
+    X1 = MmulS(MdotM(X0, matrixInverse.Run(MaddM(I, MdotM(A, MdotM(X0, X0))))), c)
   }
   return X1
 }

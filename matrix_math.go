@@ -229,6 +229,7 @@ func (r Matrix) MdotM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).Reset()
       for n := 0; n < a.cols; n++ {
         r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j)))
       }

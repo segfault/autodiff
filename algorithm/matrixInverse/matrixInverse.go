@@ -45,7 +45,7 @@ func mInverseGradient(matrix Matrix) Matrix {
   // objective function
   f := func(x Vector) Scalar {
     r.SetValues(x)
-    s := Mnorm(MsubM(MmulM(matrix, r), I))
+    s := Mnorm(MsubM(MdotM(matrix, r), I))
     return s
   }
   x := rprop.Run(f, r.Values(), 0.01, 0.1)
@@ -81,7 +81,8 @@ func mInversePD(matrix Matrix, args ...interface{}) Matrix {
   args = append(args, gaussJordan.Triangular{true})
   // call Gauss-Jordan algorithm
   gaussJordan.Run(a, x, b, args...)
-  return MmulM(x, x.T())
+  // recycle a to store the result
+  return a.MdotM(x, x.T())
 }
 
 /* -------------------------------------------------------------------------- */
@@ -90,10 +91,10 @@ func Run(matrix Matrix, args ...interface{}) Matrix {
   rows, cols := matrix.Dims()
   gArgs := []interface{}{}
   if rows != cols {
-    panic("MInverse(): Not a square matrix!")
+    panic("not a square matrix")
   }
   if rows == 0 {
-    panic("MInverse(): Empty matrix!")
+    panic("empty matrix")
   }
   positiveDefinite := false
 
