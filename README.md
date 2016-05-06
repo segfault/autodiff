@@ -1,3 +1,7 @@
+## Documentation
+
+The documentation of this package can be found [here](https://godoc.org/github.com/pbenner/autodiff).
+
 ## Examples
 
 ### Differentiation
