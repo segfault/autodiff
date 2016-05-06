@@ -202,7 +202,7 @@ func VdivS(a Vector, s Scalar) Vector {
 /* -------------------------------------------------------------------------- */
 
 // Dot product of two vectors.
-func Vdot(a, b Vector) Scalar {
+func VdotV(a, b Vector) Scalar {
   if len(a) != len(b) {
     panic("vector dimensions do not match")
   }

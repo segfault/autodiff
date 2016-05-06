@@ -59,11 +59,11 @@ func TestVectorToMatrix(t *testing.T) {
   }
 }
 
-func TestVdot(t *testing.T) {
+func TestVdotV(t *testing.T) {
 
   a := NewVector(RealType, []float64{1, 2,3,4})
   b := NewVector(RealType, []float64{2,-1,1,7})
-  r := Vdot(a, b)
+  r := VdotV(a, b)
 
   if r.Value() != 31 {
     t.Error("VmulV() failed!")
