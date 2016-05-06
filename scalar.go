@@ -32,7 +32,8 @@ type ScalarState interface {
   Alloc         (int)
   // allocate enough memory for the derivatives of the given
   // variable(s) and copy the order
-  AllocFor      (...Scalar)
+  AllocForOne   (Scalar)
+  AllocForTwo   (Scalar, Scalar)
   // read access
   Order         ()             int
   Value         ()             float64

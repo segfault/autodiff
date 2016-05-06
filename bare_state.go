@@ -42,7 +42,10 @@ func (a *BareState) Copy(b Scalar) {
 func (a *BareState) Alloc(n int) {
 }
 
-func (c *BareState) AllocFor(args ...Scalar) {
+func (c *BareState) AllocForOne(a Scalar) {
+}
+
+func (c *BareState) AllocForTwo(a, b Scalar) {
 }
 
 /* read access

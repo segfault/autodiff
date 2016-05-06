@@ -27,6 +27,7 @@ type BasicState struct {
   value            float64
   order            int
   derivative  [][2]float64
+  n                int
 }
 
 /* constructors
@@ -63,22 +64,21 @@ func (a *BasicState) Copy(b Scalar) {
 
 // Allocate memory for derivatives of n variables.
 func (a *BasicState) Alloc(n int) {
-  if len(a.derivative) != n {
+  if a.n != n {
     a.derivative = make([][2]float64, n)
+    a.n          = n
   }
 }
 
 // Allocate memory for the results of mathematical operations on
 // the given variables.
-func (c *BasicState) AllocFor(args ...Scalar) {
-  switch len(args) {
-  case 1:
-    c.Alloc(args[0].N())
-    c.order = args[0].Order()
-  case 2:
-    c.Alloc(iMax(args[0].N(), args[1].N()))
-    c.order = iMax(args[0].Order(), args[1].Order())
-  }
+func (c *BasicState) AllocForOne(a Scalar) {
+  c.Alloc(a.N())
+  c.order = a.Order()
+}
+func (c *BasicState) AllocForTwo(a, b Scalar) {
+  c.Alloc(iMax(a.N(), b.N()))
+  c.order = iMax(a.Order(), b.Order())
 }
 
 /* read access
@@ -106,7 +106,7 @@ func (a *BasicState) Derivative(i, j int) float64 {
   if i != 1 && i != 2 {
     panic("Invalid order!")
   }
-  if len(a.derivative) > 0 {
+  if a.n > 0 {
     return a.derivative[j][i-1]
   } else {
     return 0.0
@@ -115,7 +115,7 @@ func (a *BasicState) Derivative(i, j int) float64 {
 
 // Number of variables for which derivates are stored.
 func (a *BasicState) N() int {
-  return len(a.derivative)
+  return a.n
 }
 
 /* write access
@@ -123,7 +123,7 @@ func (a *BasicState) N() int {
 
 func (a *BasicState) Reset() {
   a.value = 0.0
-  for i := 0; i < len(a.derivative); i++ {
+  for i := 0; i < a.n; i++ {
     a.derivative[i][0] = 0.0
     a.derivative[i][1] = 0.0
   }
@@ -157,7 +157,8 @@ func (a *BasicState) SetDerivative(i, j int, v float64) {
 // of the ith variable to 1 (initial value).
 func (a *BasicState) SetVariable(i, n, order int) {
   a.derivative = make([][2]float64, n)
-  a.order = order
+  a.n          = n
+  a.order      = order
   if order > 0 {
     a.derivative[i][0] = 1
   }
