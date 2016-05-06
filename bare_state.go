@@ -71,6 +71,10 @@ func (a *BareState) N() int {
 /* write access
  * -------------------------------------------------------------------------- */
 
+func (a *BareState) Reset() {
+  a.value = 0.0
+}
+
 func (a *BareState) Set(b Scalar) {
   a.value = b.Value()
 }

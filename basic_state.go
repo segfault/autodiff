@@ -121,6 +121,14 @@ func (a *BasicState) N() int {
 /* write access
  * -------------------------------------------------------------------------- */
 
+func (a *BasicState) Reset() {
+  a.value = 0.0
+  for i := 0; i < len(a.derivative); i++ {
+    a.derivative[i][0] = 0.0
+    a.derivative[i][1] = 0.0
+  }
+}
+
 // Set the state to b. This includes the value and all derivatives.
 func (a *BasicState) Set(b Scalar) {
   a.Copy(b)

@@ -252,9 +252,12 @@ func (r Vector) MdotV(a Matrix, b Vector) Vector {
   if len(r) != n || len(b) != m {
     panic("matrix/vector dimensions do not match!")
   }
+  t := ZeroScalar(a.ElementType())
   for i := 0; i < n; i++ {
+    r[i].Reset()
     for j := 0; j < m; j++ {
-      r[i].Add(r[i], Mul(a.ReferenceAt(i, j), b[j]))
+      t.Mul(a.ReferenceAt(i, j), b[j])
+      r[i].Add(r[i], t)
     }
   }
   return r
@@ -275,9 +278,12 @@ func (r Vector) VdotM(a Vector, b Matrix) Vector {
   if len(r) != m || len(a) != n {
     panic("matrix/vector dimensions do not match!")
   }
+  t := ZeroScalar(a.ElementType())
   for i := 0; i < m; i++ {
+    r[i].Reset()
     for j := 0; j < n; j++ {
-      r[i].Add(r[i], Mul(a[j], b.ReferenceAt(j, i)))
+      t.Mul(a[j], b.ReferenceAt(j, i))
+      r[i].Add(r[i], t)
     }
   }
   return r

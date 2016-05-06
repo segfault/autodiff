@@ -39,6 +39,8 @@ type ScalarState interface {
   LogValue      ()             float64
   Derivative    (int, int)     float64
   N             ()             int
+  // set value and derivatives to zero
+  Reset         ()
   // write access
   Set           (Scalar)
   SetValue      (float64)
