@@ -224,6 +224,7 @@ func MdivS(a Matrix, b Scalar) Matrix {
 // Matrix product of a and b. The result is stored in r.
 func (r *Matrix) MdotM(a, b Matrix) Matrix {
   n, m := r.Dims()
+  t := ZeroScalar(a.ElementType())
   if a.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
   }
@@ -231,7 +232,8 @@ func (r *Matrix) MdotM(a, b Matrix) Matrix {
     for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Reset()
       for n := 0; n < a.cols; n++ {
-        r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j)))
+        t.Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j))
+        r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), t)
       }
     }
   }
