@@ -22,6 +22,7 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
+// True if matrix a equals b.
 func Mequal(a, b Matrix) bool {
   if a.rows != b.rows || a.cols != b.cols {
     panic("MEqual(): matrix dimensions do not match!")
@@ -34,63 +35,200 @@ func Mequal(a, b Matrix) bool {
   return true
 }
 
-func MaddM(a, b Matrix) Matrix {
-  if a.rows != b.rows || a.cols != b.cols {
-    panic("MAdd(): Matrix dimensions do not match!")
+/* -------------------------------------------------------------------------- */
+
+// Element-wise addition of two matrices. The result is stored in r.
+func (r Matrix) MaddM(a, b Matrix) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
+    panic("matrix dimensions do not match!")
   }
-  rows := a.rows
-  cols := a.cols
-  r := NullMatrix(a.ElementType(), rows, cols)
-  for i := 0; i < rows; i++ {
-    for j := 0; j < cols; j++ {
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
 }
 
-func MaddS(a Matrix, b Scalar) Matrix {
+// Element-wise addition of two matrices.
+func MaddM(a, b Matrix) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
-  for i := 0; i < a.rows; i++ {
-    for j := 0; j < a.cols; j++ {
+  r.MaddM(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Add scalar b to all elements of a. The result is stored in r.
+func (r Matrix) MaddS(a Matrix, b Scalar) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b)
     }
   }
   return r
 }
 
-func MsubM(a, b Matrix) Matrix {
-  if a.rows != b.rows || a.cols != b.cols {
-    panic("MSub(): Matrix dimensions do not match!")
+// Add scalar b to all elements of a.
+func MaddS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MaddS(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Element-wise substraction of two matrices. The result is stored in r.
+func (r Matrix) MsubM(a, b Matrix) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
+    panic("matrix dimensions do not match!")
   }
-  rows := a.rows
-  cols := a.cols
-  r := NullMatrix(a.ElementType(), rows, cols)
-  for i := 0; i < rows; i++ {
-    for j := 0; j < cols; j++ {
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
 }
 
-func MsubS(a Matrix, b Scalar) Matrix {
+// Element-wise substraction of two matrices.
+func MsubM(a, b Matrix) Matrix {
   r := NullMatrix(a.ElementType(), a.rows, a.cols)
-  for i := 0; i < a.rows; i++ {
-    for j := 0; j < a.cols; j++ {
+  r.MsubM(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Substract b from all elements of a. The result is stored in r.
+func (r Matrix) MsubS(a Matrix, b Scalar) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b)
     }
   }
   return r
 }
 
-func MmulM(a, b Matrix) Matrix {
-  if a.cols != b.rows {
-    panic("MMul(): Matrix dimensions do not match!")
+// Substract b from all elements of a.
+func MsubS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MsubS(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Element-wise multiplication of two matrices. The result is stored in r.
+func (r Matrix) MmulM(a, b Matrix) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
+    panic("matrix dimensions do not match!")
   }
-  r := NullMatrix(a.ElementType(), a.rows, b.cols)
-  for i := 0; i < r.rows; i++ {
-    for j := 0; j < r.cols; j++ {
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
+    }
+  }
+  return r
+}
+
+// Element-wise multiplication of two matrices.
+func MmulM(a, b Matrix) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MmulM(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Multiply all elements of a with b. The result is stored in r.
+func (r Matrix) MmulS(a Matrix, b Scalar) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b)
+    }
+  }
+  return r
+}
+
+// Multiply all elements of a with b.
+func MmulS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MmulS(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Element-wise division of two matrices. The result is stored in r.
+func (r Matrix) MdivM(a, b Matrix) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
+    }
+  }
+  return r
+}
+
+// Element-wise division of two matrices.
+func MdivM(a, b Matrix) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MdivM(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Divide all elements of a by b. The result is stored in r.
+func (r Matrix) MdivS(a Matrix, b Scalar) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || a.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b)
+    }
+  }
+  return r
+}
+
+// Divide all elements of a by b.
+func MdivS(a Matrix, b Scalar) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, a.cols)
+  r.MdivS(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Matrix product of a and b. The result is stored in r.
+func (r Matrix) MdotM(a, b Matrix) Matrix {
+  n, m := r.Dims()
+  if a.rows != n || b.cols != m {
+    panic("matrix dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       for n := 0; n < a.cols; n++ {
         r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), Mul(a.ReferenceAt(i, n), b.ReferenceAt(n, j)))
       }
@@ -99,92 +237,140 @@ func MmulM(a, b Matrix) Matrix {
   return r
 }
 
-func MmulV(a Matrix, b Vector) Vector {
-  if a.cols != len(b) {
-    panic("MxV(): Matrix/Vector dimensions do not match!")
+// Matrix product of a and b.
+func MdotM(a, b Matrix) Matrix {
+  r := NullMatrix(a.ElementType(), a.rows, b.cols)
+  r.MdotM(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Matrix vector product of a and b. The result is stored in r.
+func (r Vector) MdotV(a Matrix, b Vector) Vector {
+  n, m := a.Dims()
+  if len(r) != n || len(b) != m {
+    panic("matrix/vector dimensions do not match!")
   }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r[i].Add(r[i], Mul(a.ReferenceAt(i, j), b[j]))
+    }
+  }
+  return r
+}
+
+// Matrix vector product of a and b.
+func MdotV(a Matrix, b Vector) Vector {
   r := NullVector(a.ElementType(), a.rows)
-  for i := 0; i < len(r); i++ {
-    for n := 0; n < a.cols; n++ {
-      r[i].Add(r[i], Mul(a.ReferenceAt(i, n), b[n]))
+  r.MdotV(a, b)
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+// Vector matrix product of a and b. The result is stored in r.
+func (r Vector) VdotM(a Vector, b Matrix) Vector {
+  n, m := b.Dims()
+  if len(r) != m || len(a) != n {
+    panic("matrix/vector dimensions do not match!")
+  }
+  for i := 0; i < m; i++ {
+    for j := 0; j < n; j++ {
+      r[i].Add(r[i], Mul(a[j], b.ReferenceAt(j, i)))
     }
   }
   return r
 }
 
-func MmulS(a Matrix, s Scalar) Matrix {
-  r := NullMatrix(a.ElementType(), a.rows, a.cols)
-  for i := 0; i < a.rows; i++ {
-    for j := 0; j < a.cols; j++ {
-      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i,j), s)
-    }
-  }
-  return r
-}
-
-func MdivS(a Matrix, s Scalar) Matrix {
-  r := NullMatrix(a.ElementType(), a.rows, a.cols)
-  for i := 0; i < a.rows; i++ {
-    for j := 0; j < a.cols; j++ {
-      r.ReferenceAt(i, j).Div(a.ReferenceAt(i,j), s)
-    }
-  }
-  return r
-}
-
-func VmulM(a Vector, b Matrix) Vector {
-  if len(a) != b.rows {
-    panic("VxM(): Matrix/Vector dimensions do not match!")
-  }
+// Vector matrix product of a and b.
+func VdotM(a Vector, b Matrix) Vector {
   r := NullVector(a.ElementType(), b.cols)
-  for i := 0; i < len(r); i++ {
-    for n := 0; n < b.rows; n++ {
-      r[i].Add(r[i], Mul(a[n], b.ReferenceAt(n, i)))
-    }
-  }
+  r.VdotM(a, b)
   return r
 }
 
-func Outer(a, b Vector) Matrix {
-  r := NullMatrix(a.ElementType(), len(a), len(b))
-  for i := 0; i < len(a); i++ {
-    for j := 0; j < len(b); j++ {
+/* -------------------------------------------------------------------------- */
+
+// Outer product of two vectors. The result is stored in r.
+func (r Matrix) Outer(a, b Vector) Matrix {
+  n, m := r.Dims()
+  if len(a) != n || len(b) != m {
+    panic("matrix/vector dimensions do not match!")
+  }
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
       r.ReferenceAt(i, j).Mul(a[i], b[j])
     }
   }
   return r
 }
 
+// Outer product of two vectors.
+func Outer(a, b Vector) Matrix {
+  r := NullMatrix(a.ElementType(), len(a), len(b))
+  r.Outer(a, b)
+  return r
+}
+
 /* -------------------------------------------------------------------------- */
 
-func Mtrace(matrix Matrix) Scalar {
-  if matrix.rows != matrix.cols {
-    panic("MTrace(): Not a square matrix!")
+// Returns the trace of a.
+func Mtrace(a Matrix) Scalar {
+  n, m := a.Dims()
+  if n != m {
+    panic("not a square matrix")
   }
-  if matrix.rows == 0 {
+  if n == 0 {
     return nil
   }
-  t := matrix.At(0, 0)
-  for i := 1; i < matrix.rows; i++ {
-    t.Add(t, matrix.ReferenceAt(i,i))
+  t := a.At(0, 0)
+  for i := 1; i < n; i++ {
+    t.Add(t, a.ReferenceAt(i,i))
   }
   return t
 }
 
-func Mnorm(matrix Matrix) Scalar {
-  if matrix.rows == 0 && matrix.cols == 0 {
+/* -------------------------------------------------------------------------- */
+
+// Frobenius norm.
+func Mnorm(a Matrix) Scalar {
+  n, m := a.Dims()
+  if n == 0 || m == 0 {
     return nil
   }
   c := NewBareReal(2.0)
-  t := NewScalar(matrix.ElementType(), 0.0)
-  s := Pow(matrix.values[0], NewBareReal(2.0))
-  for i := 1; i < len(matrix.values); i++ {
-    t.Pow(matrix.values[i], c)
+  t := NewScalar(a.ElementType(), 0.0)
+  s := Pow(a.values[0], NewBareReal(2.0))
+  for i := 1; i < len(a.values); i++ {
+    t.Pow(a.values[i], c)
     s.Add(s, t)
   }
   return s
 }
 
+/* -------------------------------------------------------------------------- */
+
+// Compute the Jacobian of f at x_. The result is stored in r.
+func (r Matrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
+  n, m := r.Dims()
+  x := x_.Clone()
+  x.Variables(1)
+  // compute Jacobian
+  y := f(x)
+  if len(x) != m || len(y) != n {
+    panic("matrix/vector dimensions do not match")
+  }
+  // copy derivatives
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
+    }
+  }
+  return r
+}
+
+// Compute the Jacobian of f at x_.
 func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   x := x_.Clone()
   x.Variables(1)

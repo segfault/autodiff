@@ -109,22 +109,33 @@ func TestMatrixTrace(t *testing.T) {
   }
 }
 
-func TestMatrixMul(t *testing.T) {
+func TestMatrixDot(t *testing.T) {
 
   m1 := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   m2 := m1.T()
-  m3 := MmulM(m1, m2)
+  m3 := MdotM(m1, m2)
 
   if m3.At(0,0).Value() != 14 {
     t.Error("Matrix multiplication failed!")
   }
 }
 
-func TestMatrixMxV(t *testing.T) {
+func TestMatrixMul(t *testing.T) {
+
+  m1 := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m2 := NewMatrix(RealType, 2, 3, []float64{6,5,4,3,2,1})
+  m3 := MmulM(m1, m2)
+
+  if m3.At(0,0).Value() != 6 {
+    t.Error("Matrix multiplication failed!")
+  }
+}
+
+func TestMatrixMdotV(t *testing.T) {
 
   m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
   v1 := NewVector(RealType, []float64{1, 2})
-  v2 := MmulV(m1, v1)
+  v2 := MdotV(m1, v1)
   v3 := NewVector(RealType, []float64{5, 11})
 
   if Vnorm(VsubV(v2, v3)).Value() > 1e-8  {
@@ -132,11 +143,11 @@ func TestMatrixMxV(t *testing.T) {
   }
 }
 
-func TestMatrixVxM(t *testing.T) {
+func TestMatrixVdotM(t *testing.T) {
 
   m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
   v1 := NewVector(RealType, []float64{1, 2})
-  v2 := VmulM(v1, m1)
+  v2 := VdotM(v1, m1)
   v3 := NewVector(RealType, []float64{7, 10})
 
   if Vnorm(VsubV(v2, v3)).Value() > 1e-8  {
