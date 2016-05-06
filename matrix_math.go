@@ -38,7 +38,7 @@ func Mequal(a, b Matrix) bool {
 /* -------------------------------------------------------------------------- */
 
 // Element-wise addition of two matrices. The result is stored in r.
-func (r Matrix) MaddM(a, b Matrix) Matrix {
+func (r *Matrix) MaddM(a, b Matrix) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
@@ -48,7 +48,7 @@ func (r Matrix) MaddM(a, b Matrix) Matrix {
       r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
-  return r
+  return *r
 }
 
 // Element-wise addition of two matrices.
@@ -61,7 +61,7 @@ func MaddM(a, b Matrix) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Add scalar b to all elements of a. The result is stored in r.
-func (r Matrix) MaddS(a Matrix, b Scalar) Matrix {
+func (r *Matrix) MaddS(a Matrix, b Scalar) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m {
     panic("matrix dimensions do not match!")
@@ -71,7 +71,7 @@ func (r Matrix) MaddS(a Matrix, b Scalar) Matrix {
       r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b)
     }
   }
-  return r
+  return *r
 }
 
 // Add scalar b to all elements of a.
@@ -84,7 +84,7 @@ func MaddS(a Matrix, b Scalar) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Element-wise substraction of two matrices. The result is stored in r.
-func (r Matrix) MsubM(a, b Matrix) Matrix {
+func (r *Matrix) MsubM(a, b Matrix) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
@@ -94,7 +94,7 @@ func (r Matrix) MsubM(a, b Matrix) Matrix {
       r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
-  return r
+  return *r
 }
 
 // Element-wise substraction of two matrices.
@@ -107,7 +107,7 @@ func MsubM(a, b Matrix) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Substract b from all elements of a. The result is stored in r.
-func (r Matrix) MsubS(a Matrix, b Scalar) Matrix {
+func (r *Matrix) MsubS(a Matrix, b Scalar) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m {
     panic("matrix dimensions do not match!")
@@ -117,7 +117,7 @@ func (r Matrix) MsubS(a Matrix, b Scalar) Matrix {
       r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b)
     }
   }
-  return r
+  return *r
 }
 
 // Substract b from all elements of a.
@@ -130,7 +130,7 @@ func MsubS(a Matrix, b Scalar) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Element-wise multiplication of two matrices. The result is stored in r.
-func (r Matrix) MmulM(a, b Matrix) Matrix {
+func (r *Matrix) MmulM(a, b Matrix) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
@@ -140,7 +140,7 @@ func (r Matrix) MmulM(a, b Matrix) Matrix {
       r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
-  return r
+  return *r
 }
 
 // Element-wise multiplication of two matrices.
@@ -153,7 +153,7 @@ func MmulM(a, b Matrix) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Multiply all elements of a with b. The result is stored in r.
-func (r Matrix) MmulS(a Matrix, b Scalar) Matrix {
+func (r *Matrix) MmulS(a Matrix, b Scalar) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m {
     panic("matrix dimensions do not match!")
@@ -163,7 +163,7 @@ func (r Matrix) MmulS(a Matrix, b Scalar) Matrix {
       r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b)
     }
   }
-  return r
+  return *r
 }
 
 // Multiply all elements of a with b.
@@ -176,7 +176,7 @@ func MmulS(a Matrix, b Scalar) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Element-wise division of two matrices. The result is stored in r.
-func (r Matrix) MdivM(a, b Matrix) Matrix {
+func (r *Matrix) MdivM(a, b Matrix) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m || b.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
@@ -186,7 +186,7 @@ func (r Matrix) MdivM(a, b Matrix) Matrix {
       r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
-  return r
+  return *r
 }
 
 // Element-wise division of two matrices.
@@ -199,7 +199,7 @@ func MdivM(a, b Matrix) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Divide all elements of a by b. The result is stored in r.
-func (r Matrix) MdivS(a Matrix, b Scalar) Matrix {
+func (r *Matrix) MdivS(a Matrix, b Scalar) Matrix {
   n, m := r.Dims()
   if a.rows != n || a.cols != m {
     panic("matrix dimensions do not match!")
@@ -209,7 +209,7 @@ func (r Matrix) MdivS(a Matrix, b Scalar) Matrix {
       r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b)
     }
   }
-  return r
+  return *r
 }
 
 // Divide all elements of a by b.
@@ -222,7 +222,7 @@ func MdivS(a Matrix, b Scalar) Matrix {
 /* -------------------------------------------------------------------------- */
 
 // Matrix product of a and b. The result is stored in r.
-func (r Matrix) MdotM(a, b Matrix) Matrix {
+func (r *Matrix) MdotM(a, b Matrix) Matrix {
   n, m := r.Dims()
   if a.rows != n || b.cols != m {
     panic("matrix dimensions do not match!")
@@ -235,7 +235,7 @@ func (r Matrix) MdotM(a, b Matrix) Matrix {
       }
     }
   }
-  return r
+  return *r
 }
 
 // Matrix product of a and b.
@@ -300,7 +300,7 @@ func VdotM(a Vector, b Matrix) Vector {
 /* -------------------------------------------------------------------------- */
 
 // Outer product of two vectors. The result is stored in r.
-func (r Matrix) Outer(a, b Vector) Matrix {
+func (r *Matrix) Outer(a, b Vector) Matrix {
   n, m := r.Dims()
   if len(a) != n || len(b) != m {
     panic("matrix/vector dimensions do not match!")
@@ -310,7 +310,7 @@ func (r Matrix) Outer(a, b Vector) Matrix {
       r.ReferenceAt(i, j).Mul(a[i], b[j])
     }
   }
-  return r
+  return *r
 }
 
 // Outer product of two vectors.
@@ -359,7 +359,7 @@ func Mnorm(a Matrix) Scalar {
 /* -------------------------------------------------------------------------- */
 
 // Compute the Jacobian of f at x_. The result is stored in r.
-func (r Matrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
+func (r *Matrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   n, m := r.Dims()
   x := x_.Clone()
   x.Variables(1)
@@ -374,7 +374,7 @@ func (r Matrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
       r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
     }
   }
-  return r
+  return *r
 }
 
 // Compute the Jacobian of f at x_.
