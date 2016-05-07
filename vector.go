@@ -179,7 +179,7 @@ func (v Vector) String() string {
   return buffer.String()
 }
 
-func (v Vector) ToTable() string {
+func (v Vector) Table() string {
   var buffer bytes.Buffer
 
   for i, _ := range v {
