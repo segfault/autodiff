@@ -152,7 +152,7 @@ func (v Vector) Matrix(n, m int) Matrix {
   if n*m != len(v) {
     panic("Matrix dimension does not fit input vector!")
   }
-  return Matrix{v, n, m, false}
+  return &DenseMatrix{v, n, m, false}
 
 }
 

@@ -18,15 +18,15 @@ package autodiff
 
 /* -------------------------------------------------------------------------- */
 
-func (matrix Matrix) T() Matrix {
-  return Matrix{
+func (matrix *DenseMatrix) T() Matrix {
+  return &DenseMatrix{
     values:  matrix.values,
     rows  :  matrix.cols,
     cols  :  matrix.rows,
     t     : !matrix.t}
 }
 
-func (matrix Matrix) PermuteRows(_p []int) {
+func (matrix *DenseMatrix) PermuteRows(_p []int) {
   if len(_p) != matrix.rows {
     panic("PermuteRows(): permutation vector has invalid length!")
   }
