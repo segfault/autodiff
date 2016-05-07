@@ -78,7 +78,7 @@ func TestMatrixPerformance(t *testing.T) {
     sigma := NullMatrix(t, n, n)
     for i := 0; i < n; i++ {
       for j := 0; j < n; j++ {
-        sigma.Set(Mul(v, Exp(Div(NewReal(-1.0/2.0*math.Pow(float64(i)-float64(j), 2.0)), Mul(l, l)))),
+        sigma.Set(Mul(v, Exp(Div(NewReal(-1.0/2.0*math.Pow(math.Abs(float64(i)-float64(j)), 2.0)), Mul(l, l)))),
           i, j)
       }
     }
