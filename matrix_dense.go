@@ -260,7 +260,7 @@ func (m *DenseMatrix) String() string {
   return buffer.String()
 }
 
-func ToTable(a Matrix) string {
+func (a *DenseMatrix) Table() string {
   var buffer bytes.Buffer
 
   n, m := a.Dims()

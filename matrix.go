@@ -30,6 +30,7 @@ type Matrix interface {
   Col       (j int)    Vector
   Diag      ()         Vector
   T         ()         Matrix
+  Table     ()         string
   Submatrix(rfrom, rto, cfrom, cto int) Matrix
   PermuteRows([]int)
   // math
