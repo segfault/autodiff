@@ -260,18 +260,20 @@ func (m *DenseMatrix) String() string {
   return buffer.String()
 }
 
-func (m *DenseMatrix) ToTable() string {
+func ToTable(a Matrix) string {
   var buffer bytes.Buffer
 
-  for i := 0; i < m.rows; i++ {
+  n, m := a.Dims()
+
+  for i := 0; i < n; i++ {
     if i != 0 {
       buffer.WriteString("\n")
     }
-    for j := 0; j < m.cols; j++ {
+    for j := 0; j < m; j++ {
       if j != 0 {
         buffer.WriteString(" ")
       }
-      buffer.WriteString(m.At(i,j).String())
+      buffer.WriteString(a.ReferenceAt(i,j).String())
     }
   }
 
