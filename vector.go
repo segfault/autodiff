@@ -95,6 +95,14 @@ func (v Vector) ReferenceAt1(i int) Scalar {
   return v[i]
 }
 
+func (v Vector) RealReferenceAt1(i int) *Real {
+  return v[i].(*Real)
+}
+
+func (v Vector) BareRealReferenceAt1(i int) *BareReal {
+  return v[i].(*BareReal)
+}
+
 func (v Vector) Set1(s Scalar, i, j int) {
   v[i].Copy(s)
 }
