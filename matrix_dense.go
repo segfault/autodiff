@@ -159,6 +159,21 @@ func (matrix *DenseMatrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
   return r
 }
 
+/* fast matrix access
+ * -------------------------------------------------------------------------- */
+
+func (matrix *DenseMatrix) At2(i, j int) Scalar {
+  return matrix.values[matrix.index(i, j)].Clone()
+}
+
+func (matrix *DenseMatrix) ReferenceAt2(i, j int) Scalar {
+  return matrix.values[matrix.index(i, j)]
+}
+
+func (matrix *DenseMatrix) Set2(s Scalar, i, j int) {
+  matrix.values[matrix.index(i, j)].Copy(s)
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 
@@ -166,9 +181,6 @@ func (matrix *DenseMatrix) At(args ...int) Scalar {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  if k >= len(matrix.values) {
-    panic("At(): Index out of bounds!")
-  }
   // to avoid confusion we clone the value before
   // returning a reference to it
   //
@@ -183,9 +195,6 @@ func (matrix *DenseMatrix) ReferenceAt(args ...int) Scalar {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  if k >= len(matrix.values) {
-    panic("At(): Index out of bounds!")
-  }
   return matrix.values[k]
 }
 
@@ -193,9 +202,6 @@ func (matrix *DenseMatrix) Set(s Scalar, args ...int) {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  if k >= len(matrix.values) {
-    panic("Set(): Index out of bounds!")
-  }
   matrix.values[k].Copy(s)
 }
 
@@ -211,15 +217,15 @@ func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) ScalarContainer {
 
 func (matrix *DenseMatrix) Reduce(f func(Scalar, Scalar) Scalar) Scalar {
   n, m := matrix.Dims()
-  r := matrix.At(0, 0)
+  r := matrix.At2(0, 0)
   // first row
   for j := 1; j < m; j++ {
-    r = f(r, matrix.At(0, j))
+    r = f(r, matrix.ReferenceAt2(0, j))
   }
   // all other rows
   for i := 1; i < n; i++ {
     for j := 0; j < m; j++ {
-      r = f(r, matrix.At(i, j))
+      r = f(r, matrix.ReferenceAt2(i, j))
     }
   }
   return r

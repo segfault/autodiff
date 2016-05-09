@@ -33,19 +33,19 @@ func cholesky(A Matrix) Matrix {
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {
-      s.Mul(L.ReferenceAt(i,0), L.ReferenceAt(j,0))
+      s.Mul(L.ReferenceAt2(i,0), L.ReferenceAt2(j,0))
       for k := 1; k < j; k++ {
-        t.Mul(L.ReferenceAt(i,k), L.ReferenceAt(j,k))
+        t.Mul(L.ReferenceAt2(i,k), L.ReferenceAt2(j,k))
         s.Add(s, t)
       }
-      t.Sub(A.ReferenceAt(i, j), s)
+      t.Sub(A.ReferenceAt2(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
           panic("matrix is not positive definite")
         }
-        L.ReferenceAt(i, j).Sqrt(t)
+        L.ReferenceAt2(i, j).Sqrt(t)
       } else {
-        L.ReferenceAt(i, j).Div(t, L.ReferenceAt(j, j))
+        L.ReferenceAt2(i, j).Div(t, L.ReferenceAt2(j, j))
       }
     }
   }

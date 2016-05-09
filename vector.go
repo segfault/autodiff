@@ -84,6 +84,21 @@ func (v Vector) Copy(w Vector) {
   }
 }
 
+/* fast vector access
+ * -------------------------------------------------------------------------- */
+
+func (v Vector) At1(i int) Scalar {
+  return v[i].Clone()
+}
+
+func (v Vector) ReferenceAt1(i int) Scalar {
+  return v[i]
+}
+
+func (v Vector) Set1(s Scalar, i, j int) {
+  v[i].Copy(s)
+}
+
 /* imlement ScalarContainer
  * -------------------------------------------------------------------------- */
 

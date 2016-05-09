@@ -21,19 +21,24 @@ package autodiff
 
 type Matrix interface {
   ScalarContainer
-  Clone     ()         Matrix
-  Copy      (Matrix)
-  Dims      ()         (int, int)
-  Values    ()         Vector
-  SetValues (v Vector)
-  Row       (i int)    Vector
-  Col       (j int)    Vector
-  Diag      ()         Vector
-  T         ()         Matrix
-  Table     ()         string
+  // matrix access with improved performance
+  At2          (i, j int)           Scalar
+  ReferenceAt2 (i, j int)           Scalar
+  Set2         (v Scalar, i, j int)
+  // basic methods
+  Clone        ()                   Matrix
+  Copy         (Matrix)
+  Dims         ()                   (int, int)
+  Values       ()                   Vector
+  SetValues    (v Vector)
+  Row          (i int)              Vector
+  Col          (j int)              Vector
+  Diag         ()                   Vector
+  T            ()                   Matrix
+  Table        ()                   string
   Submatrix(rfrom, rto, cfrom, cto int) Matrix
   PermuteRows([]int)
-  // math
+  // math operations
   MaddM(a, b Matrix) Matrix
   MaddS(a Matrix, b Scalar) Matrix
   MsubM(a, b Matrix) Matrix

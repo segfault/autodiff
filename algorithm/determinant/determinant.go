@@ -44,10 +44,10 @@ func determinantNaive(a Matrix) Scalar {
   if (n < 1) {
     /* nothing to do */
   } else if n == 1 {
-    det.Copy(a.ReferenceAt(0, 0))
+    det.Copy(a.ReferenceAt2(0, 0))
   } else if n == 2 {
-    t1.Mul(a.ReferenceAt(0, 0), a.ReferenceAt(1, 1))
-    t2.Mul(a.ReferenceAt(1, 0), a.ReferenceAt(0, 1))
+    t1.Mul(a.ReferenceAt2(0, 0), a.ReferenceAt2(1, 1))
+    t2.Mul(a.ReferenceAt2(1, 0), a.ReferenceAt2(0, 1))
     det.Sub(t1, t2)
   } else {
     m := NullMatrix(a.ElementType(), n-1, n-1)
@@ -58,15 +58,15 @@ func determinantNaive(a Matrix) Scalar {
           if j == j1 {
             continue
           }
-          m.ReferenceAt(i-1, j2).Copy(a.ReferenceAt(i, j))
+          m.ReferenceAt2(i-1, j2).Copy(a.ReferenceAt2(i, j))
           j2++;
         }
       }
       if j1 % 2 == 0 {
-        t1.Mul(a.ReferenceAt(0, j1), determinantNaive(m))
+        t1.Mul(a.ReferenceAt2(0, j1), determinantNaive(m))
         det.Add(det, t1)
       } else {
-        t1.Mul(a.ReferenceAt(0, j1), determinantNaive(m))
+        t1.Mul(a.ReferenceAt2(0, j1), determinantNaive(m))
         det.Sub(det, t1)
       }
     }
@@ -85,14 +85,14 @@ func determinantPD(a Matrix, logScale bool) Scalar {
   if logScale {
     r.SetValue(0.0)
     for i := 0; i < n; i++ {
-      t.Log(L.ReferenceAt(i, i))
+      t.Log(L.ReferenceAt2(i, i))
       r.Add(r, t)
     }
     r.Add(r, r)
   } else {
     r.SetValue(1.0)
     for i := 0; i < n; i++ {
-      r.Mul(r, L.ReferenceAt(i, i))
+      r.Mul(r, L.ReferenceAt2(i, i))
     }
     r.Mul(r, r)
   }
