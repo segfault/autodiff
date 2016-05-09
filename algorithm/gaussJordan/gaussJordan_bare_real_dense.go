@@ -18,7 +18,7 @@ package gaussJordan
 
 /* -------------------------------------------------------------------------- */
 
-import   "fmt"
+//import   "fmt"
 import   "math"
 
 import . "github.com/pbenner/autodiff"
