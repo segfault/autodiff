@@ -30,13 +30,32 @@ func (a *Real) Equals(b Scalar) bool {
   return math.Abs(a.Value() - b.Value()) < epsilon
 }
 
+func (a *Real) RealEquals(b *Real) bool {
+  epsilon := 1e-12
+  return math.Abs(a.Value() - b.Value()) < epsilon
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *Real) Greater(b Scalar) bool {
   return a.Value() > b.Value()
 }
 
+func (a *Real) RealGreater(b *Real) bool {
+  return a.Value() > b.Value()
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *Real) Smaller(b Scalar) bool {
   return a.Value() < b.Value()
 }
+
+func (a *Real) RealSmaller(b *Real) bool {
+  return a.Value() < b.Value()
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *Real) Neg(a Scalar) Scalar {
   c.AllocForOne(a)
@@ -54,6 +73,24 @@ func (c *Real) Neg(a Scalar) Scalar {
   return c
 }
 
+func (c *Real) RealNeg(a *Real) *Real {
+  c.AllocForOne(a)
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(1, i, -a.Derivative(1, i))
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < a.N(); i++ {
+      c.SetDerivative(2, i, -a.Derivative(2, i))
+    }
+  }
+  c.SetValue(-a.Value())
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *Real) Add(a, b Scalar) Scalar {
   c.AllocForTwo(a, b)
   c.SetValue(a.Value() + b.Value())
@@ -69,6 +106,24 @@ func (c *Real) Add(a, b Scalar) Scalar {
   }
   return c
 }
+
+func (c *Real) RealAdd(a, b *Real) *Real {
+  c.AllocForTwo(a, b)
+  c.SetValue(a.Value() + b.Value())
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i) + b.Derivative(1, i))
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i) + b.Derivative(2, i))
+    }
+  }
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *Real) Sub(a, b Scalar) Scalar {
   c.AllocForTwo(a, b)
@@ -86,6 +141,24 @@ func (c *Real) Sub(a, b Scalar) Scalar {
   return c
 }
 
+func (c *Real) RealSub(a, b *Real) *Real {
+  c.AllocForTwo(a, b)
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(1, i, a.Derivative(1, i) - b.Derivative(1, i))
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(2, i, a.Derivative(2, i) - b.Derivative(2, i))
+    }
+  }
+  c.SetValue(a.Value() - b.Value())
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *Real) Mul(a, b Scalar) Scalar {
   c.AllocForTwo(a, b)
   c.SetValue(a.Value() * b.Value())
@@ -102,6 +175,24 @@ func (c *Real) Mul(a, b Scalar) Scalar {
   return c
 }
 
+func (c *Real) RealMul(a, b *Real) *Real {
+  c.AllocForTwo(a, b)
+  c.SetValue(a.Value() * b.Value())
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(1, i, a.Value()*b.Derivative(1, i) + a.Derivative(1, i)*b.Value())
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(2, i, a.Value()*b.Derivative(2, i) + a.Derivative(2, i)*b.Value() + 2*a.Derivative(1, i)*b.Derivative(1, i))
+    }
+  }
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *Real) Div(a, b Scalar) Scalar {
   c.AllocForTwo(a, b)
   if c.order >= 1 {
@@ -117,6 +208,24 @@ func (c *Real) Div(a, b Scalar) Scalar {
   c.SetValue(a.Value() / b.Value())
   return c
 }
+
+func (c *Real) RealDiv(a, b *Real) *Real {
+  c.AllocForTwo(a, b)
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(1, i, (a.Derivative(1, i)*b.Value() - a.Value()*b.Derivative(1, i))/(b.Value()*b.Value()))
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < c.N(); i++ {
+      c.SetDerivative(2, i, (2*a.Value()*math.Pow(b.Derivative(1, i), 2) + math.Pow(b.Value(), 2)*a.Derivative(2, i) - b.Value()*(2*a.Derivative(1, i)*b.Derivative(1, i) + a.Value()*b.Derivative(2, i)))/math.Pow(b.Value(), 3))
+    }
+  }
+  c.SetValue(a.Value() / b.Value())
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *Real) Pow(a, k Scalar) Scalar {
   c.AllocForTwo(a, k)
@@ -147,8 +256,43 @@ func (c *Real) Pow(a, k Scalar) Scalar {
   return c
 }
 
+func (c *Real) RealPow(a, k *Real) *Real {
+  c.AllocForTwo(a, k)
+  if c.order >= 1 {
+    for i := 0; i < c.N(); i++ {
+      if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
+        c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*(
+          k.Value()*a.Derivative(1, i) + a.Value()*math.Log(a.Value())*k.Derivative(1, i)))
+      } else {
+        c.SetDerivative(1, i, math.Pow(a.Value(), k.Value()-1)*k.Value()*a.Derivative(1, i))
+      }
+    }
+  }
+  if c.order >= 2 {
+    for i := 0; i < c.N(); i++ {
+      if k.Order() >= 1 && k.Derivative(1, i) != 0.0 {
+        c.SetDerivative(2, i,
+          math.Pow(a.Value(), k.Value())*(
+            (k.Value()-1.0)*k.Value()*math.Pow(a.Derivative(1, i), 2)/math.Pow(a.Value(), 2) +
+              (2.0*(1.0 + k.Value()*math.Log(a.Value()))*a.Derivative(1, i)*k.Derivative(1, i) + k.Value()*a.Derivative(2, i))/a.Value() +
+              math.Log(a.Value())*(math.Log(a.Value())*math.Pow(k.Derivative(1, i), 2.0) + k.Derivative(2, i))))
+      } else {
+        c.SetDerivative(2, i, k.Value()*math.Pow(a.Value(), k.Value()-1)*a.Derivative(2, i) + k.Value()*(k.Value()-1)*math.Pow(a.Value(), k.Value()-2)*math.Pow(a.Derivative(1, i), 2))
+      }
+    }
+  }
+  c.SetValue(math.Pow(a.Value(), k.Value()))
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *Real) Sqrt(a Scalar) Scalar {
   return c.Pow(a, NewBareReal(1.0/2.0))
+}
+
+func (c *Real) RealSqrt(a *Real) *Real {
+  return c.RealPow(a, NewReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */

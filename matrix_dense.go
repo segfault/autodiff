@@ -170,6 +170,14 @@ func (matrix *DenseMatrix) ReferenceAt2(i, j int) Scalar {
   return matrix.values[matrix.index(i, j)]
 }
 
+func (matrix *DenseMatrix) RealReferenceAt2(i, j int) *Real {
+  return matrix.values[matrix.index(i, j)].(*Real)
+}
+
+func (matrix *DenseMatrix) BareRealReferenceAt2(i, j int) *BareReal {
+  return matrix.values[matrix.index(i, j)].(*BareReal)
+}
+
 func (matrix *DenseMatrix) Set2(s Scalar, i, j int) {
   matrix.values[matrix.index(i, j)].Copy(s)
 }

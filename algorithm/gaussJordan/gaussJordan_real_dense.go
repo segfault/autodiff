@@ -18,30 +18,16 @@ package gaussJordan
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
+import   "fmt"
 import   "math"
 
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-type Epsilon struct {
-  Value float64
-}
-
-type Submatrix struct {
-  Value []bool
-}
-
-type Triangular struct {
-  Value bool
-}
-
-/* -------------------------------------------------------------------------- */
-
-func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
-  t := NewScalar(a.ElementType(), 0.0)
-  c := NewScalar(a.ElementType(), 0.0)
+func gaussJordan_real_dense(a, x *DenseMatrix, b Vector, submatrix []bool, epsilon float64) {
+  t := NewReal(0.0)
+  c := NewReal(0.0)
   // number of rows
   n, _ := a.Dims()
   // permutation of the rows
@@ -62,7 +48,7 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
       continue
     }
     // check if matrix is singular
-    if math.Abs(a.ReferenceAt2(p[i], i).Value()) < epsilon {
+    if math.Abs(a.RealReferenceAt2(p[i], i).Value()) < epsilon {
       panic("GaussJordan(): matrix is singular!")
     }
     // find row with maximum value at column i
@@ -71,7 +57,7 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
       if !submatrix[j] {
         continue
       }
-      if math.Abs(a.ReferenceAt2(p[j], i).Value()) > math.Abs(a.ReferenceAt2(p[maxrow], i).Value()) {
+      if math.Abs(a.RealReferenceAt2(p[j], i).Value()) > math.Abs(a.RealReferenceAt2(p[maxrow], i).Value()) {
         maxrow = j
       }
     }
@@ -83,15 +69,15 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
         continue
       }
       // c = a[j, i] / a[i, i]
-      c.Div(a.ReferenceAt2(p[j], i), a.ReferenceAt2(p[i], i))
+      c.RealDiv(a.RealReferenceAt2(p[j], i), a.RealReferenceAt2(p[i], i))
       // loop over columns in a
       for k := i; k < n; k++ {
         if !submatrix[k] {
           continue
         }
         // a[j, k] -= a[i, k]*c
-        t.Mul(a.ReferenceAt2(p[i], k), c)
-        a.ReferenceAt2(p[j], k).Sub(a.ReferenceAt2(p[j], k), t)
+        t.RealMul(a.RealReferenceAt2(p[i], k), c)
+        a.RealReferenceAt2(p[j], k).RealSub(a.RealReferenceAt2(p[j], k), t)
       }
       // loop over columns in x
       for k := 0; k < n; k++ {
@@ -99,12 +85,12 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
           continue
         }
         // x[j, k] -= x[i, k]*c
-        t.Mul(x.ReferenceAt2(p[i], k), c)
-        x.ReferenceAt2(p[j], k).Sub(x.ReferenceAt2(p[j], k), t)
+        t.RealMul(x.RealReferenceAt2(p[i], k), c)
+        x.RealReferenceAt2(p[j], k).RealSub(x.RealReferenceAt2(p[j], k), t)
       }
       // same for b: b[j] -= b[j]*c
-      t.Mul(b[p[i]], c)
-      b[p[j]].Sub(b[p[j]], t)
+      t.RealMul(b[p[i]].(*Real), c)
+      b[p[j]].(*Real).RealSub(b[p[j]].(*Real), t)
     }
   }
   // backsubstitute
@@ -112,16 +98,16 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
     if !submatrix[i] {
       continue
     }
-    c.Copy(a.ReferenceAt2(p[i], i))
+    c.Copy(a.RealReferenceAt2(p[i], i))
     for j := 0; j < i; j++ {
       if !submatrix[j] {
         continue
       }
       // b[j] -= a[j,i]*b[i]/c
-      t.Mul(a.ReferenceAt2(p[j], i), b[p[i]])
-      t.Div(t, c)
-      b[p[j]].Sub(b[p[j]], t)
-      if math.IsNaN(b[p[j]].Value()) {
+      t.RealMul(a.RealReferenceAt2(p[j], i), b[p[i]].(*Real))
+      t.RealDiv(t, c)
+      b[p[j]].(*Real).RealSub(b[p[j]].(*Real), t)
+      if math.IsNaN(b[p[j]].(*Real).Value()) {
         goto singular
       }
       // loop over colums in x
@@ -130,10 +116,10 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
           continue
         }
         // x[j,k] -= a[j,i]*x[i,k]/c
-        t.Mul(a.ReferenceAt2(p[j], i), x.ReferenceAt2(p[i], k))
-        t.Div(t, c)
-        x.ReferenceAt2(p[j], k).Sub(x.ReferenceAt2(p[j], k), t)
-        if math.IsNaN(x.ReferenceAt2(p[j], k).Value()) {
+        t.RealMul(a.RealReferenceAt2(p[j], i), x.RealReferenceAt2(p[i], k))
+        t.RealDiv(t, c)
+        x.RealReferenceAt2(p[j], k).RealSub(x.RealReferenceAt2(p[j], k), t)
+        if math.IsNaN(x.RealReferenceAt2(p[j], k).Value()) {
           goto singular
         }
       }
@@ -143,16 +129,16 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
           continue
         }
         // a[j,k] -= a[j,i]*a[i,k]/c
-        t.Mul(a.ReferenceAt2(p[j], i), a.ReferenceAt2(p[i], k))
-        t.Div(t, c)
-        a.ReferenceAt2(p[j], k).Sub(a.ReferenceAt2(p[j], k), t)
-        if math.IsNaN(a.ReferenceAt2(p[j], k).Value()) {
+        t.RealMul(a.RealReferenceAt2(p[j], i), a.RealReferenceAt2(p[i], k))
+        t.RealDiv(t, c)
+        a.RealReferenceAt2(p[j], k).RealSub(a.RealReferenceAt2(p[j], k), t)
+        if math.IsNaN(a.RealReferenceAt2(p[j], k).Value()) {
           goto singular
         }
       }
     }
-    a.ReferenceAt2(p[i], i).Div(a.ReferenceAt2(p[i], i), c)
-    if math.IsNaN(a.ReferenceAt2(p[i], i).Value()) {
+    a.RealReferenceAt2(p[i], i).RealDiv(a.RealReferenceAt2(p[i], i), c)
+    if math.IsNaN(a.RealReferenceAt2(p[i], i).Value()) {
       goto singular
     }
     // normalize ith row in x
@@ -160,10 +146,10 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
       if !submatrix[k] {
         continue
       }
-      x.ReferenceAt2(p[i], k).Div(x.ReferenceAt2(p[i], k), c)
+      x.RealReferenceAt2(p[i], k).RealDiv(x.RealReferenceAt2(p[i], k), c)
     }
     // normalize ith element in b
-    b[p[i]].Div(b[p[i]], c)
+    b[p[i]].(*Real).RealDiv(b[p[i]].(*Real), c)
   }
   a.PermuteRows(p)
   x.PermuteRows(p)
@@ -173,9 +159,10 @@ singular:
   panic("system is computationally singular")
 }
 
-func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
-  t := NewScalar(a.ElementType(), 0.0)
-  c := NewScalar(a.ElementType(), 0.0)
+func gaussJordanTriangular_real_dense(a, x *DenseMatrix, b Vector, submatrix []bool) {
+  fmt.Println("running dense")
+  t := NewReal(0.0)
+  c := NewReal(0.0)
   // number of rows
   n, _ := a.Dims()
   // x and b should have the same number of rows
@@ -190,16 +177,16 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
     if !submatrix[i] {
       continue
     }
-    c.Copy(a.ReferenceAt2(i, i))
+    c.Copy(a.RealReferenceAt2(i, i))
     for j := 0; j < i; j++ {
       if !submatrix[j] {
         continue
       }
       // b[j] -= a[j,i]*b[i]/c
-      t.Mul(a.ReferenceAt2(j, i), b[i])
-      t.Div(t, c)
-      b[j].Sub(b[j], t)
-      if math.IsNaN(b[j].Value()) {
+      t.RealMul(a.RealReferenceAt2(j, i), b[i].(*Real))
+      t.RealDiv(t, c)
+      b[j].(*Real).RealSub(b[j].(*Real), t)
+      if math.IsNaN(b[j].(*Real).Value()) {
         goto singular
       }
       // loop over colums in x
@@ -208,10 +195,10 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
           continue
         }
         // x[j,k] -= a[j,i]*x[i,k]/c
-        t.Mul(a.ReferenceAt2(j, i), x.ReferenceAt2(i, k))
-        t.Div(t, c)
-        x.ReferenceAt2(j, k).Sub(x.ReferenceAt2(j, k), t)
-        if math.IsNaN(x.ReferenceAt2(j, k).Value()) {
+        t.RealMul(a.RealReferenceAt2(j, i), x.RealReferenceAt2(i, k))
+        t.RealDiv(t, c)
+        x.RealReferenceAt2(j, k).RealSub(x.RealReferenceAt2(j, k), t)
+        if math.IsNaN(x.RealReferenceAt2(j, k).Value()) {
           goto singular
         }
       }
@@ -221,16 +208,16 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
           continue
         }
         // a[j,k] -= a[j,i]*a[i,k]/c
-        t.Mul(a.ReferenceAt2(j, i), a.ReferenceAt2(i, k))
-        t.Div(t, c)
-        a.ReferenceAt2(j, k).Sub(a.ReferenceAt2(j, k),t)
-        if math.IsNaN(a.ReferenceAt2(j, k).Value()) {
+        t.RealMul(a.RealReferenceAt2(j, i), a.RealReferenceAt2(i, k))
+        t.RealDiv(t, c)
+        a.RealReferenceAt2(j, k).RealSub(a.RealReferenceAt2(j, k),t)
+        if math.IsNaN(a.RealReferenceAt2(j, k).Value()) {
           goto singular
         }
       }
     }
-    a.ReferenceAt2(i, i).Div(a.ReferenceAt2(i, i), c)
-    if math.IsNaN(a.ReferenceAt2(i, i).Value()) {
+    a.RealReferenceAt2(i, i).RealDiv(a.RealReferenceAt2(i, i), c)
+    if math.IsNaN(a.RealReferenceAt2(i, i).Value()) {
       goto singular
     }
     // normalize ith row in x
@@ -238,70 +225,12 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
       if !submatrix[k] {
         continue
       }
-      x.ReferenceAt2(i, k).Div(x.ReferenceAt2(i, k), c)
+      x.RealReferenceAt2(i, k).RealDiv(x.RealReferenceAt2(i, k), c)
     }
     // normalize ith element in b
-    b[i].Div(b[i], c)
+    b[i].(*Real).RealDiv(b[i].(*Real), c)
   }
   return
 singular:
   panic("system is computationally singular")
-}
-
-/* -------------------------------------------------------------------------- */
-
-func Run(a, x Matrix, b Vector, args ...interface{}) {
-
-  epsilon    := Epsilon  {1e-120}.Value
-  submatrix  := Submatrix{   nil}.Value
-  triangular := false
-
-  // loop over optional arguments
-  for _, arg := range args {
-    switch a := arg.(type) {
-    case Submatrix:
-      submatrix = a.Value
-    case Epsilon:
-      epsilon = a.Value
-    case Triangular:
-      triangular = a.Value
-    default:
-      panic("GaussJordan(): Invalid optional argument!")
-    }
-  }
-  // initialize with default values
-  if submatrix == nil {
-    n, _ := a.Dims()
-    submatrix = make([]bool, n)
-    for i, _ := range submatrix {
-      submatrix[i] = true
-    }
-  }
-  ad, ok1 := a.(*DenseMatrix)
-  xd, ok2 := x.(*DenseMatrix)
-  t1 := a.ElementType()
-  t2 := x.ElementType()
-  if ok1 && ok2 && t1 == t2 {
-    if t1 == RealType {
-      if triangular {
-        gaussJordanTriangular_real_dense(ad, xd, b, submatrix)
-      } else {
-        gaussJordan_real_dense(ad, xd, b, submatrix, epsilon)
-      }
-      return
-    }
-    if t1 == BareRealType {
-      if triangular {
-        gaussJordanTriangular_bare_real_dense(ad, xd, b, submatrix)
-      } else {
-        gaussJordan_bare_real_dense(ad, xd, b, submatrix, epsilon)
-      }
-      return
-    }
-  }
-  if triangular {
-    gaussJordanTriangular(a, x, b, submatrix)
-  } else {
-    gaussJordan(a, x, b, submatrix, epsilon)
-  }
 }

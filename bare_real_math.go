@@ -37,19 +37,46 @@ func (a *BareReal) Equals(b Scalar) bool {
   return math.Abs(a.Value() - b.Value()) < epsilon
 }
 
+func (a *BareReal) BareRealEquals(b Scalar) bool {
+  epsilon := 1e-12
+  return math.Abs(a.Value() - b.Value()) < epsilon
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *BareReal) Greater(b Scalar) bool {
   return a.Value() > b.Value()
 }
 
+func (a *BareReal) BareRealGreater(b *BareReal) bool {
+  return a.Value() > b.Value()
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *BareReal) Smaller(b Scalar) bool {
   return a.Value() < b.Value()
 }
+
+func (a *BareReal) BareRealSmaller(b *BareReal) bool {
+  return a.Value() < b.Value()
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *BareReal) Neg(a Scalar) Scalar {
   checkBare(a)
   c.value = -a.Value()
   return c
 }
+
+func (c *BareReal) BareRealNeg(a *BareReal) *BareReal {
+  checkBare(a)
+  c.value = -a.Value()
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *BareReal) Add(a, b Scalar) Scalar {
   checkBare(a)
@@ -58,12 +85,30 @@ func (c *BareReal) Add(a, b Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) BareRealAdd(a, b *BareReal) *BareReal {
+  checkBare(a)
+  checkBare(b)
+  c.value = a.Value() + b.Value()
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *BareReal) Sub(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
   c.value = a.Value() - b.Value()
   return c
 }
+
+func (c *BareReal) BareRealSub(a, b *BareReal) *BareReal {
+  checkBare(a)
+  checkBare(b)
+  c.value = a.Value() - b.Value()
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *BareReal) Mul(a, b Scalar) Scalar {
   checkBare(a)
@@ -72,12 +117,30 @@ func (c *BareReal) Mul(a, b Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) BareRealMul(a, b *BareReal) *BareReal {
+  checkBare(a)
+  checkBare(b)
+  c.value = a.Value() * b.Value()
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *BareReal) Div(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
   c.value = a.Value() / b.Value()
   return c
 }
+
+func (c *BareReal) BareRealDiv(a, b *BareReal) *BareReal {
+  checkBare(a)
+  checkBare(b)
+  c.value = a.Value() / b.Value()
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
 
 func (c *BareReal) Pow(a, k Scalar) Scalar {
   checkBare(a)
@@ -86,9 +149,23 @@ func (c *BareReal) Pow(a, k Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) BareRealPow(a, k *BareReal) *BareReal {
+  checkBare(a)
+  checkBare(k)
+  c.value = math.Pow(a.Value(), k.Value())
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *BareReal) Sqrt(a Scalar) Scalar {
   checkBare(a)
   return c.Pow(a, NewBareReal(1.0/2.0))
+}
+
+func (c *BareReal) BareRealSqrt(a *BareReal) *BareReal {
+  checkBare(a)
+  return c.BareRealPow(a, NewBareReal(1.0/2.0))
 }
 
 /* -------------------------------------------------------------------------- */
