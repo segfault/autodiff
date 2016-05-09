@@ -282,23 +282,20 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
   t1 := a.ElementType()
   t2 := x.ElementType()
   if ok1 && ok2 && t1 == t2 {
-    if t1 == RealType {
-      if triangular {
-        gaussJordanTriangular_real_dense(ad, xd, b, submatrix)
-      } else {
-        gaussJordan_real_dense(ad, xd, b, submatrix, epsilon)
-      }
-      return
-    }
-    if t1 == BareRealType {
-      if triangular {
-        gaussJordanTriangular_bare_real_dense(ad, xd, b, submatrix)
-      } else {
-        gaussJordan_bare_real_dense(ad, xd, b, submatrix, epsilon)
-      }
-      return
+    if t1 == RealType && triangular == true {
+      gaussJordanTriangular_RealDense(ad, xd, b, submatrix)
+    } else if t1 == BareRealType && triangular == true {
+      gaussJordanTriangular_BareRealDense(ad, xd, b, submatrix)
+    } else if t1 == RealType && triangular == false {
+      gaussJordan_RealDense(ad, xd, b, submatrix, epsilon)
+    } else if t1 == BareRealType && triangular == false {
+      gaussJordan_BareRealDense(ad, xd, b, submatrix, epsilon)
+    } else {
+      goto generic
     }
   }
+  return
+generic:
   if triangular {
     gaussJordanTriangular(a, x, b, submatrix)
   } else {
