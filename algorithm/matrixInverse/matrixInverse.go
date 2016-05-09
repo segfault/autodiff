@@ -31,6 +31,10 @@ type PositiveDefinite struct {
   Value bool
 }
 
+type InSitu struct {
+  Value bool
+}
+
 /* -------------------------------------------------------------------------- */
 
 // compute the inverse of a matrix with a
@@ -68,10 +72,10 @@ func mInverse(matrix Matrix, args ...interface{}) Matrix {
   return x
 }
 
-func mInversePD(matrix Matrix, args ...interface{}) Matrix {
+func mInversePD(matrix Matrix, s InSitu, args ...interface{}) Matrix {
   rows, _ := matrix.Dims()
   t := matrix.ElementType()
-  a := cholesky.Run(matrix).T()
+  a := cholesky.Run(matrix, cholesky.InSitu{s.Value}).T()
   x := IdentityMatrix(t, rows)
   b := NullVector(t, rows)
   // initialize b with ones
@@ -97,12 +101,15 @@ func Run(matrix Matrix, args ...interface{}) Matrix {
     panic("empty matrix")
   }
   positiveDefinite := false
+  inSitu           := false
 
   // loop over optional arguments
   for _, arg := range args {
     switch a := arg.(type) {
     case PositiveDefinite:
       positiveDefinite = a.Value
+    case InSitu:
+      inSitu = a.Value
     default:
       // all other arguments are passed to the
       // Gauss-Jordan algorithm
@@ -110,7 +117,7 @@ func Run(matrix Matrix, args ...interface{}) Matrix {
     }
   }
   if positiveDefinite {
-    return mInversePD(matrix, gArgs...)
+    return mInversePD(matrix, InSitu{inSitu}, gArgs...)
   } else {
     return mInverse(matrix, gArgs...)
   }

@@ -24,6 +24,12 @@ import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
+type InSitu struct {
+  Value bool
+}
+
+/* -------------------------------------------------------------------------- */
+
 func cholesky(A Matrix) Matrix {
   n, _  := A.Dims()
   eType := A.ElementType()
@@ -52,6 +58,44 @@ func cholesky(A Matrix) Matrix {
   return L
 }
 
+func cholesky_insitu(A Matrix) Matrix {
+  n, _  := A.Dims()
+  eType := A.ElementType()
+  t     := NewScalar(eType, 0.0)
+  s     := NewScalar(eType, 0.0)
+  Aii   := NewScalar(eType, 0.0)
+
+  for i := 0; i < n; i++ {
+    Aii.Copy(A.ReferenceAt2(i,i))
+    for j := 0; j < (i+1); j++ {
+      s.Reset()
+      for k := 0; k < j; k++ {
+        t.Mul(A.ReferenceAt2(i,k), A.ReferenceAt2(j,k))
+        s.Add(s, t)
+      }
+      if i == j {
+        t.Sub(Aii, s)
+        if t.Value() < 0.0 {
+          panic("matrix is not positive definite")
+        }
+        A.ReferenceAt2(j, i).Sqrt(t)
+      } else {
+        t.Sub(A.ReferenceAt2(i, j), s)
+        A.ReferenceAt2(i, j).Div(t, A.ReferenceAt2(j, j))
+      }
+    }
+  }
+  // move elements from upper triangular matrix
+  for i := 0; i < n; i++ {
+    for j := 0; j < i; j++ {
+      r := A.ReferenceAt2(j, i)
+      A.ReferenceAt2(j, i).Copy(r)
+      r.Reset()
+    }
+  }
+  return A
+}
+
 /* -------------------------------------------------------------------------- */
 
 func Run(matrix Matrix, args ...interface{}) Matrix {
@@ -62,5 +106,19 @@ func Run(matrix Matrix, args ...interface{}) Matrix {
   if rows == 0 {
     panic("Cholesky(): Empty matrix!")
   }
-  return cholesky(matrix)
+  inSitu := false
+
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case InSitu:
+      inSitu = a.Value
+    default:
+      panic("Cholesky(): Invalid optional argument!")
+    }
+  }
+  if inSitu {
+    return cholesky_insitu(matrix)
+  } else {
+    return cholesky(matrix)
+  }
 }

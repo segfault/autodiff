@@ -25,7 +25,7 @@ import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func TestMSqrt(t *testing.T) {
+func TestCholesky1(t *testing.T) {
   n := 4
   a := NewMatrix(RealType, n, n, []float64{
     18, 22,  54,  42,
@@ -40,6 +40,28 @@ func TestMSqrt(t *testing.T) {
      9.89949, 1.62455, 1.84971, 1.39262 })
 
   if Mnorm(MsubM(x, r)).Value() > 1e-8 {
+    t.Error("Cholesky failed!")
+  }
+}
+
+func TestCholesky2(t *testing.T) {
+  n := 4
+  a := NewMatrix(RealType, n, n, []float64{
+    18, 22,  54,  42,
+    22, 70,  86,  62,
+    54, 86, 174, 134,
+    42, 62, 134, 106 })
+  x := Run(a, InSitu{true})
+  r := NewMatrix(RealType, n, n, []float64{
+     4.24264, 0.00000, 0.00000, 0.00000,
+     5.18545, 6.56591, 0.00000, 0.00000,
+    12.72792, 3.04604, 1.64974, 0.00000,
+     9.89949, 1.62455, 1.84971, 1.39262 })
+
+  if Mnorm(MsubM(x, r)).Value() > 1e-8 {
+    t.Error("Cholesky failed!")
+  }
+  if Mnorm(MsubM(x, a)).Value() > 1e-8 {
     t.Error("Cholesky failed!")
   }
 }

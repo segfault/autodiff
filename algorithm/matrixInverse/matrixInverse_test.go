@@ -89,12 +89,12 @@ func TestMatrixPerformance(t *testing.T) {
   m2 := kernelSquaredExponential(100, BareRealType, NewBareReal(1.0), NewBareReal(1.0))
 
   start := time.Now()
-  Run(m1, PositiveDefinite{true})
+  Run(m1, PositiveDefinite{true}, InSitu{true})
   elapsed := time.Since(start)
   fmt.Printf("Inverting a 100x100 real positive definite matrix took %s.\n", elapsed)
 
   start = time.Now()
-  Run(m2, PositiveDefinite{true})
+  Run(m2, PositiveDefinite{true}, InSitu{true})
   elapsed = time.Since(start)
   fmt.Printf("Inverting a 100x100 bare real positive definite matrix took %s.\n", elapsed)
 
