@@ -160,7 +160,6 @@ singular:
 }
 
 func gaussJordanTriangular_bare_real_dense(a, x *DenseMatrix, b Vector, submatrix []bool) {
-  fmt.Println("running dense")
   t := NewBareReal(0.0)
   c := NewBareReal(0.0)
   // number of rows
