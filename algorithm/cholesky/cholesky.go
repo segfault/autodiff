@@ -58,7 +58,7 @@ func cholesky(A Matrix) Matrix {
   return L
 }
 
-func cholesky_insitu(A Matrix) Matrix {
+func choleskyInSitu(A Matrix) Matrix {
   n, _  := A.Dims()
   eType := A.ElementType()
   t     := NewScalar(eType, 0.0)
@@ -98,27 +98,39 @@ func cholesky_insitu(A Matrix) Matrix {
 
 /* -------------------------------------------------------------------------- */
 
-func Run(matrix Matrix, args ...interface{}) Matrix {
-  rows, cols := matrix.Dims()
-  if rows != cols {
+func Run(a Matrix, args ...interface{}) Matrix {
+  n, m := a.Dims()
+  if n != m {
     panic("Cholesky(): Not a square matrix!")
   }
-  if rows == 0 {
+  if n == 0 {
     panic("Cholesky(): Empty matrix!")
   }
   inSitu := false
 
   for _, arg := range args {
-    switch a := arg.(type) {
+    switch t := arg.(type) {
     case InSitu:
-      inSitu = a.Value
+      inSitu = t.Value
     default:
       panic("Cholesky(): Invalid optional argument!")
     }
   }
+  if ad, ok := a.(*DenseMatrix); ok {
+    t := a.ElementType()
+    if t == RealType && inSitu == true {
+      return choleskyInSitu_RealDense(ad)
+    } else if t == RealType && inSitu == false {
+      return cholesky_RealDense(ad)
+    } else if t == BareRealType && inSitu == true {
+      return choleskyInSitu_BareRealDense(ad)
+    } else if t == BareRealType && inSitu == false {
+      return cholesky_BareRealDense(ad)
+    }
+  }
   if inSitu {
-    return cholesky_insitu(matrix)
+    return choleskyInSitu(a)
   } else {
-    return cholesky(matrix)
+    return cholesky(a)
   }
 }
