@@ -33,8 +33,8 @@ func cholesky(A Matrix) Matrix {
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {
-      s.Mul(L.ReferenceAt2(i,0), L.ReferenceAt2(j,0))
-      for k := 1; k < j; k++ {
+      s.Reset()
+      for k := 0; k < j; k++ {
         t.Mul(L.ReferenceAt2(i,k), L.ReferenceAt2(j,k))
         s.Add(s, t)
       }
