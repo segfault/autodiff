@@ -39,9 +39,9 @@ type Vector []Scalar
 // Allocate a vector for scalars of type t (i.e. RealType, or ProbabilityType).
 func NewVector(t ScalarType, values []float64) Vector {
   v := NilVector(len(values))
-
+  f := ScalarConstructor(t)
   for i, _ := range values {
-    v[i] = NewScalar(t, values[i])
+    v[i] = f(values[i])
   }
   return v
 }
@@ -49,9 +49,9 @@ func NewVector(t ScalarType, values []float64) Vector {
 // Allocate an empty vector of type t. All values are initialized to zero.
 func NullVector(t ScalarType, length int) Vector {
   v := NilVector(length)
-
+  f := ScalarConstructor(t)
   for i := 0; i < length; i++ {
-    v[i] = NewScalar(t, 0.0)
+    v[i] = f(0.0)
   }
   return v
 }

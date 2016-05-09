@@ -43,13 +43,14 @@ type DenseMatrix struct {
 func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
   m := NilMatrix(rows, cols)
   v := m.Values()
+  f := ScalarConstructor(t)
   if len(values) == 1 {
     for i := 0; i < rows*cols; i++ {
-      v[i] = NewScalar(t, values[0])
+      v[i] = f(values[0])
     }
   } else if len(values) == rows*cols {
     for i := 0; i < rows*cols; i++ {
-      v[i] = NewScalar(t, values[i])
+      v[i] = f(values[i])
     }
   } else {
     panic("NewMatrix(): Matrix dimension does not fit input values!")

@@ -100,10 +100,18 @@ func RegisterScalar(t ScalarType, constructor func(float64) Scalar) {
 /* constructors
  * -------------------------------------------------------------------------- */
 
+func ScalarConstructor(t ScalarType) func(float64) Scalar {
+  f, ok := registry[t]
+  if !ok {
+    panic("invalid scalar type")
+  }
+  return f
+}
+
 func NewScalar(t ScalarType, value float64) Scalar {
   f, ok := registry[t]
   if !ok {
-    panic("NewScalar(): Invalid scalar type!")
+    panic("invalid scalar type")
   }
   return f(value)
 }
@@ -111,7 +119,7 @@ func NewScalar(t ScalarType, value float64) Scalar {
 func ZeroScalar(t ScalarType) Scalar {
   f, ok := registry[t]
   if !ok {
-    panic("NewScalar(): Invalid scalar type!")
+    panic("invalid scalar type")
   }
   return f(0.0)
 }
