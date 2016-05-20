@@ -121,6 +121,11 @@ func Erfc(a Scalar) Scalar {
   return c.Erfc(a)
 }
 
+func LogErfc(a Scalar) Scalar {
+  c := a.Clone()
+  return c.LogErfc(a)
+}
+
 func Gamma(a Scalar) Scalar {
   c := a.Clone()
   return c.Gamma(a)

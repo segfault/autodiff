@@ -75,6 +75,7 @@ type Scalar interface {
   Log       (Scalar)          Scalar
   Erf       (Scalar)          Scalar
   Erfc      (Scalar)          Scalar
+  LogErfc   (Scalar)          Scalar
   Gamma     (Scalar)          Scalar
   Lgamma    (Scalar)          Scalar
   Mlgamma   (Scalar, int)     Scalar // multivariate log gamma

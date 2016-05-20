@@ -218,6 +218,12 @@ func (c *BareReal) Erfc(a Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) LogErfc(a Scalar) Scalar {
+  checkBare(a)
+  c.value = special.LogErfc(a.Value())
+  return c
+}
+
 func (c *BareReal) Gamma(a Scalar) Scalar {
   checkBare(a)
   c.value = math.Gamma(a.Value())
