@@ -81,6 +81,28 @@ func TestDiff2(t *testing.T) {
   }
 }
 
+func TestMul(t *testing.T) {
+
+  a := NewReal(13.123)
+  b := NewReal( 4.321)
+
+  Variables(2, a)
+
+  a.Mul(a, a) // a^2
+  a.Mul(a, a) // a^4
+  a.Mul(a, b) // a^4 b
+
+  if math.Abs(a.Value() - 128149.4603376) > 1e-4 {
+    t.Error("Multiplication failed!")
+  }
+  if math.Abs(a.Derivative(1, 0) - 39061.025783) > 1e-4 {
+    t.Error("Differentiation failed!")
+  }
+  if math.Abs(a.Derivative(2, 0) - 8929.5951649) > 1e-4 {
+    t.Error("Differentiation failed!")
+  }
+}
+
 func TestPow1(t *testing.T) {
   x := NewReal(3.4)
   k := NewReal(4.1)
