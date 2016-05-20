@@ -31,12 +31,12 @@ func digamma_imp_large(x float64) float64 {
     -0.021092796092796092796092796092796092796092796092796,
      0.083333333333333333333333333333333333333333333333333,
     -0.44325980392156862745098039215686274509803921568627 })
-  x -= 1.0;
-  z := 1.0/(x*x);
-  result := math.Log(x);
-  result += 1.0/(2.0*x);
-  result -= z * P.Eval(z);
-  return result;
+  x -= 1.0
+  z := 1.0/(x*x)
+  result := math.Log(x)
+  result += 1.0/(2.0*x)
+  result -= z * P.Eval(z)
+  return result
 }
 
 func digamma_imp_1_2(x float64) float64 {
@@ -73,10 +73,10 @@ func digamma_imp_1_2(x float64) float64 {
      0.054151797245674225,
      0.0021284987017821144,
     -0.55789841321675513e-6 })
-  g := x - root1;
-  g -= root2;
-  g -= root3;
-  r := P.Eval(x-1.0)/Q.Eval(x-1.0);
+  g := x - root1
+  g -= root2
+  g -= root3
+  r := P.Eval(x-1.0)/Q.Eval(x-1.0)
 
   return g * Y + g * r
 }
