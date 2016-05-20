@@ -39,10 +39,33 @@ func TestReal(t *testing.T) {
   }
 }
 
-func TestDiff(t *testing.T) {
+func TestDiff1(t *testing.T) {
 
   f := func(x Scalar) Scalar {
     return Add(Mul(NewReal(2), Pow(x, NewBareReal(3))), NewReal(4))
+  }
+  x := NewReal(9)
+
+  Variables(2, x)
+
+  y := f(x)
+
+  if y.Derivative(1, 0) != 486 {
+    t.Error("Differentiation failed!")
+  }
+  if y.Derivative(2, 0) != 108 {
+    t.Error("Differentiation failed!")
+  }
+}
+
+func TestDiff2(t *testing.T) {
+
+  f := func(x Scalar) Scalar {
+    y := x.Clone()
+    y.Pow(y, NewBareReal(3))
+    y.Mul(y, NewReal(2))
+    y.Add(y, NewReal(4))
+    return y
   }
   x := NewReal(9)
 
@@ -106,14 +129,32 @@ func TestTan(t *testing.T) {
   }
 }
 
-func TestTanh(t *testing.T) {
+func TestTanh1(t *testing.T) {
 
   a := NewReal(4.321)
-  Variables(1, a)
+  Variables(2, a)
 
   s := Tanh(a)
 
-  if math.Abs(s.Derivative(1, 0) - 0.00070588) > 0.0000001 {
+  if math.Abs(s.Derivative(1, 0) -  0.00070588) > 0.0000001 {
+    t.Error("Incorrect derivative for Tanh()!")
+  }
+  if math.Abs(s.Derivative(2, 0) - -0.00141127) > 0.0000001 {
+    t.Error("Incorrect derivative for Tanh()!")
+  }
+}
+
+func TestTanh2(t *testing.T) {
+
+  a := NewReal(4.321)
+  Variables(2, a)
+
+  a.Tanh(a)
+
+  if math.Abs(a.Derivative(1, 0) -  0.00070588) > 0.0000001 {
+    t.Error("Incorrect derivative for Tanh()!")
+  }
+  if math.Abs(a.Derivative(2, 0) - -0.00141127) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
 }
@@ -144,15 +185,32 @@ func TestErfc(t *testing.T) {
   }
 }
 
-func TestLogErfc(t *testing.T) {
+func TestLogErfc1(t *testing.T) {
 
   a := NewReal(0.23)
   Variables(2, a)
 
   s := LogErfc(a)
 
-  if math.Abs(s.Derivative(1, 0) - -1.436606354) > 1e-6 ||
-    (math.Abs(s.Derivative(2, 0) - -1.402998894) > 1e-6) {
+  if math.Abs(s.Derivative(1, 0) - -1.436606354) > 1e-6 {
+    t.Error("Incorrect derivative for LogErfc()!")
+  }
+  if math.Abs(s.Derivative(2, 0) - -1.402998894) > 1e-6 {
+    t.Error("Incorrect derivative for LogErfc()!")
+  }
+}
+
+func TestLogErfc2(t *testing.T) {
+
+  a := NewReal(0.23)
+  Variables(2, a)
+
+  a.LogErfc(a)
+
+  if math.Abs(a.Derivative(1, 0) - -1.436606354) > 1e-6 {
+    t.Error("Incorrect derivative for LogErfc()!")
+  }
+  if math.Abs(a.Derivative(2, 0) - -1.402998894) > 1e-6 {
     t.Error("Incorrect derivative for LogErfc()!")
   }
 }
