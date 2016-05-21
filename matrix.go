@@ -25,6 +25,7 @@ type Matrix interface {
   At2          (i, j int)           Scalar
   ReferenceAt2 (i, j int)           Scalar
   Set2         (v Scalar, i, j int)
+  SetReference2(v Scalar, i, j int)
   // basic methods
   Clone        ()                   Matrix
   Copy         (Matrix)

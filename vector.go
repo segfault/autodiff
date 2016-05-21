@@ -107,6 +107,10 @@ func (v Vector) Set1(s Scalar, i, j int) {
   v[i].Copy(s)
 }
 
+func (v Vector) SetReference1(s Scalar, i, j int) {
+  v[i] = s
+}
+
 /* imlement ScalarContainer
  * -------------------------------------------------------------------------- */
 
@@ -122,6 +126,10 @@ func (v Vector) ReferenceAt(args ...int) Scalar {
 
 func (v Vector) Set(value Scalar, args ...int) {
   v[args[0]].Copy(value)
+}
+
+func (v Vector) SetReference(value Scalar, args ...int) {
+  v[args[0]] = value
 }
 
 func (v Vector) Map(f func(Scalar) Scalar) ScalarContainer {

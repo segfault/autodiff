@@ -182,6 +182,11 @@ func (matrix *DenseMatrix) Set2(s Scalar, i, j int) {
   matrix.values[matrix.index(i, j)].Copy(s)
 }
 
+func (matrix *DenseMatrix) SetReference2(s Scalar, i, j int) {
+  k := matrix.index(i, j)
+  matrix.values[k] = s
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 
@@ -211,6 +216,13 @@ func (matrix *DenseMatrix) Set(s Scalar, args ...int) {
   j := args[1]
   k := matrix.index(i, j)
   matrix.values[k].Copy(s)
+}
+
+func (matrix *DenseMatrix) SetReference(s Scalar, args ...int) {
+  i := args[0]
+  j := args[1]
+  k := matrix.index(i, j)
+  matrix.values[k] = s
 }
 
 func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) ScalarContainer {
