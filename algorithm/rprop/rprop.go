@@ -29,7 +29,7 @@ type Epsilon struct {
 }
 
 type Hook struct {
-  Value func([]float64, Vector, Scalar) bool
+  Value func([]float64, []float64, Vector, Scalar) bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -40,7 +40,7 @@ type Hook struct {
  */
 
 func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
-  hook func([]float64, Vector, Scalar) bool) Vector {
+  hook func([]float64, []float64, Vector, Scalar) bool) Vector {
 
   var s Scalar
   t := x0.ElementType()
@@ -71,7 +71,7 @@ func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
       gradient_new[i] = s.Derivative(1, i)
     }
     // execute hook if available
-    if hook != nil && hook(gradient_new, x, s) {
+    if hook != nil && hook(gradient_new, step, x, s) {
       break;
     }
     // evaluate stop criterion

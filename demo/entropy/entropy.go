@@ -37,7 +37,7 @@ import   "github.com/pbenner/autodiff/algorithm/rprop"
 /* gradient based optimization
  * -------------------------------------------------------------------------- */
 
-func hook_g(gradient []float64, px Vector, s Scalar) bool {
+func hook_g(gradient, step []float64, px Vector, s Scalar) bool {
   fmt.Println("px: ", px)
   return false
 }

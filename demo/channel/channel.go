@@ -244,7 +244,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   trace[3] = []float64{distance(px0, pxstar)}
 
   // hooks
-  hook1 := func(gradient []float64, variables Vector, s Scalar) bool {
+  hook1 := func(gradient, step []float64, variables Vector, s Scalar) bool {
     return hook_g(&trace[0], pxstar, gradient, variables, s)
   }
   hook2 := func(gradient Matrix, variables Vector, s Vector) bool {

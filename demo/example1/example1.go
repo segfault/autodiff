@@ -102,7 +102,7 @@ func main() {
     gradientDescent.Epsilon{1e-8})
   // resilient backpropagation
   xn2 := rprop.Run(f, x0, 0.0001, 0.4,
-    rprop.Hook{func(gradient []float64, px Vector, s Scalar) bool { return hook(&err2, gradient, px, s) }},
+    rprop.Hook{func(gradient, step []float64, px Vector, s Scalar) bool { return hook(&err2, gradient, px, s) }},
     rprop.Epsilon{1e-8})
 
   fmt.Println(xn1)
