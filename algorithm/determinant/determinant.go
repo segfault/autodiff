@@ -20,6 +20,7 @@ package determinant
 
 //import   "fmt"
 //import   "math"
+
 import . "github.com/pbenner/autodiff"
 import   "github.com/pbenner/autodiff/algorithm/cholesky"
 
@@ -74,14 +75,17 @@ func determinantNaive(a Matrix) Scalar {
   return det
 }
 
-func determinantPD(a Matrix, logScale bool) Scalar {
+func determinantPD(a Matrix, logScale bool) (Scalar, error) {
   n, m := a.Dims()
   r := ZeroScalar(a.ElementType())
   t := ZeroScalar(a.ElementType())
   if n != m {
     panic("Matrix is not a square matrix!")
   }
-  L := cholesky.Run(a)
+  L, err := cholesky.Run(a)
+  if err != nil {
+    return nil, err
+  }
   if logScale {
     r.SetValue(0.0)
     for i := 0; i < n; i++ {
@@ -96,20 +100,20 @@ func determinantPD(a Matrix, logScale bool) Scalar {
     }
     r.Mul(r, r)
   }
-  return r
+  return r, nil
 }
 
-func determinant(a Matrix, positiveDefinite, logScale bool) Scalar {
+func determinant(a Matrix, positiveDefinite, logScale bool) (Scalar, error) {
   if positiveDefinite {
     return determinantPD(a, logScale)
   } else {
-    return determinantNaive(a)
+    return determinantNaive(a), nil
   }
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(a Matrix, args ...interface{}) Scalar {
+func Run(a Matrix, args ...interface{}) (Scalar, error) {
   positiveDefinite := false
   logScale := false
 

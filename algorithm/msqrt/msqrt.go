@@ -19,6 +19,7 @@ package msqrt
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "errors"
 
 import . "github.com/pbenner/autodiff"
 import   "github.com/pbenner/autodiff/algorithm/matrixInverse"
@@ -30,31 +31,47 @@ import   "github.com/pbenner/autodiff/algorithm/matrixInverse"
 // Higham, N.~J. (2008). Functions of Matrices: Theory and Computation;
 // Society for Industrial and Applied Mathematics, Philadelphia, PA, USA.
 
-func mSqrt(matrix Matrix) Matrix {
+func mSqrt(matrix Matrix) (Matrix, error) {
   n, _ := matrix.Dims()
   c  := NewScalar(matrix.ElementType(), 0.5)
   Y0 := matrix
   Z0 := IdentityMatrix(matrix.ElementType(), n)
-  Y1 := MmulS(MaddM(Y0, matrixInverse.Run(Z0)), c)
-  Z1 := MmulS(MaddM(Z0, matrixInverse.Run(Y0)), c)
+  t1, err := matrixInverse.Run(Z0)
+  if err != nil {
+    return nil, err
+  }
+  t2, err := matrixInverse.Run(Y0)
+  if err != nil {
+    return nil, err
+  }
+  Y1 := MmulS(MaddM(Y0, t1), c)
+  Z1 := MmulS(MaddM(Z0, t2), c)
   for Mnorm(MsubM(Y0, Y1)).Value() > 1e-8 {
     Y0 = Y1
     Z0 = Z1
-    Y1 = MmulS(MaddM(Y0, matrixInverse.Run(Z0)), c)
-    Z1 = MmulS(MaddM(Z0, matrixInverse.Run(Y0)), c)
+    t1, err := matrixInverse.Run(Z0)
+    if err != nil {
+      return nil, err
+    }
+    t2, err := matrixInverse.Run(Y0)
+    if err != nil {
+      return nil, err
+    }
+    Y1 = MmulS(MaddM(Y0, t1), c)
+    Z1 = MmulS(MaddM(Z0, t2), c)
   }
-  return Y1
+  return Y1, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(matrix Matrix, args ...interface{}) Matrix {
+func Run(matrix Matrix, args ...interface{}) (Matrix, error) {
   rows, cols := matrix.Dims()
   if rows != cols {
-    panic("MSqrt(): Not a square matrix!")
+    return nil, errors.New("MSqrt(): Not a square matrix!")
   }
   if rows == 0 {
-    panic("MSqrt(): Empty matrix!")
+    return nil, errors.New("MSqrt(): Empty matrix!")
   }
   return mSqrt(matrix)
 }

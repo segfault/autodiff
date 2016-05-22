@@ -19,13 +19,14 @@ package gaussJordan
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "errors"
 import   "math"
 
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool, epsilon float64) {
+func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error {
   t := NewReal(0.0)
   c := NewReal(0.0)
   // number of rows
@@ -46,10 +47,6 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool, epsilo
   for i := 0; i < n; i++ {
     if !submatrix[i] {
       continue
-    }
-    // check if matrix is singular
-    if math.Abs(a.RealReferenceAt2(p[i], i).Value()) < epsilon {
-      panic("GaussJordan(): matrix is singular!")
     }
     // find row with maximum value at column i
     maxrow := i
@@ -154,12 +151,12 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool, epsilo
   a.PermuteRows(p)
   x.PermuteRows(p)
   b.Permute(p)
-  return
+  return nil
 singular:
-  panic("system is computationally singular")
+  return errors.New("system is computationally singular")
 }
 
-func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) {
+func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error {
   t := NewReal(0.0)
   c := NewReal(0.0)
   // number of rows
@@ -229,14 +226,14 @@ func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bo
     // normalize ith element in b
     b.RealReferenceAt1(i).RealDiv(b.RealReferenceAt1(i), c)
   }
-  return
+  return nil
 singular:
-  panic("system is computationally singular")
+  return errors.New("system is computationally singular")
 }
 
 /* -------------------------------------------------------------------------- */
 
-func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool, epsilon float64) {
+func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error {
   t := NewBareReal(0.0)
   c := NewBareReal(0.0)
   // number of rows
@@ -248,19 +245,15 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool, ep
   }
   // x and b should have the same number of rows
   if m, _ := x.Dims(); m != n {
-    panic("GaussJordan(): x has invalid dimension!")
+    return errors.New("GaussJordan(): x has invalid dimension!")
   }
   if len(b) != n {
-    panic("GaussJordan(): b has invalid dimension!")
+    return errors.New("GaussJordan(): b has invalid dimension!")
   }
   // loop over columns
   for i := 0; i < n; i++ {
     if !submatrix[i] {
       continue
-    }
-    // check if matrix is singular
-    if math.Abs(a.BareRealReferenceAt2(p[i], i).Value()) < epsilon {
-      panic("GaussJordan(): matrix is singular!")
     }
     // find row with maximum value at column i
     maxrow := i
@@ -365,22 +358,22 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool, ep
   a.PermuteRows(p)
   x.PermuteRows(p)
   b.Permute(p)
-  return
+  return nil
 singular:
-  panic("system is computationally singular")
+  return errors.New("system is computationally singular")
 }
 
-func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) {
+func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error {
   t := NewBareReal(0.0)
   c := NewBareReal(0.0)
   // number of rows
   n, _ := a.Dims()
   // x and b should have the same number of rows
   if m, _ := x.Dims(); m != n {
-    panic("GaussJordan(): x has invalid dimension!")
+    return errors.New("GaussJordan(): x has invalid dimension!")
   }
   if len(b) != n {
-    panic("GaussJordan(): b has invalid dimension!")
+    return errors.New("GaussJordan(): b has invalid dimension!")
   }
   // backsubstitute
   for i := n-1; i >= 0; i-- {
@@ -440,7 +433,7 @@ func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix 
     // normalize ith element in b
     b.BareRealReferenceAt1(i).BareRealDiv(b.BareRealReferenceAt1(i), c)
   }
-  return
+  return nil
 singular:
-  panic("system is computationally singular")
+  return errors.New("system is computationally singular")
 }

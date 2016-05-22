@@ -19,15 +19,12 @@ package gaussJordan
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "errors"
 import   "math"
 
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
-
-type Epsilon struct {
-  Value float64
-}
 
 type Submatrix struct {
   Value []bool
@@ -39,7 +36,7 @@ type Triangular struct {
 
 /* -------------------------------------------------------------------------- */
 
-func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
+func gaussJordan(a, x Matrix, b Vector, submatrix []bool) error {
   t := NewScalar(a.ElementType(), 0.0)
   c := NewScalar(a.ElementType(), 0.0)
   // number of rows
@@ -51,19 +48,15 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
   }
   // x and b should have the same number of rows
   if m, _ := x.Dims(); m != n {
-    panic("GaussJordan(): x has invalid dimension!")
+    return errors.New("GaussJordan(): x has invalid dimension!")
   }
   if len(b) != n {
-    panic("GaussJordan(): b has invalid dimension!")
+    return errors.New("GaussJordan(): b has invalid dimension!")
   }
   // loop over columns
   for i := 0; i < n; i++ {
     if !submatrix[i] {
       continue
-    }
-    // check if matrix is singular
-    if math.Abs(a.ReferenceAt2(p[i], i).Value()) < epsilon {
-      panic("GaussJordan(): matrix is singular!")
     }
     // find row with maximum value at column i
     maxrow := i
@@ -168,12 +161,12 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool, epsilon float64) {
   a.PermuteRows(p)
   x.PermuteRows(p)
   b.Permute(p)
-  return
+  return nil
 singular:
   panic("system is computationally singular")
 }
 
-func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
+func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) error {
   t := NewScalar(a.ElementType(), 0.0)
   c := NewScalar(a.ElementType(), 0.0)
   // number of rows
@@ -243,16 +236,15 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) {
     // normalize ith element in b
     b[i].Div(b[i], c)
   }
-  return
+  return nil
 singular:
   panic("system is computationally singular")
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(a, x Matrix, b Vector, args ...interface{}) {
+func Run(a, x Matrix, b Vector, args ...interface{}) error {
 
-  epsilon    := Epsilon  {1e-120}.Value
   submatrix  := Submatrix{   nil}.Value
   triangular := false
 
@@ -261,8 +253,6 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
     switch a := arg.(type) {
     case Submatrix:
       submatrix = a.Value
-    case Epsilon:
-      epsilon = a.Value
     case Triangular:
       triangular = a.Value
     default:
@@ -283,22 +273,19 @@ func Run(a, x Matrix, b Vector, args ...interface{}) {
   t2 := x.ElementType()
   if ok1 && ok2 && t1 == t2 {
     if t1 == RealType && triangular == true {
-      gaussJordanTriangular_RealDense(ad, xd, b, submatrix)
+      return gaussJordanTriangular_RealDense(ad, xd, b, submatrix)
     } else if t1 == BareRealType && triangular == true {
-      gaussJordanTriangular_BareRealDense(ad, xd, b, submatrix)
+      return gaussJordanTriangular_BareRealDense(ad, xd, b, submatrix)
     } else if t1 == RealType && triangular == false {
-      gaussJordan_RealDense(ad, xd, b, submatrix, epsilon)
+      return gaussJordan_RealDense(ad, xd, b, submatrix)
     } else if t1 == BareRealType && triangular == false {
-      gaussJordan_BareRealDense(ad, xd, b, submatrix, epsilon)
-    } else {
-      goto generic
+      return gaussJordan_BareRealDense(ad, xd, b, submatrix)
     }
   }
-  return
-generic:
+  // call generic gaussJordan
   if triangular {
-    gaussJordanTriangular(a, x, b, submatrix)
+    return gaussJordanTriangular(a, x, b, submatrix)
   } else {
-    gaussJordan(a, x, b, submatrix, epsilon)
+    return gaussJordan(a, x, b, submatrix)
   }
 }

@@ -28,9 +28,9 @@ Compare vanilla gradient descent with resilient backpropagation
   }
   x0 := NewVector(RealType, []float64{8})
   // vanilla gradient descent
-  xn1, err1 := gradientDescent.Run(f, x0, 0.0001, gradientDescent.Epsilon{1e-8})
+  xn1, _ := gradientDescent.Run(f, x0, 0.0001, gradientDescent.Epsilon{1e-8})
   // resilient backpropagation
-  xn2, err2 := rprop.Run(f, x0, 0.0001, 0.4, rprop.Epsilon{1e-8})
+  xn2, _ := rprop.Run(f, x0, 0.0001, 0.4, rprop.Epsilon{1e-8})
 ```
 ![Gradient descent](demo/example1/example1.png)
 

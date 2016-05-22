@@ -31,7 +31,7 @@ import   "github.com/pbenner/autodiff/algorithm/gaussJordan"
 func TestMatrixInverse(t *testing.T) {
 
   m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
-  m2 := Run(m1)
+  m2, _ := Run(m1)
   m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
 
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
@@ -45,7 +45,7 @@ func TestSubmatrixInverse(t *testing.T) {
   submatrix := []bool{true, true, false}
 
   m1 := NewMatrix(RealType, 3, 3, []float64{1,2,50,3,4,60,70,80,90})
-  m2 := Run(m1, gaussJordan.Submatrix{submatrix})
+  m2, _ := Run(m1, gaussJordan.Submatrix{submatrix})
   m3 := NewMatrix(RealType, 3, 3, []float64{-2, 1, 0, 1.5, -0.5, 0, 0, 0, 1})
 
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
@@ -60,7 +60,7 @@ func TestMatrixInversePD(t *testing.T) {
     22, 70,  86,  62,
     54, 86, 174, 134,
     42, 62, 134, 106 })
-  m2 := Run(m1, PositiveDefinite{true})
+  m2, _ := Run(m1, PositiveDefinite{true})
   m3 := NewMatrix(RealType, 4, 4, []float64{
      2.515625e+00,  4.843750e-01, -1.296875e+00,  3.593750e-01,
      4.843750e-01,  1.406250e-01, -3.281250e-01,  1.406250e-01,

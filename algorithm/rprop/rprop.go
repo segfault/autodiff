@@ -19,6 +19,8 @@ package rprop
 /* -------------------------------------------------------------------------- */
 
 import   "math"
+import   "errors"
+
 import . "github.com/pbenner/autodiff"
 import . "github.com/pbenner/autodiff/algorithm"
 
@@ -39,48 +41,51 @@ type Hook struct {
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
-  hook func([]float64, []float64, Vector, Scalar) bool) Vector {
+func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon float64,
+  hook func([]float64, []float64, Vector, Scalar) bool) (Vector, error) {
 
-  var s Scalar
+  n := len(x0)
   t := x0.ElementType()
   // copy variables
-  x := x0.Clone()
+  x1 := x0.Clone()
+  x2 := x0.Clone()
   // step size for each variable
-  step := make([]float64, len(x))
+  step := make([]float64, n)
   // gradients
-  gradient_new := make([]float64, len(x))
-  gradient_old := make([]float64, len(x))
+  gradient_new := make([]float64, n)
+  gradient_old := make([]float64, n)
   // initialize values
-  for i, _ := range x {
+  for i, _ := range x1 {
     step[i]         = step_init
     gradient_new[i] = 1
     gradient_old[i] = 1
   }
-  x.Variables(1)
+  x1.Variables(1)
 
+  // evaluate objective function
+  s, err := f(x1)
+  if err != nil {
+    return x1, errors.New("invalid initial value")
+  }
   for {
-    for i, _ := range x {
+    for i, _ := range x1 {
       gradient_old[i] = gradient_new[i]
     }
-    // evaluate objective function
-    s = f(x)
     // compute partial derivatives and update x
-    for i, _ := range x {
+    for i, _ := range x1 {
       // save derivative
       gradient_new[i] = s.Derivative(1, i)
     }
     // execute hook if available
-    if hook != nil && hook(gradient_new, step, x, s) {
+    if hook != nil && hook(gradient_new, step, x1, s) {
       break;
     }
     // evaluate stop criterion
-    err := Norm(gradient_new)
-    if (err < epsilon) {
+    if (Norm(gradient_new) < epsilon) {
       break;
     }
     // update step size
-    for i, _ := range x {
+    for i, _ := range x1 {
       if gradient_new[i] != 0.0 {
         if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
             (gradient_old[i] > 0 && gradient_new[i] > 0)) {
@@ -90,26 +95,42 @@ func rprop(f func(Vector) Scalar, x0 Vector, step_init, eta, epsilon float64,
         }
       }
     }
-    // update x
-    for i, _ := range x {
-      if gradient_new[i] != 0.0 {
-        if gradient_new[i] > 0.0 {
-          x[i] = Sub(x[i], NewScalar(t, step[i]))
-        } else {
-          x[i] = Add(x[i], NewScalar(t, step[i]))
+    for {
+      // update x
+      for i, _ := range x1 {
+        if gradient_new[i] != 0.0 {
+          if gradient_new[i] > 0.0 {
+            x2[i] = Sub(x1[i], NewScalar(t, step[i]))
+          } else {
+            x2[i] = Add(x1[i], NewScalar(t, step[i]))
+          }
+        }
+        if math.IsNaN(x2[i].Value()) {
+          panic("Gradient descent diverged!")
         }
       }
-      if math.IsNaN(x[i].Value()) {
-        panic("Gradient descent diverged!")
+      // evaluate objective function
+      s, err = f(x2)
+      if err != nil {
+        // if the updated is invalid reduce step size
+        for i, _ := range x1 {
+          if gradient_new[i] != 0.0 {
+            step[i] *= 1.0 - eta
+          }
+        }
+      } else {
+        // new position is valid, exit loop
+        break
       }
     }
+    x1.Copy(x2)
   }
-  return x
+  return x1, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(f func(Vector) Scalar, x0 Vector, step_init, eta float64, args ...interface{}) Vector {
+func Run(f func(Vector) (Scalar, error), x0 Vector, step_init, eta float64, args ...interface{}) (Vector, error) {
 
   hook    := Hook   { nil}.Value
   epsilon := Epsilon{1e-8}.Value

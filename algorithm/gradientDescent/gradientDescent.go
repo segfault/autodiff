@@ -19,6 +19,7 @@ package gradientDescent
 /* -------------------------------------------------------------------------- */
 
 import   "math"
+
 import . "github.com/pbenner/autodiff"
 import . "github.com/pbenner/autodiff/algorithm"
 
@@ -34,10 +35,9 @@ type Hook struct {
 
 /* -------------------------------------------------------------------------- */
 
-func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
-  hook func([]float64, Vector, Scalar) bool) Vector {
+func gradientDescent(f func(Vector) (Scalar, error), x0 Vector, step, epsilon float64,
+  hook func([]float64, Vector, Scalar) bool) (Vector, error) {
 
-  var s Scalar
   t := x0.ElementType()
   // copy variables
   x := x0.Clone()
@@ -47,7 +47,10 @@ func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
 
   for {
     // evaluate objective function
-    s = f(x)
+    s, err := f(x)
+    if err != nil {
+      return x, err
+    }
     // compute partial derivatives and update variables
     for i, _ := range x {
       // save partial derivative
@@ -58,8 +61,7 @@ func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
       break;
     }
     // evaluate stop criterion
-    err := Norm(gradient)
-    if (err < epsilon) {
+    if (Norm(gradient) < epsilon) {
       break;
     }
     // update variables
@@ -70,12 +72,12 @@ func gradientDescent(f func(Vector) Scalar, x0 Vector, step, epsilon float64,
       }
     }
   }
-  return x
+  return x, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(f func(Vector) Scalar, x0 Vector, step float64, args ...interface{}) Vector {
+func Run(f func(Vector) (Scalar, error), x0 Vector, step float64, args ...interface{}) (Vector, error) {
 
   hook    := Hook   { nil}.Value
   epsilon := Epsilon{1e-8}.Value

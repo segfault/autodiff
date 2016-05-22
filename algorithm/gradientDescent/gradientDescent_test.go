@@ -36,12 +36,12 @@ func TestRProp(t *testing.T) {
   }
   I := IdentityMatrix(m1.ElementType(), rows)
   // objective function
-  f := func(x Vector) Scalar {
+  f := func(x Vector) (Scalar, error) {
     m2.SetValues(x)
     s := Mnorm(MsubM(MdotM(m1, m2), I))
-    return s
+    return s, nil
   }
-  x := Run(f, m2.Values(), 0.01)
+  x, _ := Run(f, m2.Values(), 0.01)
   m2.SetValues(x)
 
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {

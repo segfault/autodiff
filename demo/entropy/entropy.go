@@ -30,6 +30,8 @@ package main
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
+import   "errors"
+
 import . "github.com/pbenner/autodiff"
 import   "github.com/pbenner/autodiff/algorithm/newton"
 import   "github.com/pbenner/autodiff/algorithm/rprop"
@@ -48,10 +50,10 @@ func hook_f(gradient Matrix, px Vector, s Vector) bool {
 }
 
 /* Gradient of L(p) */
-func objective_f(px Vector) Vector {
+func objective_f(px Vector) (Vector, error) {
   n := len(px) - 1
   if len(px) != n+1 {
-    panic("Input vector has invalid dimension!")
+    return nil, errors.New("Input vector has invalid dimension!")
   }
   gradient := NullVector(RealType, n+1)
   // derivative with respect to px[i]
@@ -64,12 +66,13 @@ func objective_f(px Vector) Vector {
   for i := 0; i < n; i++ {
     gradient[n] = Add(gradient[n], px[i])
   }
-  return gradient
+  return gradient, nil
 }
 
 /* Norm of the gradient of L(p) */
-func objective_g(px Vector) Scalar {
-  return Pow(Vnorm(objective_f(px)), NewBareReal(2.0))
+func objective_g(px Vector) (Scalar, error) {
+  x, err := objective_f(px)
+  return Pow(Vnorm(x), NewBareReal(2.0)), err
 }
 
 func main() {
@@ -84,13 +87,16 @@ func main() {
   px0m := NewVector(RealType, append(px0v, 1))
 
   fmt.Println("Rprop optimization:")
-  pxn1 := rprop.Run (objective_g, px0m, step, 0.5,
+  pxn1, err1 := rprop.Run (objective_g, px0m, step, 0.5,
     rprop.Hook{hook_g},
     rprop.Epsilon{epsilon})
   fmt.Println("Newton optimization:")
-  pxn2 := newton.Run(objective_f, px0m,
+  pxn2, err2 := newton.Run(objective_f, px0m,
     newton.Hook{hook_f},
     newton.Epsilon{epsilon})
+
+  if err1 != nil { panic(err1) }
+  if err2 != nil { panic(err2) }
 
   fmt.Println("Rprop  p(x): ", pxn1)
   fmt.Println("Newton p(x): ", pxn2)

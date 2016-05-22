@@ -50,10 +50,10 @@ func gradientDescent(x, y Vector, l *Line) *Line {
   variables[1] = l.Intercept()
 
   // create the objective function
-  f := func(v Vector) Scalar {
+  f := func(v Vector) (Scalar, error) {
     l.SetSlope    (v[0])
     l.SetIntercept(v[1])
-    return sumOfSquares(x, y, l)
+    return sumOfSquares(x, y, l), nil
   }
 //  GradientDescent(f, variables, step, epsilon)
   rprop.Run(f, variables, step, 0.2,

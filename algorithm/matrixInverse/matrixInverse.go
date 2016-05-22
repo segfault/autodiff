@@ -39,7 +39,7 @@ type InSitu struct {
 
 // compute the inverse of a matrix with a
 // gradient descent method
-func mInverseGradient(matrix Matrix) Matrix {
+func mInverseGradient(matrix Matrix) (Matrix, error) {
   rows, cols := matrix.Dims()
   if rows != cols {
     panic("MInverse(): Not a square matrix!")
@@ -47,17 +47,17 @@ func mInverseGradient(matrix Matrix) Matrix {
   I := IdentityMatrix(matrix.ElementType(), rows)
   r := matrix.Clone()
   // objective function
-  f := func(x Vector) Scalar {
+  f := func(x Vector) (Scalar, error) {
     r.SetValues(x)
     s := Mnorm(MsubM(MdotM(matrix, r), I))
-    return s
+    return s, nil
   }
-  x := rprop.Run(f, r.Values(), 0.01, 0.1)
+  x, _ := rprop.Run(f, r.Values(), 0.01, 0.1)
   r.SetValues(x)
-  return r
+  return r, nil
 }
 
-func mInverse(matrix Matrix, args ...interface{}) Matrix {
+func mInverse(matrix Matrix, args ...interface{}) (Matrix, error) {
   rows, _ := matrix.Dims()
   t := matrix.ElementType()
   a := matrix.Clone()
@@ -68,14 +68,18 @@ func mInverse(matrix Matrix, args ...interface{}) Matrix {
     b[i].SetValue(1.0)
   }
   // call Gauss-Jordan algorithm
-  gaussJordan.Run(a, x, b, args...)
-  return x
+  err := gaussJordan.Run(a, x, b, args...)
+  return x, err
 }
 
-func mInversePD(matrix Matrix, s InSitu, args ...interface{}) Matrix {
+func mInversePD(matrix Matrix, s InSitu, args ...interface{}) (Matrix, error) {
   rows, _ := matrix.Dims()
   t := matrix.ElementType()
-  a := cholesky.Run(matrix, cholesky.InSitu{s.Value}).T()
+  a, err := cholesky.Run(matrix, cholesky.InSitu{s.Value})
+  a = a.T()
+  if err != nil {
+    return nil, err
+  }
   x := IdentityMatrix(t, rows)
   b := NullVector(t, rows)
   // initialize b with ones
@@ -86,12 +90,12 @@ func mInversePD(matrix Matrix, s InSitu, args ...interface{}) Matrix {
   // call Gauss-Jordan algorithm
   gaussJordan.Run(a, x, b, args...)
   // recycle a to store the result
-  return a.MdotM(x, x.T())
+  return a.MdotM(x, x.T()), nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(matrix Matrix, args ...interface{}) Matrix {
+func Run(matrix Matrix, args ...interface{}) (Matrix, error) {
   rows, cols := matrix.Dims()
   gArgs := []interface{}{}
   if rows != cols {

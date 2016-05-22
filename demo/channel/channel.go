@@ -258,8 +258,8 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   }
 
   // objective functions
-  f := func(px Vector) Vector { return objective_f(active2, channelm, px) }
-  g := func(px Vector) Scalar { return objective_g(active1, channelm, px) }
+  f := func(px Vector) (Vector, error) { return objective_f(active2, channelm, px), nil }
+  g := func(px Vector) (Scalar, error) { return objective_g(active1, channelm, px), nil }
 
   // execute algorithms
   rprop .Run(g, px0m, step, 0.01,

@@ -19,6 +19,7 @@ package cholesky
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "errors"
 
 import . "github.com/pbenner/autodiff"
 
@@ -30,7 +31,7 @@ type InSitu struct {
 
 /* -------------------------------------------------------------------------- */
 
-func cholesky(A Matrix) Matrix {
+func cholesky(A Matrix) (Matrix, error) {
   n, _  := A.Dims()
   eType := A.ElementType()
   t     := NewScalar(eType, 0.0)
@@ -47,7 +48,7 @@ func cholesky(A Matrix) Matrix {
       t.Sub(A.ReferenceAt2(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         L.ReferenceAt2(i, j).Sqrt(t)
       } else {
@@ -55,10 +56,10 @@ func cholesky(A Matrix) Matrix {
       }
     }
   }
-  return L
+  return L, nil
 }
 
-func choleskyInSitu(A Matrix) Matrix {
+func choleskyInSitu(A Matrix) (Matrix, error) {
   n, _  := A.Dims()
   eType := A.ElementType()
   t     := NewScalar(eType, 0.0)
@@ -76,7 +77,7 @@ func choleskyInSitu(A Matrix) Matrix {
       if i == j {
         t.Sub(Aii, s)
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         A.ReferenceAt2(j, i).Sqrt(t)
       } else {
@@ -93,12 +94,12 @@ func choleskyInSitu(A Matrix) Matrix {
       r.Reset()
     }
   }
-  return A
+  return A, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(a Matrix, args ...interface{}) Matrix {
+func Run(a Matrix, args ...interface{}) (Matrix, error) {
   n, m := a.Dims()
   if n != m {
     panic("Cholesky(): Not a square matrix!")

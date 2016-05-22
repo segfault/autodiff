@@ -89,19 +89,19 @@ func hook(err *[]float64, gradient []float64, px Vector, s Scalar) bool {
 /* -------------------------------------------------------------------------- */
 
 func main() {
-  f := func(x Vector) Scalar {
+  f := func(x Vector) (Scalar, error) {
     // x^4 - 3x^3 + 2
-    return Add(Sub(Pow(x[0], NewBareReal(4)), Mul(NewReal(3), Pow(x[0], NewBareReal(3)))), NewReal(2))
+    return Add(Sub(Pow(x[0], NewBareReal(4)), Mul(NewReal(3), Pow(x[0], NewBareReal(3)))), NewReal(2)), nil
   }
   err1 := make([]float64, 0)
   err2 := make([]float64, 0)
   x0 := NewVector(RealType, []float64{4})
   // vanilla gradient descent
-  xn1 := gradientDescent.Run(f, x0, 0.0001,
+  xn1, _ := gradientDescent.Run(f, x0, 0.0001,
     gradientDescent.Hook{func(gradient []float64, px Vector, s Scalar) bool { return hook(&err1, gradient, px, s) }},
     gradientDescent.Epsilon{1e-8})
   // resilient backpropagation
-  xn2 := rprop.Run(f, x0, 0.0001, 0.4,
+  xn2, _ := rprop.Run(f, x0, 0.0001, 0.4,
     rprop.Hook{func(gradient, step []float64, px Vector, s Scalar) bool { return hook(&err2, gradient, px, s) }},
     rprop.Epsilon{1e-8})
 

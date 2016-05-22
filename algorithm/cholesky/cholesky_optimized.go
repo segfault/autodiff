@@ -19,12 +19,13 @@ package cholesky
 /* -------------------------------------------------------------------------- */
 
 //import   "fmt"
+import   "errors"
 
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func cholesky_RealDense(A *DenseMatrix) *DenseMatrix {
+func cholesky_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewReal(0.0)
   s     := NewReal(0.0)
@@ -40,7 +41,7 @@ func cholesky_RealDense(A *DenseMatrix) *DenseMatrix {
       t.RealSub(A.RealReferenceAt2(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         L.RealReferenceAt2(i, j).RealSqrt(t)
       } else {
@@ -48,10 +49,10 @@ func cholesky_RealDense(A *DenseMatrix) *DenseMatrix {
       }
     }
   }
-  return L
+  return L, nil
 }
 
-func choleskyInSitu_RealDense(A *DenseMatrix) *DenseMatrix {
+func choleskyInSitu_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewReal(0.0)
   s     := NewReal(0.0)
@@ -68,7 +69,7 @@ func choleskyInSitu_RealDense(A *DenseMatrix) *DenseMatrix {
       if i == j {
         t.RealSub(Aii, s)
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         A.RealReferenceAt2(j, i).RealSqrt(t)
       } else {
@@ -85,12 +86,12 @@ func choleskyInSitu_RealDense(A *DenseMatrix) *DenseMatrix {
       r.Reset()
     }
   }
-  return A
+  return A, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func cholesky_BareRealDense(A *DenseMatrix) *DenseMatrix {
+func cholesky_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewBareReal(0.0)
   s     := NewBareReal(0.0)
@@ -106,7 +107,7 @@ func cholesky_BareRealDense(A *DenseMatrix) *DenseMatrix {
       t.BareRealSub(A.BareRealReferenceAt2(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         L.BareRealReferenceAt2(i, j).BareRealSqrt(t)
       } else {
@@ -114,10 +115,10 @@ func cholesky_BareRealDense(A *DenseMatrix) *DenseMatrix {
       }
     }
   }
-  return L
+  return L, nil
 }
 
-func choleskyInSitu_BareRealDense(A *DenseMatrix) *DenseMatrix {
+func choleskyInSitu_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewBareReal(0.0)
   s     := NewBareReal(0.0)
@@ -134,7 +135,7 @@ func choleskyInSitu_BareRealDense(A *DenseMatrix) *DenseMatrix {
       if i == j {
         t.BareRealSub(Aii, s)
         if t.Value() < 0.0 {
-          panic("matrix is not positive definite")
+          return nil, errors.New("matrix is not positive definite")
         }
         A.BareRealReferenceAt2(j, i).BareRealSqrt(t)
       } else {
@@ -151,5 +152,5 @@ func choleskyInSitu_BareRealDense(A *DenseMatrix) *DenseMatrix {
       r.Reset()
     }
   }
-  return A
+  return A, nil
 }

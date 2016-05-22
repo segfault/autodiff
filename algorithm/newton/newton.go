@@ -33,15 +33,25 @@ type Hook struct {
 
 /* -------------------------------------------------------------------------- */
 
-func newton(f func(Vector) Vector, x Vector, epsilon float64,
+func newton(f func(Vector) (Vector, error), x Vector, epsilon float64,
   hook func(Matrix, Vector, Vector) bool,
-  options []interface{}) Vector {
+  options []interface{}) (Vector, error) {
   x1  := x.Clone()
   x2  := x.Clone()
+  g := func(x Vector) Vector {
+    y, _ := f(x)
+    return y
+  }
   for {
-    y  := f(x1)
-    J  := Jacobian(f, x1)
-    Q  := matrixInverse.Run(J, options...)
+    y, err := f(x1)
+    if err != nil {
+      return nil, err
+    }
+    J := Jacobian(g, x1)
+    Q, err := matrixInverse.Run(J, options...)
+    if err != nil {
+      return nil, err
+    }
     x2  = VsubV(x1, MdotV(Q, y))
     // execute hook if available
     if hook != nil && hook(J, x2, y) {
@@ -53,12 +63,12 @@ func newton(f func(Vector) Vector, x Vector, epsilon float64,
     }
     x1.Copy(x2)
   }
-  return x2
+  return x2, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(f func(Vector) Vector, x Vector, args ...interface{}) Vector {
+func Run(f func(Vector) (Vector, error), x Vector, args ...interface{}) (Vector, error) {
 
   hook      := Hook     { nil}.Value
   epsilon   := Epsilon  {1e-8}.Value

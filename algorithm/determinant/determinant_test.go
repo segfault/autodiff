@@ -30,7 +30,7 @@ func TestDeterminant1(t *testing.T) {
 
   m := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
-  if Run(m).Value() != -2 {
+  if r, _ := Run(m); r.Value() != -2 {
     t.Error("Matrix determinant failed!")
   }
 
@@ -40,7 +40,7 @@ func TestDeterminant2(t *testing.T) {
 
   m := NewMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
 
-  if Run(m).Value() != 0 {
+  if r, _ := Run(m); r.Value() != 0 {
     t.Error("Matrix determinant failed!")
   }
 
@@ -50,7 +50,7 @@ func TestDeterminant3(t *testing.T) {
 
   m := NewMatrix(RealType, 4, 4, []float64{3,2,0,1, 4,0,1,2, 3,0,2,1, 9,2,3,1})
 
-  if Run(m).Value() != 24 {
+  if r, _ := Run(m); r.Value() != 24 {
     t.Error("Matrix determinant failed!")
   }
 
@@ -60,10 +60,14 @@ func TestDeterminant4(t *testing.T) {
 
   m := NewMatrix(RealType, 3, 3, []float64{2, -1, 0, -1, 2, -1, 0, -1, 2})
 
-  if math.Abs(Run(m).Value() - Run(m, PositiveDefinite{true}).Value()) > 1e-4 {
+  r1, _ := Run(m)
+  r2, _ := Run(m, PositiveDefinite{true})
+  r3, _ := Run(m, PositiveDefinite{true}, LogScale{true})
+
+  if math.Abs(r1.Value() - r2.Value()) > 1e-4 {
     t.Error("Matrix determinant failed!")
   }
-  if math.Abs(Log(Run(m)).Value() - Run(m, PositiveDefinite{true}, LogScale{true}).Value()) > 1e-4 {
+  if math.Abs(Log(r1).Value() - r3.Value()) > 1e-4 {
     t.Error("Matrix determinant failed!")
   }
 

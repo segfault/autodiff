@@ -19,15 +19,17 @@ package newton
 /* -------------------------------------------------------------------------- */
 
 import   "testing"
+import   "errors"
+
 import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
 func TestNewton(t *testing.T) {
 
-  f := func(x Vector) Vector {
+  f := func(x Vector) (Vector, error) {
     if len(x) != 2 {
-      panic("Invalid input vector!")
+      return nil, errors.New("Invalid input vector!")
     }
     y := NullVector(RealType, 2)
     // y1 = x1^2 + x2^2 - 6
@@ -35,10 +37,10 @@ func TestNewton(t *testing.T) {
     // y2 = x1^3 - x2^2
     y[1] = Sub(Pow(x[0], NewReal(3)), Pow(x[1], NewReal(2)))
 
-    return y
+    return y, nil
   }
   v1 := NewVector(RealType, []float64{1,1})
-  v2 := Run(f, v1, Epsilon{1e-8})
+  v2, _ := Run(f, v1, Epsilon{1e-8})
   v3 := NewVector(RealType, []float64{1.537656, 1.906728})
 
   if Vnorm(VsubV(v2, v3)).Value() > 1e-6  {
