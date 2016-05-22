@@ -18,6 +18,7 @@ package rprop
 
 /* -------------------------------------------------------------------------- */
 
+//import   "fmt"
 import   "math"
 import   "errors"
 
@@ -106,7 +107,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon fl
           }
         }
         if math.IsNaN(x2[i].Value()) {
-          panic("Gradient descent diverged!")
+          return x2, errors.New("Gradient descent diverged!")
         }
       }
       // evaluate objective function

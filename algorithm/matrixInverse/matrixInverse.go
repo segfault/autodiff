@@ -76,10 +76,10 @@ func mInversePD(matrix Matrix, s InSitu, args ...interface{}) (Matrix, error) {
   rows, _ := matrix.Dims()
   t := matrix.ElementType()
   a, err := cholesky.Run(matrix, cholesky.InSitu{s.Value})
-  a = a.T()
   if err != nil {
     return nil, err
   }
+  a  = a.T()
   x := IdentityMatrix(t, rows)
   b := NullVector(t, rows)
   // initialize b with ones
