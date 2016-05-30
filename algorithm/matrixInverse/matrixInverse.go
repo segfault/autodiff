@@ -52,7 +52,7 @@ func mInverseGradient(matrix Matrix) (Matrix, error) {
     s := Mnorm(MsubM(MdotM(matrix, r), I))
     return s, nil
   }
-  x, _ := rprop.Run(f, r.Values(), 0.01, 0.1)
+  x, _ := rprop.Run(f, r.Values(), 0.01, []float64{2.0, 0.1})
   r.SetValues(x)
   return r, nil
 }

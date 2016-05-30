@@ -42,7 +42,7 @@ type Hook struct {
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon float64,
+func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []float64, epsilon float64,
   hook func([]float64, []float64, Vector, Scalar) bool) (Vector, error) {
 
   n := len(x0)
@@ -90,9 +90,9 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon fl
       if gradient_new[i] != 0.0 {
         if ((gradient_old[i] < 0 && gradient_new[i] < 0) ||
             (gradient_old[i] > 0 && gradient_new[i] > 0)) {
-          step[i] *= 1.0 + eta
+          step[i] *= eta[0]
         } else {
-          step[i] *= 1.0 - eta
+          step[i] *= eta[1]
         }
       }
     }
@@ -116,7 +116,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon fl
         // if the updated is invalid reduce step size
         for i, _ := range x1 {
           if gradient_new[i] != 0.0 {
-            step[i] *= 1.0 - eta
+            step[i] *= eta[1]
           }
         }
       } else {
@@ -131,10 +131,14 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init, eta, epsilon fl
 
 /* -------------------------------------------------------------------------- */
 
-func Run(f func(Vector) (Scalar, error), x0 Vector, step_init, eta float64, args ...interface{}) (Vector, error) {
+func Run(f func(Vector) (Scalar, error), x0 Vector, step_init float64, eta []float64, args ...interface{}) (Vector, error) {
 
   hook    := Hook   { nil}.Value
   epsilon := Epsilon{1e-8}.Value
+
+  if len(eta) != 2 {
+    panic("Rprop(): Argument eta must have length two!")
+  }
 
   for _, arg := range args {
     switch a := arg.(type) {

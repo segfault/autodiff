@@ -87,7 +87,7 @@ func main() {
   px0m := NewVector(RealType, append(px0v, 1))
 
   fmt.Println("Rprop optimization:")
-  pxn1, err1 := rprop.Run (objective_g, px0m, step, 0.5,
+  pxn1, err1 := rprop.Run (objective_g, px0m, step, []float64{1.2, 0.8},
     rprop.Hook{hook_g},
     rprop.Epsilon{epsilon})
   fmt.Println("Newton optimization:")

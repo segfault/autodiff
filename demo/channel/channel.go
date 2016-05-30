@@ -262,7 +262,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   g := func(px Vector) (Scalar, error) { return objective_g(active1, channelm, px), nil }
 
   // execute algorithms
-  rprop .Run(g, px0m, step, 0.01,
+  rprop .Run(g, px0m, step, []float64{1.1, 0.9},
     rprop.Hook{hook1},
     rprop.Epsilon{epsilon})
   newton.Run(f, px0m,
