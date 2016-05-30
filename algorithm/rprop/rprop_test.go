@@ -18,7 +18,8 @@ package rprop
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
+import   "fmt"
+import   "os"
 import   "testing"
 
 import . "github.com/pbenner/autodiff"
@@ -46,5 +47,42 @@ func TestRProp(t *testing.T) {
 
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+
+func TestRPropRosenbrock(t *testing.T) {
+
+  fp, err := os.Create("rprop_test.table")
+  if err != nil {
+    panic(err)
+  }
+  defer fp.Close()
+
+  f := func(x Vector) (Scalar, error) {
+    // f(x1, x2) = (a - x1)^2 + b(x2 - x1^2)^2
+    // a = 1
+    // b = 100
+    // minimum: (x1,x2) = (a, a^2)
+    a := NewReal(  1.0)
+    b := NewReal(100.0)
+    s := Pow(Sub(a, x[0]), NewReal(2.0))
+    t := Mul(b, Pow(Sub(x[1], Mul(x[0], x[0])), NewReal(2.0)))
+    return Add(s, t), nil
+  }
+  hook := func(gradient []float64, step []float64, x Vector, value Scalar) bool {
+    fmt.Fprintf(fp, "%s\n", x.Table())
+    return false
+  }
+
+  x0 := NewVector(RealType, []float64{-10,10})
+  xr := NewVector(RealType, []float64{  1, 1})
+  xn, _ := Run(f, x0, 0.01, 0.3,
+    Hook{hook},
+    Epsilon{1e-10})
+
+  if Vnorm(VsubV(xn, xr)).Value() > 1e-8 {
+    t.Error("Rosenbrock test failed!")
   }
 }
