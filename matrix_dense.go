@@ -22,6 +22,7 @@ import "bytes"
 import "bufio"
 import "compress/gzip"
 import "errors"
+import "fmt"
 import "reflect"
 import "strconv"
 import "strings"
@@ -305,6 +306,21 @@ func (a *DenseMatrix) Table() string {
   }
 
   return buffer.String()
+}
+
+func (m *DenseMatrix) WriteMatrix(filename string) error {
+  f, err := os.Create(filename)
+  if err != nil {
+    return err
+  }
+  defer f.Close()
+
+  w := bufio.NewWriter(f)
+  defer w.Flush()
+
+  fmt.Fprintf(w, "%s\n", m.Table())
+
+  return nil
 }
 
 func ReadMatrix(t ScalarType, filename string) (Matrix, error) {

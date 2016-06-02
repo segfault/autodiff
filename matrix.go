@@ -37,6 +37,7 @@ type Matrix interface {
   Diag         ()                   Vector
   T            ()                   Matrix
   Table        ()                   string
+  WriteMatrix  (string)             error
   Submatrix(rfrom, rto, cfrom, cto int) Matrix
   PermuteRows([]int)
   // math operations
