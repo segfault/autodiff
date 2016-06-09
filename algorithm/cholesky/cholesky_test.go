@@ -27,13 +27,13 @@ import . "github.com/pbenner/autodiff"
 
 func TestCholesky1(t *testing.T) {
   n := 4
-  a := NewMatrix(RealType, n, n, []float64{
+  a := NewDenseMatrix(RealType, n, n, []float64{
     18, 22,  54,  42,
     22, 70,  86,  62,
     54, 86, 174, 134,
     42, 62, 134, 106 })
   x, _ := Run(a)
-  r    := NewMatrix(RealType, n, n, []float64{
+  r    := NewDenseMatrix(RealType, n, n, []float64{
      4.24264, 0.00000, 0.00000, 0.00000,
      5.18545, 6.56591, 0.00000, 0.00000,
     12.72792, 3.04604, 1.64974, 0.00000,
@@ -46,13 +46,13 @@ func TestCholesky1(t *testing.T) {
 
 func TestCholesky2(t *testing.T) {
   n := 4
-  a := NewMatrix(RealType, n, n, []float64{
+  a := NewDenseMatrix(RealType, n, n, []float64{
     18, 22,  54,  42,
     22, 70,  86,  62,
     54, 86, 174, 134,
     42, 62, 134, 106 })
   x, _ := Run(a, InSitu{true})
-  r    := NewMatrix(RealType, n, n, []float64{
+  r    := NewDenseMatrix(RealType, n, n, []float64{
      4.24264, 0.00000, 0.00000, 0.00000,
      5.18545, 6.56591, 0.00000, 0.00000,
     12.72792, 3.04604, 1.64974, 0.00000,

@@ -27,7 +27,7 @@ import . "github.com/pbenner/autodiff"
 
 func TestBlahut(t *testing.T) {
 
-  channel := NewMatrix(ProbabilityType, 3, 3,
+  channel := NewDenseMatrix(ProbabilityType, 3, 3,
     flatten([][]float64{
       {0.60, 0.30, 0.10},
       {0.70, 0.10, 0.20},

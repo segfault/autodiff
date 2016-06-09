@@ -29,7 +29,7 @@ func cholesky_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewReal(0.0)
   s     := NewReal(0.0)
-  L     := NullMatrix(RealType, n, n)
+  L     := NullDenseMatrix(RealType, n, n)
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {
@@ -95,7 +95,7 @@ func cholesky_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
   n, _  := A.Dims()
   t     := NewBareReal(0.0)
   s     := NewBareReal(0.0)
-  L     := NullMatrix(BareRealType, n, n)
+  L     := NullDenseMatrix(BareRealType, n, n)
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {

@@ -36,7 +36,7 @@ func cholesky(A Matrix) (Matrix, error) {
   eType := A.ElementType()
   t     := NewScalar(eType, 0.0)
   s     := NewScalar(eType, 0.0)
-  L     := NullMatrix(eType, n, n)
+  L     := NullDenseMatrix(eType, n, n)
  
   for i := 0; i < n; i++ {
     for j := 0; j < (i+1); j++ {

@@ -217,7 +217,7 @@ func channel_capacity(channel [][]float64, pxstar, px0 []float64) ([][]float64) 
   const step    = 0.001
 
   // copy variables for automatic differentation
-  channelm := NewMatrix(RealType, n, m, flatten(channel))
+  channelm := NewDenseMatrix(RealType, n, m, flatten(channel))
   // add n+1 lagrange multipliers
   px0m     := NewVector(RealType, append(px0, make([]float64, n+1)...))
 

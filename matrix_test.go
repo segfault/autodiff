@@ -26,7 +26,7 @@ import "testing"
 
 func TestMatrix(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m1 := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   m2 := m1.T()
 
   if m1.At(1,2).Value() != m2.At(2,1).Value() {
@@ -36,7 +36,7 @@ func TestMatrix(t *testing.T) {
 
 func TestMatrixRowCol(t *testing.T) {
 
-  m  := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m  := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   v1 := m.Row(1)
   v2 := m.Col(2)
 
@@ -59,7 +59,7 @@ func TestMatrixRowCol(t *testing.T) {
 
 func TestMatrixDiag(t *testing.T) {
 
-  m := NewMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
+  m := NewDenseMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
   v := m.Diag()
 
   if v[0].Value() != 1 ||
@@ -71,7 +71,7 @@ func TestMatrixDiag(t *testing.T) {
 
 func TestMatrixReference(t *testing.T) {
 
-  m := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   c := NewReal(163)
 
   m.Set(c, 0, 0)
@@ -91,9 +91,9 @@ func TestMatrixReference(t *testing.T) {
 
 func TestSubmatrix(t *testing.T) {
 
-  a := NewMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
+  a := NewDenseMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
   m := a.Submatrix(1,2,0,1)
-  r := NewMatrix(RealType, 2, 2, []float64{4,5,7,8})
+  r := NewDenseMatrix(RealType, 2, 2, []float64{4,5,7,8})
 
   if Mnorm(MsubM(r, m)).Value() > 1e-8  {
     t.Error("Submatrix failed!")
@@ -102,7 +102,7 @@ func TestSubmatrix(t *testing.T) {
 
 func TestMatrixTrace(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
+  m1 := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
   if Mtrace(m1).Value() != 5 {
     t.Error("Wrong matrix trace!")
@@ -111,7 +111,7 @@ func TestMatrixTrace(t *testing.T) {
 
 func TestMatrixDot(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m1 := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   m2 := m1.T()
   m3 := MdotM(m1, m2)
 
@@ -122,8 +122,8 @@ func TestMatrixDot(t *testing.T) {
 
 func TestMatrixMul(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
-  m2 := NewMatrix(RealType, 2, 3, []float64{6,5,4,3,2,1})
+  m1 := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  m2 := NewDenseMatrix(RealType, 2, 3, []float64{6,5,4,3,2,1})
   m3 := MmulM(m1, m2)
 
   if m3.At(0,0).Value() != 6 {
@@ -133,7 +133,7 @@ func TestMatrixMul(t *testing.T) {
 
 func TestMatrixMdotV(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
+  m1 := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
   v1 := NewVector(RealType, []float64{1, 2})
   v2 := MdotV(m1, v1)
   v3 := NewVector(RealType, []float64{5, 11})
@@ -145,7 +145,7 @@ func TestMatrixMdotV(t *testing.T) {
 
 func TestMatrixVdotM(t *testing.T) {
 
-  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
+  m1 := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
   v1 := NewVector(RealType, []float64{1, 2})
   v2 := VdotM(v1, m1)
   v3 := NewVector(RealType, []float64{7, 10})
@@ -157,9 +157,9 @@ func TestMatrixVdotM(t *testing.T) {
 
 func TestMatrixMapReduce(t *testing.T) {
 
-  r1 := NewMatrix(RealType, 2, 2, []float64{2.718282e+00, 7.389056e+00, 2.008554e+01, 5.459815e+01})
+  r1 := NewDenseMatrix(RealType, 2, 2, []float64{2.718282e+00, 7.389056e+00, 2.008554e+01, 5.459815e+01})
   r2 := 84.79103
-  m := NewMatrix(RealType, 2, 2, []float64{1, 2,3,4})
+  m := NewDenseMatrix(RealType, 2, 2, []float64{1, 2,3,4})
   a := m.Map(Exp).Reduce(Add)
 
   if Mnorm(MsubM(m, r1)).Value() > 1e-8  {
@@ -174,7 +174,7 @@ func TestOuter(t *testing.T) {
   a := NewVector(RealType, []float64{1,3,2})
   b := NewVector(RealType, []float64{2,1,0,3})
   r := Outer(a,b)
-  m := NewMatrix(RealType, 3, 4, []float64{
+  m := NewDenseMatrix(RealType, 3, 4, []float64{
     2,1,0,3,
     6,3,0,9,
     4,2,0,6 })
@@ -203,7 +203,7 @@ func TestMatrixJacobian(t *testing.T) {
 
   v1 := NewVector(RealType, []float64{1,1})
   m1 := Jacobian(f, v1)
-  m2 := NewMatrix(RealType, 3, 2, []float64{2, 2, 3, -2, 0, 0})
+  m2 := NewDenseMatrix(RealType, 3, 2, []float64{2, 2, 3, -2, 0, 0})
 
   if Mnorm(MsubM(m1, m2)).Value() > 1e-8 {
     t.Error("Inverting matrix failed!")
@@ -216,7 +216,7 @@ func TestReadMatrix(t *testing.T) {
   if err != nil {
     panic(err)
   }
-  r := NewMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
+  r := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
 
   if Mnorm(MsubM(m, r)).Value() != 0.0 {
     t.Error("Read matrix failed!")

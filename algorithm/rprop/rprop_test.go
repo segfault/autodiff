@@ -27,9 +27,9 @@ import . "github.com/pbenner/autodiff"
 /* -------------------------------------------------------------------------- */
 
 func TestRProp(t *testing.T) {
-  m1 := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
+  m1 := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
   m2 := m1.Clone()
-  m3 := NewMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
+  m3 := NewDenseMatrix(RealType, 2, 2, []float64{-2, 1, 1.5, -0.5})
 
   rows, cols := m1.Dims()
   if rows != cols {

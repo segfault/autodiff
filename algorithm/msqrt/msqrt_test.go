@@ -25,9 +25,9 @@ import . "github.com/pbenner/autodiff"
 
 func TestMSqrt(t *testing.T) {
   n := 2
-  a := NewMatrix(RealType, n, n, []float64{2, 1, 1, 2})
+  a := NewDenseMatrix(RealType, n, n, []float64{2, 1, 1, 2})
   x, _ := Run(a)
-  r := NewMatrix(RealType, n, n, []float64{1.366025e+00, 3.660254e-01, 3.660254e-01, 1.366025e+00})
+  r := NewDenseMatrix(RealType, n, n, []float64{1.366025e+00, 3.660254e-01, 3.660254e-01, 1.366025e+00})
 
   if Mnorm(MsubM(x, r)).Value() > 1e-8 {
     t.Error("MSqrt failed!")

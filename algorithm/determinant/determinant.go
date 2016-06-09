@@ -51,7 +51,7 @@ func determinantNaive(a Matrix) Scalar {
     t2.Mul(a.ReferenceAt2(1, 0), a.ReferenceAt2(0, 1))
     det.Sub(t1, t2)
   } else {
-    m := NullMatrix(a.ElementType(), n-1, n-1)
+    m := NullDenseMatrix(a.ElementType(), n-1, n-1)
     for j1 := 0; j1 < n; j1++ {
       for i := 1; i < n; i++ {
         j2 := 0

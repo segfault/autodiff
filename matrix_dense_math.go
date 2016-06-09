@@ -60,7 +60,7 @@ func (r *DenseMatrix) MaddM(a, b Matrix) Matrix {
 // Element-wise addition of two matrices.
 func MaddM(a, b Matrix) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MaddM(a, b)
   return r
 }
@@ -85,7 +85,7 @@ func (r *DenseMatrix) MaddS(a Matrix, b Scalar) Matrix {
 // Add scalar b to all elements of a.
 func MaddS(a Matrix, b Scalar) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MaddS(a, b)
   return r
 }
@@ -111,7 +111,7 @@ func (r *DenseMatrix) MsubM(a, b Matrix) Matrix {
 // Element-wise substraction of two matrices.
 func MsubM(a, b Matrix) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MsubM(a, b)
   return r
 }
@@ -136,7 +136,7 @@ func (r *DenseMatrix) MsubS(a Matrix, b Scalar) Matrix {
 // Substract b from all elements of a.
 func MsubS(a Matrix, b Scalar) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MsubS(a, b)
   return r
 }
@@ -162,7 +162,7 @@ func (r *DenseMatrix) MmulM(a, b Matrix) Matrix {
 // Element-wise multiplication of two matrices.
 func MmulM(a, b Matrix) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MmulM(a, b)
   return r
 }
@@ -187,7 +187,7 @@ func (r *DenseMatrix) MmulS(a Matrix, b Scalar) Matrix {
 // Multiply all elements of a with b.
 func MmulS(a Matrix, b Scalar) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MmulS(a, b)
   return r
 }
@@ -213,7 +213,7 @@ func (r *DenseMatrix) MdivM(a, b Matrix) Matrix {
 // Element-wise division of two matrices.
 func MdivM(a, b Matrix) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MdivM(a, b)
   return r
 }
@@ -238,7 +238,7 @@ func (r *DenseMatrix) MdivS(a Matrix, b Scalar) Matrix {
 // Divide all elements of a by b.
 func MdivS(a Matrix, b Scalar) Matrix {
   n, m := a.Dims()
-  r := NullMatrix(a.ElementType(), n, m)
+  r := NullDenseMatrix(a.ElementType(), n, m)
   r.MdivS(a, b)
   return r
 }
@@ -270,7 +270,7 @@ func (r *DenseMatrix) MdotM(a, b Matrix) Matrix {
 func MdotM(a, b Matrix) Matrix {
   n1, _  := a.Dims()
   _,  m2 := b.Dims()
-  r := NullMatrix(a.ElementType(), n1, m2)
+  r := NullDenseMatrix(a.ElementType(), n1, m2)
   r.MdotM(a, b)
   return r
 }
@@ -347,7 +347,7 @@ func (r *DenseMatrix) Outer(a, b Vector) Matrix {
 
 // Outer product of two vectors.
 func Outer(a, b Vector) Matrix {
-  r := NullMatrix(a.ElementType(), len(a), len(b))
+  r := NullDenseMatrix(a.ElementType(), len(a), len(b))
   r.Outer(a, b)
   return r
 }
@@ -418,7 +418,7 @@ func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   y := f(x)
   n := len(y)
   m := len(x)
-  r := NullMatrix(x.ElementType(), n, m)
+  r := NullDenseMatrix(x.ElementType(), n, m)
   if n != len(y) {
     panic("Jacobian(): dimensions do not match!")
   }

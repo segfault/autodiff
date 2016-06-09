@@ -41,8 +41,8 @@ type DenseMatrix struct {
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewMatrix(t ScalarType, rows, cols int, values []float64) *DenseMatrix {
-  m := NilMatrix(rows, cols)
+func NewDenseMatrix(t ScalarType, rows, cols int, values []float64) *DenseMatrix {
+  m := NilDenseMatrix(rows, cols)
   v := m.GetValues()
   f := ScalarConstructor(t)
   if len(values) == 1 {
@@ -54,16 +54,16 @@ func NewMatrix(t ScalarType, rows, cols int, values []float64) *DenseMatrix {
       v[i] = f(values[i])
     }
   } else {
-    panic("NewMatrix(): Matrix dimension does not fit input values!")
+    panic("NewDenseMatrix(): Matrix dimension does not fit input values!")
   }
   return m
 }
 
-func NullMatrix(t ScalarType, rows, cols int) *DenseMatrix {
+func NullDenseMatrix(t ScalarType, rows, cols int) *DenseMatrix {
   return &DenseMatrix{NullVector(t, rows*cols), rows, cols, false}
 }
 
-func NilMatrix(rows, cols int) *DenseMatrix {
+func NilDenseMatrix(rows, cols int) *DenseMatrix {
   return &DenseMatrix{NilVector(rows*cols), rows, cols, false}
 }
 
@@ -91,7 +91,7 @@ func (a *DenseMatrix) Copy(b Matrix) {
  * -------------------------------------------------------------------------- */
 
 func IdentityMatrix(t ScalarType, dim int) Matrix {
-  matrix := NullMatrix(t, dim, dim)
+  matrix := NullDenseMatrix(t, dim, dim)
   for i := 0; i < dim; i++ {
     matrix.Set(NewScalar(t, 1), i, i)
   }
@@ -151,7 +151,7 @@ func (matrix *DenseMatrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
   t := matrix.ElementType()
   n := rto-rfrom+1
   m := cto-cfrom+1
-  r := NullMatrix(t, n, m)
+  r := NullDenseMatrix(t, n, m)
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
       r.Set(matrix.At(rfrom+i, cfrom+j), i, j)
@@ -324,7 +324,7 @@ func (m *DenseMatrix) WriteMatrix(filename string) error {
 }
 
 func ReadMatrix(t ScalarType, filename string) (Matrix, error) {
-  result := NewMatrix(t, 0, 0, []float64{})
+  result := NewDenseMatrix(t, 0, 0, []float64{})
   data   := []float64{}
   rows   := 0
   cols   := 0
@@ -372,7 +372,7 @@ func ReadMatrix(t ScalarType, filename string) (Matrix, error) {
     }
     rows++
   }
-  result = NewMatrix(t, rows, cols, data)
+  result = NewDenseMatrix(t, rows, cols, data)
 
   return result, nil
 }
