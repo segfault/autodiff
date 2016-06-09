@@ -20,30 +20,30 @@ package autodiff
 
 func (matrix *DenseMatrix) T() Matrix {
   return &DenseMatrix{
-    values:  matrix.values,
-    rows  :  matrix.cols,
-    cols  :  matrix.rows,
-    t     : !matrix.t}
+    Values    :  matrix.Values,
+    Rows      :  matrix.Cols,
+    Cols      :  matrix.Rows,
+    Transposed: !matrix.Transposed}
 }
 
 func (matrix *DenseMatrix) PermuteRows(_p []int) {
-  if len(_p) != matrix.rows {
+  if len(_p) != matrix.Rows {
     panic("PermuteRows(): permutation vector has invalid length!")
   }
   // make a copy of _p
   p := make([]int, len(_p))
   copy(p, _p)
   // permute matrix
-  for i := 0; i < matrix.rows; i++ {
+  for i := 0; i < matrix.Rows; i++ {
     if i != p[i] {
-      for j := 0; j < matrix.cols; j++ {
+      for j := 0; j < matrix.Cols; j++ {
         v1 := matrix.At(  i , j)
         v2 := matrix.At(p[i], j)
         matrix.Set(v2,   i , j)
         matrix.Set(v1, p[i], j)
       }
       // save permutation
-      for k := 0; k < matrix.rows; k++ {
+      for k := 0; k < matrix.Rows; k++ {
         if p[k] == i {
           p[k], p[i] = p[i], i
           break

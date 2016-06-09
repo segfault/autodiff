@@ -30,7 +30,7 @@ type Matrix interface {
   Clone        ()                   Matrix
   Copy         (Matrix)
   Dims         ()                   (int, int)
-  Values       ()                   Vector
+  GetValues    ()                   Vector
   SetValues    (v Vector)
   Row          (i int)              Vector
   Col          (j int)              Vector

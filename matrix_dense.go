@@ -32,18 +32,18 @@ import "os"
  * -------------------------------------------------------------------------- */
 
 type DenseMatrix struct {
-  values Vector
-  rows   int
-  cols   int
-  t      bool
+  Values     Vector
+  Rows       int
+  Cols       int
+  Transposed bool
 }
 
 /* constructors
  * -------------------------------------------------------------------------- */
 
-func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
+func NewMatrix(t ScalarType, rows, cols int, values []float64) *DenseMatrix {
   m := NilMatrix(rows, cols)
-  v := m.Values()
+  v := m.GetValues()
   f := ScalarConstructor(t)
   if len(values) == 1 {
     for i := 0; i < rows*cols; i++ {
@@ -59,11 +59,11 @@ func NewMatrix(t ScalarType, rows, cols int, values []float64) Matrix {
   return m
 }
 
-func NullMatrix(t ScalarType, rows, cols int) Matrix {
+func NullMatrix(t ScalarType, rows, cols int) *DenseMatrix {
   return &DenseMatrix{NullVector(t, rows*cols), rows, cols, false}
 }
 
-func NilMatrix(rows, cols int) Matrix {
+func NilMatrix(rows, cols int) *DenseMatrix {
   return &DenseMatrix{NilVector(rows*cols), rows, cols, false}
 }
 
@@ -72,10 +72,10 @@ func NilMatrix(rows, cols int) Matrix {
 
 func (matrix *DenseMatrix) Clone() Matrix {
   return &DenseMatrix{
-    values: matrix.values.Clone(),
-    rows  : matrix.rows,
-    cols  : matrix.cols,
-    t     : matrix.t}
+    Values    : matrix.Values.Clone(),
+    Rows      : matrix.Rows,
+    Cols      : matrix.Cols,
+    Transposed: matrix.Transposed}
 }
 
 func (a *DenseMatrix) Copy(b Matrix) {
@@ -84,7 +84,7 @@ func (a *DenseMatrix) Copy(b Matrix) {
   if n1 != n2 || m1 != m2 {
     panic("Copy(): Matrix dimension does not match!")
   }
-  a.values.Copy(b.Values())
+  a.Values.Copy(b.GetValues())
 }
 
 /* constructors for special types of matrices
@@ -102,35 +102,35 @@ func IdentityMatrix(t ScalarType, dim int) Matrix {
  * -------------------------------------------------------------------------- */
 
 func (matrix *DenseMatrix) index(i, j int) int {
-  if matrix.t {
-    return j*matrix.rows + i
+  if matrix.Transposed {
+    return j*matrix.Rows + i
   } else {
-    return i*matrix.cols + j
+    return i*matrix.Cols + j
   }
 }
 
 func (matrix *DenseMatrix) Dims() (int, int) {
-  return matrix.rows, matrix.cols
+  return matrix.Rows, matrix.Cols
 }
 
-func (matrix *DenseMatrix) Values() Vector {
-  return matrix.values
+func (matrix *DenseMatrix) GetValues() Vector {
+  return matrix.Values
 }
 
 func (matrix *DenseMatrix) SetValues(v Vector) {
-  matrix.values = v
+  matrix.Values = v
 }
 
 func (matrix *DenseMatrix) Row(i int) Vector {
   n := matrix.index(i, 0)
-  m := matrix.index(i, matrix.cols)
-  return matrix.values[n:m]
+  m := matrix.index(i, matrix.Cols)
+  return matrix.Values[n:m]
 }
 
 func (matrix *DenseMatrix) Col(j int) Vector {
-  v := NilVector(matrix.rows)
-  for i := 0; i < matrix.rows; i++ {
-    v[i] = matrix.values[matrix.index(i, j)]
+  v := NilVector(matrix.Rows)
+  for i := 0; i < matrix.Rows; i++ {
+    v[i] = matrix.Values[matrix.index(i, j)]
   }
   return v
 }
@@ -142,7 +142,7 @@ func (matrix *DenseMatrix) Diag() Vector {
   }
   v := NilVector(n)
   for i := 0; i < n; i++ {
-    v[i] = matrix.values[matrix.index(i, i)]
+    v[i] = matrix.Values[matrix.index(i, i)]
   }
   return v
 }
@@ -164,28 +164,28 @@ func (matrix *DenseMatrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
  * -------------------------------------------------------------------------- */
 
 func (matrix *DenseMatrix) At2(i, j int) Scalar {
-  return matrix.values[matrix.index(i, j)].Clone()
+  return matrix.Values[matrix.index(i, j)].Clone()
 }
 
 func (matrix *DenseMatrix) ReferenceAt2(i, j int) Scalar {
-  return matrix.values[matrix.index(i, j)]
+  return matrix.Values[matrix.index(i, j)]
 }
 
 func (matrix *DenseMatrix) RealReferenceAt2(i, j int) *Real {
-  return matrix.values[matrix.index(i, j)].(*Real)
+  return matrix.Values[matrix.index(i, j)].(*Real)
 }
 
 func (matrix *DenseMatrix) BareRealReferenceAt2(i, j int) *BareReal {
-  return matrix.values[matrix.index(i, j)].(*BareReal)
+  return matrix.Values[matrix.index(i, j)].(*BareReal)
 }
 
 func (matrix *DenseMatrix) Set2(s Scalar, i, j int) {
-  matrix.values[matrix.index(i, j)].Copy(s)
+  matrix.Values[matrix.index(i, j)].Copy(s)
 }
 
 func (matrix *DenseMatrix) SetReference2(s Scalar, i, j int) {
   k := matrix.index(i, j)
-  matrix.values[k] = s
+  matrix.Values[k] = s
 }
 
 /* implement ScalarContainer
@@ -202,28 +202,28 @@ func (matrix *DenseMatrix) At(args ...int) Scalar {
   // c := m.At(0, 0)
   // m.Set(1, 0, 0)
   // which would alter the value of c!
-  return matrix.values[k].Clone()
+  return matrix.Values[k].Clone()
 }
 
 func (matrix *DenseMatrix) ReferenceAt(args ...int) Scalar {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  return matrix.values[k]
+  return matrix.Values[k]
 }
 
 func (matrix *DenseMatrix) Set(s Scalar, args ...int) {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  matrix.values[k].Copy(s)
+  matrix.Values[k].Copy(s)
 }
 
 func (matrix *DenseMatrix) SetReference(s Scalar, args ...int) {
   i := args[0]
   j := args[1]
   k := matrix.index(i, j)
-  matrix.values[k] = s
+  matrix.Values[k] = s
 }
 
 func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) ScalarContainer {
@@ -253,14 +253,14 @@ func (matrix *DenseMatrix) Reduce(f func(Scalar, Scalar) Scalar) Scalar {
 }
 
 func (matrix *DenseMatrix) ElementType() ScalarType {
-  if matrix.rows > 0 && matrix.cols > 0 {
-    return reflect.TypeOf(matrix.values[0])
+  if matrix.Rows > 0 && matrix.Cols > 0 {
+    return reflect.TypeOf(matrix.Values[0])
   }
   return nil
 }
 
 func (matrix *DenseMatrix) Variables(order int) {
-  Variables(order, matrix.values...)
+  Variables(order, matrix.Values...)
 }
 
 /* type conversion
@@ -270,12 +270,12 @@ func (m *DenseMatrix) String() string {
   var buffer bytes.Buffer
 
   buffer.WriteString("[")
-  for i := 0; i < m.rows; i++ {
+  for i := 0; i < m.Rows; i++ {
     if i != 0 {
       buffer.WriteString(",\n ")
     }
     buffer.WriteString("[")
-    for j := 0; j < m.cols; j++ {
+    for j := 0; j < m.Cols; j++ {
       if j != 0 {
         buffer.WriteString(", ")
       }

@@ -42,7 +42,7 @@ func TestRProp(t *testing.T) {
     s := Mnorm(MsubM(MdotM(m1, m2), I))
     return s, nil
   }
-  x, _ := Run(f, m2.Values(), 0.01, []float64{2, 0.1})
+  x, _ := Run(f, m2.GetValues(), 0.01, []float64{2, 0.1})
   m2.SetValues(x)
 
   if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
