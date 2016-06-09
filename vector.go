@@ -146,7 +146,7 @@ type sortVectorByValue Vector
 
 func (v sortVectorByValue) Len() int           { return len(v) }
 func (v sortVectorByValue) Swap(i, j int)      { v[i], v[j] = v[j], v[i] }
-func (v sortVectorByValue) Less(i, j int) bool { return v[i].Value() < v[j].Value() }
+func (v sortVectorByValue) Less(i, j int) bool { return v[i].GetValue() < v[j].GetValue() }
 
 func (v Vector) Sort(reverse bool) Vector {
   if reverse {
@@ -171,7 +171,7 @@ func (v Vector) Matrix(n, m int) Matrix {
 func (v Vector) Slice() []float64 {
   s := make([]float64, len(v))
   for i, _ := range v {
-    s[i] = v[i].Value()
+    s[i] = v[i].GetValue()
   }
   return s
 }

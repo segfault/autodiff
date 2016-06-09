@@ -45,7 +45,7 @@ func TestRProp(t *testing.T) {
   x, _ := Run(f, m2.GetValues(), 0.01, []float64{2, 0.1})
   m2.SetValues(x)
 
-  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).GetValue() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }
@@ -82,7 +82,7 @@ func TestRPropRosenbrock(t *testing.T) {
     Hook{hook},
     Epsilon{1e-10})
 
-  if Vnorm(VsubV(xn, xr)).Value() > 1e-8 {
+  if Vnorm(VsubV(xn, xr)).GetValue() > 1e-8 {
     t.Error("Rosenbrock test failed!")
   }
 }

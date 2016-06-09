@@ -28,8 +28,8 @@ func TestProbability(t *testing.T) {
 
   a := NewProbability(2)
 
-  if math.Abs(a.LogValue() - math.Log(2.0)) > 1e-8 {
-    t.Error("a.Value() should be 1.0")
+  if math.Abs(a.GetLogValue() - math.Log(2.0)) > 1e-8 {
+    t.Error("a.GetValue() should be 1.0")
   }
 }
 
@@ -148,7 +148,7 @@ func TestProbabilityDiff1(t *testing.T) {
 
     c := Add(a, b)
 
-    if math.Abs(c.Derivative(1, 0) - 1.0) > 1e-8 {
+    if math.Abs(c.GetDerivative(1, 0) - 1.0) > 1e-8 {
       t.Error("Probability differentiation test 1 failed")
     }
   }
@@ -159,7 +159,7 @@ func TestProbabilityDiff1(t *testing.T) {
 
     c := Mul(a, b)
 
-    if math.Abs(c.Derivative(1, 0) - 3.0) > 1e-8 {
+    if math.Abs(c.GetDerivative(1, 0) - 3.0) > 1e-8 {
       t.Error("Probability differentiation test 2 failed")
     }
   }
@@ -169,7 +169,7 @@ func TestProbabilityDiff1(t *testing.T) {
 
     c := Neg(Mul(a, a))
 
-    if math.Abs(c.Derivative(1, 0) + 4.0) > 1e-8 {
+    if math.Abs(c.GetDerivative(1, 0) + 4.0) > 1e-8 {
       t.Error("Probability differentiation test 3 failed")
     }
   }
@@ -180,7 +180,7 @@ func TestProbabilityDiff1(t *testing.T) {
 
     c := Pow(a, NewBareReal(13))
 
-    if math.Abs(c.Derivative(1, 0) - 13*math.Pow(2.0, 12)) > 1e-8 {
+    if math.Abs(c.GetDerivative(1, 0) - 13*math.Pow(2.0, 12)) > 1e-8 {
       t.Error("Probability differentiation test 4 failed")
     }
   }
@@ -191,7 +191,7 @@ func TestProbabilityDiff1(t *testing.T) {
 
     c := Div(a, b)
 
-    if math.Abs(c.Derivative(1, 0) + 2.0/math.Pow(3.0, 2)) > 1e-8 {
+    if math.Abs(c.GetDerivative(1, 0) + 2.0/math.Pow(3.0, 2)) > 1e-8 {
       t.Error("Probability differentiation test 5 failed")
     }
   }
@@ -225,15 +225,15 @@ func TestMultinomialLikelihood(t *testing.T) {
 
   l := likelihood(theta, 13, 17)
 
-  if math.IsNaN(l.Value()) {
+  if math.IsNaN(l.GetValue()) {
     t.Error("result is NaN")
   }
   // first derivative at the mode should be zero
-  if math.Abs(l.Derivative(1, 0)) > 1e-12 {
-    t.Error("l.Derivative(1) should be 0.0")
+  if math.Abs(l.GetDerivative(1, 0)) > 1e-12 {
+    t.Error("l.GetDerivative(1) should be 0.0")
   }
   // second derivative at the mode should be negative
-  if l.Derivative(2, 0) >= 0.0 {
-    t.Error("l.Derivative(2) should be negative")
+  if l.GetDerivative(2, 0) >= 0.0 {
+    t.Error("l.GetDerivative(2) should be negative")
   }
 }

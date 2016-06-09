@@ -44,7 +44,7 @@ func TestRProp(t *testing.T) {
   x, _ := Run(f, m2.GetValues(), 0.01)
   m2.SetValues(x)
 
-  if Mnorm(MsubM(m2, m3)).Value() > 1e-8 {
+  if Mnorm(MsubM(m2, m3)).GetValue() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }

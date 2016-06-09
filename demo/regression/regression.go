@@ -73,11 +73,11 @@ func main() {
 
   for i := 0; i < n; i++ {
     x[i] = NewScalar(RealType, r.NormFloat64() + 0)
-    y[i] = NewScalar(RealType, r.NormFloat64() + 2*x[i].Value()+1)
+    y[i] = NewScalar(RealType, r.NormFloat64() + 2*x[i].GetValue()+1)
   }
 
   l := NewLine(NewScalar(RealType, -1.23), NewScalar(RealType, 1));
   l  = gradientDescent(x, y, l)
 
-  fmt.Println("slope: ", l.Slope().Value(), "intercept: ", l.Intercept().Value())
+  fmt.Println("slope: ", l.Slope().GetValue(), "intercept: ", l.Intercept().GetValue())
 }

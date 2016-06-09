@@ -54,7 +54,7 @@ func gradientDescent(f func(Vector) (Scalar, error), x0 Vector, step, epsilon fl
     // compute partial derivatives and update variables
     for i, _ := range x {
       // save partial derivative
-      gradient[i] = s.Derivative(1, i)
+      gradient[i] = s.GetDerivative(1, i)
     }
     // execute hook if available
     if hook != nil && hook(gradient, x, s) {
@@ -66,8 +66,8 @@ func gradientDescent(f func(Vector) (Scalar, error), x0 Vector, step, epsilon fl
     }
     // update variables
     for i, _ := range x {
-      x[i] = Sub(x[i], NewScalar(t, step*s.Derivative(1, i)))
-      if math.IsNaN(x[i].Value()) {
+      x[i] = Sub(x[i], NewScalar(t, step*s.GetDerivative(1, i)))
+      if math.IsNaN(x[i].GetValue()) {
         panic("Gradient descent diverged!")
       }
     }

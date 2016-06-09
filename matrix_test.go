@@ -29,7 +29,7 @@ func TestMatrix(t *testing.T) {
   m1 := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
   m2 := m1.T()
 
-  if m1.At(1,2).Value() != m2.At(2,1).Value() {
+  if m1.At(1,2).GetValue() != m2.At(2,1).GetValue() {
     t.Error("Matrix transpose failed!")
   }
 }
@@ -43,10 +43,10 @@ func TestMatrixRowCol(t *testing.T) {
   v1.Set(NewReal(100), 0)
   v2.Set(NewReal(200), 0)
 
-  if m.At(1,0).Value() != 100 {
+  if m.At(1,0).GetValue() != 100 {
     t.Error("Matrix Row() test failed!")
   }
-  if m.At(0,2).Value() != 200 {
+  if m.At(0,2).GetValue() != 200 {
     t.Error("Matrix Col() test failed!")
   }
   if len(v1) != 3 {
@@ -62,9 +62,9 @@ func TestMatrixDiag(t *testing.T) {
   m := NewDenseMatrix(RealType, 3, 3, []float64{1,2,3,4,5,6,7,8,9})
   v := m.Diag()
 
-  if v[0].Value() != 1 ||
-     v[1].Value() != 5 ||
-     v[2].Value() != 9 {
+  if v[0].GetValue() != 1 ||
+     v[1].GetValue() != 5 ||
+     v[2].GetValue() != 9 {
     t.Error("Matrix diag failed!")
   }
 }
@@ -77,14 +77,14 @@ func TestMatrixReference(t *testing.T) {
   m.Set(c, 0, 0)
   c.SetValue(400)
 
-  if m.At(0,0).Value() != 163 {
+  if m.At(0,0).GetValue() != 163 {
     t.Error("Matrix transpose failed!")
   }
 
   m.Set(Sub(m.At(1,2), Mul(m.At(1,1), m.At(1,2))),
     1, 2)
 
-  if m.At(1,2).Value() != -24 {
+  if m.At(1,2).GetValue() != -24 {
     t.Error("Matrix transpose failed!")
   }
 }
@@ -95,7 +95,7 @@ func TestSubmatrix(t *testing.T) {
   m := a.Submatrix(1,2,0,1)
   r := NewDenseMatrix(RealType, 2, 2, []float64{4,5,7,8})
 
-  if Mnorm(MsubM(r, m)).Value() > 1e-8  {
+  if Mnorm(MsubM(r, m)).GetValue() > 1e-8  {
     t.Error("Submatrix failed!")
   }
 }
@@ -104,7 +104,7 @@ func TestMatrixTrace(t *testing.T) {
 
   m1 := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
-  if Mtrace(m1).Value() != 5 {
+  if Mtrace(m1).GetValue() != 5 {
     t.Error("Wrong matrix trace!")
   }
 }
@@ -115,7 +115,7 @@ func TestMatrixDot(t *testing.T) {
   m2 := m1.T()
   m3 := MdotM(m1, m2)
 
-  if m3.At(0,0).Value() != 14 {
+  if m3.At(0,0).GetValue() != 14 {
     t.Error("Matrix multiplication failed!")
   }
 }
@@ -126,7 +126,7 @@ func TestMatrixMul(t *testing.T) {
   m2 := NewDenseMatrix(RealType, 2, 3, []float64{6,5,4,3,2,1})
   m3 := MmulM(m1, m2)
 
-  if m3.At(0,0).Value() != 6 {
+  if m3.At(0,0).GetValue() != 6 {
     t.Error("Matrix multiplication failed!")
   }
 }
@@ -138,7 +138,7 @@ func TestMatrixMdotV(t *testing.T) {
   v2 := MdotV(m1, v1)
   v3 := NewVector(RealType, []float64{5, 11})
 
-  if Vnorm(VsubV(v2, v3)).Value() > 1e-8  {
+  if Vnorm(VsubV(v2, v3)).GetValue() > 1e-8  {
     t.Error("Matrix/Vector multiplication failed!")
   }
 }
@@ -150,7 +150,7 @@ func TestMatrixVdotM(t *testing.T) {
   v2 := VdotM(v1, m1)
   v3 := NewVector(RealType, []float64{7, 10})
 
-  if Vnorm(VsubV(v2, v3)).Value() > 1e-8  {
+  if Vnorm(VsubV(v2, v3)).GetValue() > 1e-8  {
     t.Error("Matrix/Vector multiplication failed!")
   }
 }
@@ -163,10 +163,10 @@ func TestMatrixMapReduce(t *testing.T) {
   m.Map(Exp)
   a := m.Reduce(Add)
 
-  if Mnorm(MsubM(m, r1)).Value() > 1e-8  {
+  if Mnorm(MsubM(m, r1)).GetValue() > 1e-8  {
     t.Error("Matrix/Vector multiplication failed!")
   }
-  if math.Abs(a.Value() - r2) > 1e-2 {
+  if math.Abs(a.GetValue() - r2) > 1e-2 {
     t.Error("Vector map/reduce failed!")
   }
 }
@@ -180,7 +180,7 @@ func TestOuter(t *testing.T) {
     6,3,0,9,
     4,2,0,6 })
 
-  if Mnorm(MsubM(r, m)).Value() > 1e-8  {
+  if Mnorm(MsubM(r, m)).GetValue() > 1e-8  {
     t.Error("Outer product multiplication failed!")
   }
 
@@ -206,7 +206,7 @@ func TestMatrixJacobian(t *testing.T) {
   m1 := Jacobian(f, v1)
   m2 := NewDenseMatrix(RealType, 3, 2, []float64{2, 2, 3, -2, 0, 0})
 
-  if Mnorm(MsubM(m1, m2)).Value() > 1e-8 {
+  if Mnorm(MsubM(m1, m2)).GetValue() > 1e-8 {
     t.Error("Inverting matrix failed!")
   }
 }
@@ -219,7 +219,7 @@ func TestReadMatrix(t *testing.T) {
   }
   r := NewDenseMatrix(RealType, 2, 3, []float64{1,2,3,4,5,6})
 
-  if Mnorm(MsubM(m, r)).Value() != 0.0 {
+  if Mnorm(MsubM(m, r)).GetValue() != 0.0 {
     t.Error("Read matrix failed!")
   }
 }

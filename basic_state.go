@@ -24,10 +24,10 @@ import "math"
 
 // This is the basic state used by real and probability scalars.
 type BasicState struct {
-  value            float64
-  order            int
-  derivative  [][2]float64
-  n                int
+  Value            float64
+  Order            int
+  Derivative  [][2]float64
+  N                int
 }
 
 /* constructors
@@ -37,9 +37,9 @@ type BasicState struct {
 // for which derivatives are computed may be passed.
 func NewBasicState(value float64) *BasicState {
   a := BasicState{}
-  a.value = value
-  a.order = 0
-  a.n     = 0
+  a.Value = value
+  a.Order = 0
+  a.N     = 0
   return &a
 }
 
@@ -47,32 +47,32 @@ func NewBasicState(value float64) *BasicState {
 
 // Copy the basic state from b. Allocate memory if needed.
 func (a *BasicState) Copy(b Scalar) {
-  a.value = b.Value()
-  a.order = b.Order()
-  a.Alloc(b.N())
-  for i := 0; i < b.N(); i++ {
-    a.derivative[i][0] = b.Derivative(1, i)
-    a.derivative[i][1] = b.Derivative(2, i)
+  a.Value = b.GetValue()
+  a.Order = b.GetOrder()
+  a.Alloc(b.GetN())
+  for i := 0; i < b.GetN(); i++ {
+    a.Derivative[i][0] = b.GetDerivative(1, i)
+    a.Derivative[i][1] = b.GetDerivative(2, i)
   }
 }
 
 // Allocate memory for derivatives of n variables.
 func (a *BasicState) Alloc(n int) {
-  if a.n != n {
-    a.derivative = make([][2]float64, n)
-    a.n          = n
+  if a.N != n {
+    a.Derivative = make([][2]float64, n)
+    a.N          = n
   }
 }
 
 // Allocate memory for the results of mathematical operations on
 // the given variables.
 func (c *BasicState) AllocForOne(a Scalar) {
-  c.Alloc(a.N())
-  c.order = a.Order()
+  c.Alloc(a.GetN())
+  c.Order = a.GetOrder()
 }
 func (c *BasicState) AllocForTwo(a, b Scalar) {
-  c.Alloc(iMax(a.N(), b.N()))
-  c.order = iMax(a.Order(), b.Order())
+  c.Alloc(iMax(a.GetN(), b.GetN()))
+  c.Order = iMax(a.GetOrder(), b.GetOrder())
 }
 
 /* read access
@@ -81,45 +81,45 @@ func (c *BasicState) AllocForTwo(a, b Scalar) {
 // Indicates the maximal order of derivatives that are computed for this
 // variable. `0' means no derivatives, `1' only the first derivative, and
 // `2' the first and second derivative.
-func (a *BasicState) Order() int {
-  return a.order
+func (a *BasicState) GetOrder() int {
+  return a.Order
 }
 
 // Returns the value of the variable.
-func (a *BasicState) Value() float64 {
-  return a.value
+func (a *BasicState) GetValue() float64 {
+  return a.Value
 }
 
 // Returns the value of the variable on log scale.
-func (a *BasicState) LogValue() float64 {
-  return math.Log(a.value)
+func (a *BasicState) GetLogValue() float64 {
+  return math.Log(a.Value)
 }
 
 // Returns the ith derivative of the jth variable.
-func (a *BasicState) Derivative(i, j int) float64 {
+func (a *BasicState) GetDerivative(i, j int) float64 {
   if i != 1 && i != 2 {
     panic("Invalid order!")
   }
-  if a.n > 0 {
-    return a.derivative[j][i-1]
+  if a.N > 0 {
+    return a.Derivative[j][i-1]
   } else {
     return 0.0
   }
 }
 
 // Number of variables for which derivates are stored.
-func (a *BasicState) N() int {
-  return a.n
+func (a *BasicState) GetN() int {
+  return a.N
 }
 
 /* write access
  * -------------------------------------------------------------------------- */
 
 func (a *BasicState) Reset() {
-  a.value = 0.0
-  for i := 0; i < a.n; i++ {
-    a.derivative[i][0] = 0.0
-    a.derivative[i][1] = 0.0
+  a.Value = 0.0
+  for i := 0; i < a.N; i++ {
+    a.Derivative[i][0] = 0.0
+    a.Derivative[i][1] = 0.0
   }
 }
 
@@ -130,12 +130,12 @@ func (a *BasicState) Set(b Scalar) {
 
 // Set only the value of the variable.
 func (a *BasicState) SetValue(v float64) {
-  a.value = v
-  // for i := 0; i < len(a.derivative); i++ {
-  //   if a.derivative[i][0] != 0.0 {
-  //     a.derivative[i][0] = 1
+  a.Value = v
+  // for i := 0; i < len(a.Derivative); i++ {
+  //   if a.Derivative[i][0] != 0.0 {
+  //     a.Derivative[i][0] = 1
   //   }
-  //   a.derivative[i][1] = 0
+  //   a.Derivative[i][1] = 0
   // }
 }
 
@@ -144,16 +144,16 @@ func (a *BasicState) SetDerivative(i, j int, v float64) {
   if i != 1 && i != 2 {
     panic("Invalid order!")
   }
-  a.derivative[j][i-1] = v
+  a.Derivative[j][i-1] = v
 }
 
 // Allocate memory for n variables and set the derivative
 // of the ith variable to 1 (initial value).
 func (a *BasicState) SetVariable(i, n, order int) {
-  a.derivative = make([][2]float64, n)
-  a.n          = n
-  a.order      = order
+  a.Derivative = make([][2]float64, n)
+  a.N          = n
+  a.Order      = order
   if order > 0 {
-    a.derivative[i][0] = 1
+    a.Derivative[i][0] = 1
   }
 }

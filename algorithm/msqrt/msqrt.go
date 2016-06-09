@@ -46,7 +46,7 @@ func mSqrt(matrix Matrix) (Matrix, error) {
   }
   Y1 := MmulS(MaddM(Y0, t1), c)
   Z1 := MmulS(MaddM(Z0, t2), c)
-  for Mnorm(MsubM(Y0, Y1)).Value() > 1e-8 {
+  for Mnorm(MsubM(Y0, Y1)).GetValue() > 1e-8 {
     Y0 = Y1
     Z0 = Z1
     t1, err := matrixInverse.Run(Z0)

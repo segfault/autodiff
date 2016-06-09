@@ -54,7 +54,7 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error 
       if !submatrix[j] {
         continue
       }
-      if math.Abs(a.RealReferenceAt(p[j], i).Value()) > math.Abs(a.RealReferenceAt(p[maxrow], i).Value()) {
+      if math.Abs(a.RealReferenceAt(p[j], i).GetValue()) > math.Abs(a.RealReferenceAt(p[maxrow], i).GetValue()) {
         maxrow = j
       }
     }
@@ -104,7 +104,7 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error 
       t.RealMul(a.RealReferenceAt(p[j], i), b[p[i]].(*Real))
       t.RealDiv(t, c)
       b[p[j]].(*Real).RealSub(b[p[j]].(*Real), t)
-      if math.IsNaN(b[p[j]].(*Real).Value()) {
+      if math.IsNaN(b[p[j]].(*Real).GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -116,7 +116,7 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error 
         t.RealMul(a.RealReferenceAt(p[j], i), x.RealReferenceAt(p[i], k))
         t.RealDiv(t, c)
         x.RealReferenceAt(p[j], k).RealSub(x.RealReferenceAt(p[j], k), t)
-        if math.IsNaN(x.RealReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(x.RealReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
@@ -129,13 +129,13 @@ func gaussJordan_RealDense(a, x *DenseMatrix, b Vector, submatrix []bool) error 
         t.RealMul(a.RealReferenceAt(p[j], i), a.RealReferenceAt(p[i], k))
         t.RealDiv(t, c)
         a.RealReferenceAt(p[j], k).RealSub(a.RealReferenceAt(p[j], k), t)
-        if math.IsNaN(a.RealReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(a.RealReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
     }
     a.RealReferenceAt(p[i], i).RealDiv(a.RealReferenceAt(p[i], i), c)
-    if math.IsNaN(a.RealReferenceAt(p[i], i).Value()) {
+    if math.IsNaN(a.RealReferenceAt(p[i], i).GetValue()) {
       goto singular
     }
     // normalize ith row in x
@@ -182,7 +182,7 @@ func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bo
       t.RealMul(a.RealReferenceAt(j, i), b.RealReferenceAt(i))
       t.RealDiv(t, c)
       b.RealReferenceAt(j).RealSub(b.RealReferenceAt(j), t)
-      if math.IsNaN(b.RealReferenceAt(j).Value()) {
+      if math.IsNaN(b.RealReferenceAt(j).GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -194,7 +194,7 @@ func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bo
         t.RealMul(a.RealReferenceAt(j, i), x.RealReferenceAt(i, k))
         t.RealDiv(t, c)
         x.RealReferenceAt(j, k).RealSub(x.RealReferenceAt(j, k), t)
-        if math.IsNaN(x.RealReferenceAt(j, k).Value()) {
+        if math.IsNaN(x.RealReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
@@ -207,13 +207,13 @@ func gaussJordanTriangular_RealDense(a, x *DenseMatrix, b Vector, submatrix []bo
         t.RealMul(a.RealReferenceAt(j, i), a.RealReferenceAt(i, k))
         t.RealDiv(t, c)
         a.RealReferenceAt(j, k).RealSub(a.RealReferenceAt(j, k),t)
-        if math.IsNaN(a.RealReferenceAt(j, k).Value()) {
+        if math.IsNaN(a.RealReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
     }
     a.RealReferenceAt(i, i).RealDiv(a.RealReferenceAt(i, i), c)
-    if math.IsNaN(a.RealReferenceAt(i, i).Value()) {
+    if math.IsNaN(a.RealReferenceAt(i, i).GetValue()) {
       goto singular
     }
     // normalize ith row in x
@@ -261,7 +261,7 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) er
       if !submatrix[j] {
         continue
       }
-      if math.Abs(a.BareRealReferenceAt(p[j], i).Value()) > math.Abs(a.BareRealReferenceAt(p[maxrow], i).Value()) {
+      if math.Abs(a.BareRealReferenceAt(p[j], i).GetValue()) > math.Abs(a.BareRealReferenceAt(p[maxrow], i).GetValue()) {
         maxrow = j
       }
     }
@@ -311,7 +311,7 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) er
       t.BareRealMul(a.BareRealReferenceAt(p[j], i), b.BareRealReferenceAt(p[i]))
       t.BareRealDiv(t, c)
       b.BareRealReferenceAt(p[j]).BareRealSub(b.BareRealReferenceAt(p[j]), t)
-      if math.IsNaN(b.BareRealReferenceAt(p[j]).Value()) {
+      if math.IsNaN(b.BareRealReferenceAt(p[j]).GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -323,7 +323,7 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) er
         t.BareRealMul(a.BareRealReferenceAt(p[j], i), x.BareRealReferenceAt(p[i], k))
         t.BareRealDiv(t, c)
         x.BareRealReferenceAt(p[j], k).BareRealSub(x.BareRealReferenceAt(p[j], k), t)
-        if math.IsNaN(x.BareRealReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(x.BareRealReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
@@ -336,13 +336,13 @@ func gaussJordan_BareRealDense(a, x *DenseMatrix, b Vector, submatrix []bool) er
         t.BareRealMul(a.BareRealReferenceAt(p[j], i), a.BareRealReferenceAt(p[i], k))
         t.BareRealDiv(t, c)
         a.BareRealReferenceAt(p[j], k).BareRealSub(a.BareRealReferenceAt(p[j], k), t)
-        if math.IsNaN(a.BareRealReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(a.BareRealReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
     }
     a.BareRealReferenceAt(p[i], i).BareRealDiv(a.BareRealReferenceAt(p[i], i), c)
-    if math.IsNaN(a.BareRealReferenceAt(p[i], i).Value()) {
+    if math.IsNaN(a.BareRealReferenceAt(p[i], i).GetValue()) {
       goto singular
     }
     // normalize ith row in x
@@ -389,7 +389,7 @@ func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix 
       t.BareRealMul(a.BareRealReferenceAt(j, i), b.BareRealReferenceAt(i))
       t.BareRealDiv(t, c)
       b.BareRealReferenceAt(j).BareRealSub(b.BareRealReferenceAt(j), t)
-      if math.IsNaN(b.BareRealReferenceAt(j).Value()) {
+      if math.IsNaN(b.BareRealReferenceAt(j).GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -401,7 +401,7 @@ func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix 
         t.BareRealMul(a.BareRealReferenceAt(j, i), x.BareRealReferenceAt(i, k))
         t.BareRealDiv(t, c)
         x.BareRealReferenceAt(j, k).BareRealSub(x.BareRealReferenceAt(j, k), t)
-        if math.IsNaN(x.BareRealReferenceAt(j, k).Value()) {
+        if math.IsNaN(x.BareRealReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
@@ -414,13 +414,13 @@ func gaussJordanTriangular_BareRealDense(a, x *DenseMatrix, b Vector, submatrix 
         t.BareRealMul(a.BareRealReferenceAt(j, i), a.BareRealReferenceAt(i, k))
         t.BareRealDiv(t, c)
         a.BareRealReferenceAt(j, k).BareRealSub(a.BareRealReferenceAt(j, k),t)
-        if math.IsNaN(a.BareRealReferenceAt(j, k).Value()) {
+        if math.IsNaN(a.BareRealReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
     }
     a.BareRealReferenceAt(i, i).BareRealDiv(a.BareRealReferenceAt(i, i), c)
-    if math.IsNaN(a.BareRealReferenceAt(i, i).Value()) {
+    if math.IsNaN(a.BareRealReferenceAt(i, i).GetValue()) {
       goto singular
     }
     // normalize ith row in x

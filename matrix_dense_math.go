@@ -404,7 +404,7 @@ func (r *DenseMatrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   // copy derivatives
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
+      r.ReferenceAt(i, j).SetValue(y[i].GetDerivative(1, j))
     }
   }
   return r
@@ -425,7 +425,7 @@ func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   // copy derivatives
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
+      r.ReferenceAt(i, j).SetValue(y[i].GetDerivative(1, j))
     }
   }
   return r

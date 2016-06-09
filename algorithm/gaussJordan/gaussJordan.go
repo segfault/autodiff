@@ -64,7 +64,7 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool) error {
       if !submatrix[j] {
         continue
       }
-      if math.Abs(a.ReferenceAt(p[j], i).Value()) > math.Abs(a.ReferenceAt(p[maxrow], i).Value()) {
+      if math.Abs(a.ReferenceAt(p[j], i).GetValue()) > math.Abs(a.ReferenceAt(p[maxrow], i).GetValue()) {
         maxrow = j
       }
     }
@@ -114,7 +114,7 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool) error {
       t.Mul(a.ReferenceAt(p[j], i), b[p[i]])
       t.Div(t, c)
       b[p[j]].Sub(b[p[j]], t)
-      if math.IsNaN(b[p[j]].Value()) {
+      if math.IsNaN(b[p[j]].GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -126,7 +126,7 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool) error {
         t.Mul(a.ReferenceAt(p[j], i), x.ReferenceAt(p[i], k))
         t.Div(t, c)
         x.ReferenceAt(p[j], k).Sub(x.ReferenceAt(p[j], k), t)
-        if math.IsNaN(x.ReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(x.ReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
@@ -139,13 +139,13 @@ func gaussJordan(a, x Matrix, b Vector, submatrix []bool) error {
         t.Mul(a.ReferenceAt(p[j], i), a.ReferenceAt(p[i], k))
         t.Div(t, c)
         a.ReferenceAt(p[j], k).Sub(a.ReferenceAt(p[j], k), t)
-        if math.IsNaN(a.ReferenceAt(p[j], k).Value()) {
+        if math.IsNaN(a.ReferenceAt(p[j], k).GetValue()) {
           goto singular
         }
       }
     }
     a.ReferenceAt(p[i], i).Div(a.ReferenceAt(p[i], i), c)
-    if math.IsNaN(a.ReferenceAt(p[i], i).Value()) {
+    if math.IsNaN(a.ReferenceAt(p[i], i).GetValue()) {
       goto singular
     }
     // normalize ith row in x
@@ -192,7 +192,7 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) error {
       t.Mul(a.ReferenceAt(j, i), b[i])
       t.Div(t, c)
       b[j].Sub(b[j], t)
-      if math.IsNaN(b[j].Value()) {
+      if math.IsNaN(b[j].GetValue()) {
         goto singular
       }
       // loop over colums in x
@@ -204,7 +204,7 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) error {
         t.Mul(a.ReferenceAt(j, i), x.ReferenceAt(i, k))
         t.Div(t, c)
         x.ReferenceAt(j, k).Sub(x.ReferenceAt(j, k), t)
-        if math.IsNaN(x.ReferenceAt(j, k).Value()) {
+        if math.IsNaN(x.ReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
@@ -217,13 +217,13 @@ func gaussJordanTriangular(a, x Matrix, b Vector, submatrix []bool) error {
         t.Mul(a.ReferenceAt(j, i), a.ReferenceAt(i, k))
         t.Div(t, c)
         a.ReferenceAt(j, k).Sub(a.ReferenceAt(j, k),t)
-        if math.IsNaN(a.ReferenceAt(j, k).Value()) {
+        if math.IsNaN(a.ReferenceAt(j, k).GetValue()) {
           goto singular
         }
       }
     }
     a.ReferenceAt(i, i).Div(a.ReferenceAt(i, i), c)
-    if math.IsNaN(a.ReferenceAt(i, i).Value()) {
+    if math.IsNaN(a.ReferenceAt(i, i).GetValue()) {
       goto singular
     }
     // normalize ith row in x

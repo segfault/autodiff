@@ -58,13 +58,13 @@ func (a *BareReal) Type() ScalarType {
  * -------------------------------------------------------------------------- */
 
 func (a *BareReal) String() string {
-  return fmt.Sprintf("%e", a.Value())
+  return fmt.Sprintf("%e", a.GetValue())
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (a *BareReal) Copy(b Scalar) {
-  *a = BareReal(b.Value())
+  *a = BareReal(b.GetValue())
 }
 
 func (a *BareReal) Alloc(n int) {
@@ -79,23 +79,23 @@ func (c *BareReal) AllocForTwo(a, b Scalar) {
 /* read access
  * -------------------------------------------------------------------------- */
 
-func (a *BareReal) Order() int {
+func (a *BareReal) GetOrder() int {
   return 0
 }
 
-func (a *BareReal) Value() float64 {
+func (a *BareReal) GetValue() float64 {
   return float64(*a)
 }
 
-func (a *BareReal) LogValue() float64 {
-  return math.Log(a.Value())
+func (a *BareReal) GetLogValue() float64 {
+  return math.Log(a.GetValue())
 }
 
-func (a *BareReal) Derivative(i, j int) float64 {
+func (a *BareReal) GetDerivative(i, j int) float64 {
   return 0.0
 }
 
-func (a *BareReal) N() int {
+func (a *BareReal) GetN() int {
   return 0
 }
 
@@ -107,7 +107,7 @@ func (a *BareReal) Reset() {
 }
 
 func (a *BareReal) Set(b Scalar) {
-  *a = BareReal(b.Value())
+  *a = BareReal(b.GetValue())
 }
 
 func (a *BareReal) SetValue(v float64) {

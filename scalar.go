@@ -35,11 +35,11 @@ type ScalarState interface {
   AllocForOne   (Scalar)
   AllocForTwo   (Scalar, Scalar)
   // read access
-  Order         ()             int
-  Value         ()             float64
-  LogValue      ()             float64
-  Derivative    (int, int)     float64
-  N             ()             int
+  GetOrder      ()             int
+  GetValue      ()             float64
+  GetLogValue   ()             float64
+  GetDerivative (int, int)     float64
+  GetN          ()             int
   // set value and derivatives to zero
   Reset         ()
   // write access

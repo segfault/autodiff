@@ -47,7 +47,7 @@ func cholesky(A Matrix) (Matrix, error) {
       }
       t.Sub(A.ReferenceAt(i, j), s)
       if i == j {
-        if t.Value() < 0.0 {
+        if t.GetValue() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
         L.ReferenceAt(i, j).Sqrt(t)
@@ -76,7 +76,7 @@ func choleskyInSitu(A Matrix) (Matrix, error) {
       }
       if i == j {
         t.Sub(Aii, s)
-        if t.Value() < 0.0 {
+        if t.GetValue() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
         A.ReferenceAt(j, i).Sqrt(t)

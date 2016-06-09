@@ -42,7 +42,7 @@ func TestBlahut(t *testing.T) {
   pxn := Run(channel, px0, 1000)
 
   for i := 0; i < len(px0); i++ {
-    if math.Abs(pxn[i].Value() - pxstar[i]) > 1e-5 {
+    if math.Abs(pxn[i].GetValue() - pxstar[i]) > 1e-5 {
       t.Error("Blahut test failed!")
     }
   }
