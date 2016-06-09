@@ -20,12 +20,11 @@ package autodiff
 
 import "fmt"
 import "reflect"
+import "math"
 
 /* -------------------------------------------------------------------------- */
 
-type BareReal struct {
-  BareState
-}
+type BareReal float64
 
 /* register scalar type
  * -------------------------------------------------------------------------- */
@@ -41,13 +40,14 @@ func init() {
  * -------------------------------------------------------------------------- */
 
 func NewBareReal(v float64) *BareReal {
-  return &BareReal{*NewBareState(v)}
+  r := BareReal(v)
+  return &r
 }
 
 /* -------------------------------------------------------------------------- */
 
 func (a *BareReal) Clone() Scalar {
-  return NewBareReal(a.value)
+  return NewBareReal(float64(*a))
 }
 
 func (a *BareReal) Type() ScalarType {
@@ -59,4 +59,63 @@ func (a *BareReal) Type() ScalarType {
 
 func (a *BareReal) String() string {
   return fmt.Sprintf("%e", a.Value())
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (a *BareReal) Copy(b Scalar) {
+  *a = BareReal(b.Value())
+}
+
+func (a *BareReal) Alloc(n int) {
+}
+
+func (c *BareReal) AllocForOne(a Scalar) {
+}
+
+func (c *BareReal) AllocForTwo(a, b Scalar) {
+}
+
+/* read access
+ * -------------------------------------------------------------------------- */
+
+func (a *BareReal) Order() int {
+  return 0
+}
+
+func (a *BareReal) Value() float64 {
+  return float64(*a)
+}
+
+func (a *BareReal) LogValue() float64 {
+  return math.Log(a.Value())
+}
+
+func (a *BareReal) Derivative(i, j int) float64 {
+  return 0.0
+}
+
+func (a *BareReal) N() int {
+  return 0
+}
+
+/* write access
+ * -------------------------------------------------------------------------- */
+
+func (a *BareReal) Reset() {
+  *a = 0.0
+}
+
+func (a *BareReal) Set(b Scalar) {
+  *a = BareReal(b.Value())
+}
+
+func (a *BareReal) SetValue(v float64) {
+  *a = BareReal(v)
+}
+
+func (a *BareReal) SetDerivative(i, j int, v float64) {
+}
+
+func (a *BareReal) SetVariable(i, n, order int) {
 }

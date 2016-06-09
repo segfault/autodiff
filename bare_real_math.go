@@ -66,12 +66,12 @@ func (a *BareReal) BareRealSmaller(b *BareReal) bool {
 
 func (c *BareReal) Neg(a Scalar) Scalar {
   checkBare(a)
-  c.value = -a.Value()
+  *c = BareReal(-a.Value())
   return c
 }
 
 func (c *BareReal) BareRealNeg(a *BareReal) *BareReal {
-  c.value = -a.Value()
+  *c = BareReal(-a.Value())
   return c
 }
 
@@ -80,12 +80,12 @@ func (c *BareReal) BareRealNeg(a *BareReal) *BareReal {
 func (c *BareReal) Add(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
-  c.value = a.Value() + b.Value()
+  *c = BareReal(a.Value() + b.Value())
   return c
 }
 
 func (c *BareReal) BareRealAdd(a, b *BareReal) *BareReal {
-  c.value = a.Value() + b.Value()
+  *c = *a + *b
   return c
 }
 
@@ -94,12 +94,12 @@ func (c *BareReal) BareRealAdd(a, b *BareReal) *BareReal {
 func (c *BareReal) Sub(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
-  c.value = a.Value() - b.Value()
+  *c = BareReal(a.Value() - b.Value())
   return c
 }
 
 func (c *BareReal) BareRealSub(a, b *BareReal) *BareReal {
-  c.value = a.Value() - b.Value()
+  *c = *a - *b
   return c
 }
 
@@ -108,12 +108,12 @@ func (c *BareReal) BareRealSub(a, b *BareReal) *BareReal {
 func (c *BareReal) Mul(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
-  c.value = a.Value() * b.Value()
+  *c = BareReal(a.Value() * b.Value())
   return c
 }
 
 func (c *BareReal) BareRealMul(a, b *BareReal) *BareReal {
-  c.value = a.Value() * b.Value()
+  *c = *a * *b
   return c
 }
 
@@ -122,12 +122,12 @@ func (c *BareReal) BareRealMul(a, b *BareReal) *BareReal {
 func (c *BareReal) Div(a, b Scalar) Scalar {
   checkBare(a)
   checkBare(b)
-  c.value = a.Value() / b.Value()
+  *c = BareReal(a.Value() / b.Value())
   return c
 }
 
 func (c *BareReal) BareRealDiv(a, b *BareReal) *BareReal {
-  c.value = a.Value() / b.Value()
+  *c = *a / *b
   return c
 }
 
@@ -136,12 +136,12 @@ func (c *BareReal) BareRealDiv(a, b *BareReal) *BareReal {
 func (c *BareReal) Pow(a, k Scalar) Scalar {
   checkBare(a)
   checkBare(k)
-  c.value = math.Pow(a.Value(), k.Value())
+  *c = BareReal(math.Pow(a.Value(), k.Value()))
   return c
 }
 
 func (c *BareReal) BareRealPow(a, k *BareReal) *BareReal {
-  c.value = math.Pow(a.Value(), k.Value())
+  *c = BareReal(math.Pow(a.Value(), k.Value()))
   return c
 }
 
@@ -160,73 +160,73 @@ func (c *BareReal) BareRealSqrt(a *BareReal) *BareReal {
 
 func (c *BareReal) Sin(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Sin(a.Value())
+  *c = BareReal(math.Sin(a.Value()))
   return c
 }
 
 func (c *BareReal) Sinh(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Sinh(a.Value())
+  *c = BareReal(math.Sinh(a.Value()))
   return c
 }
 
 func (c *BareReal) Cos(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Cos(a.Value())
+  *c = BareReal(math.Cos(a.Value()))
   return c
 }
 
 func (c *BareReal) Cosh(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Cosh(a.Value())
+  *c = BareReal(math.Cosh(a.Value()))
   return c
 }
 
 func (c *BareReal) Tan(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Tan(a.Value())
+  *c = BareReal(math.Tan(a.Value()))
   return c
 }
 
 func (c *BareReal) Tanh(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Tanh(a.Value())
+  *c = BareReal(math.Tanh(a.Value()))
   return c
 }
 
 func (c *BareReal) Exp(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Exp(a.Value())
+  *c = BareReal(math.Exp(a.Value()))
   return c
 }
 
 func (c *BareReal) Log(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Log(a.Value())
+  *c = BareReal(math.Log(a.Value()))
   return c
 }
 
 func (c *BareReal) Erf(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Erf(a.Value())
+  *c = BareReal(math.Erf(a.Value()))
   return c
 }
 
 func (c *BareReal) Erfc(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Erfc(a.Value())
+  *c = BareReal(math.Erfc(a.Value()))
   return c
 }
 
 func (c *BareReal) LogErfc(a Scalar) Scalar {
   checkBare(a)
-  c.value = special.LogErfc(a.Value())
+  *c = BareReal(special.LogErfc(a.Value()))
   return c
 }
 
 func (c *BareReal) Gamma(a Scalar) Scalar {
   checkBare(a)
-  c.value = math.Gamma(a.Value())
+  *c = BareReal(math.Gamma(a.Value()))
   return c
 }
 
@@ -236,12 +236,12 @@ func (c *BareReal) Lgamma(a Scalar) Scalar {
   if s == -1 {
     v = math.NaN()
   }
-  c.value = v
+  *c = BareReal(v)
   return c
 }
 
 func (c *BareReal) Mlgamma(a Scalar, k int) Scalar {
   checkBare(a)
-  c.value = special.Mlgamma(a.Value(), k)
+  *c = BareReal(special.Mlgamma(a.Value(), k))
   return c
 }
