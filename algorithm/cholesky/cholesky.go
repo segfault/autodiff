@@ -42,17 +42,17 @@ func cholesky(A Matrix) (Matrix, error) {
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.Mul(L.ReferenceAt2(i,k), L.ReferenceAt2(j,k))
+        t.Mul(L.ReferenceAt(i,k), L.ReferenceAt(j,k))
         s.Add(s, t)
       }
-      t.Sub(A.ReferenceAt2(i, j), s)
+      t.Sub(A.ReferenceAt(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        L.ReferenceAt2(i, j).Sqrt(t)
+        L.ReferenceAt(i, j).Sqrt(t)
       } else {
-        L.ReferenceAt2(i, j).Div(t, L.ReferenceAt2(j, j))
+        L.ReferenceAt(i, j).Div(t, L.ReferenceAt(j, j))
       }
     }
   }
@@ -67,11 +67,11 @@ func choleskyInSitu(A Matrix) (Matrix, error) {
   Aii   := NewScalar(eType, 0.0)
 
   for i := 0; i < n; i++ {
-    Aii.Copy(A.ReferenceAt2(i,i))
+    Aii.Copy(A.ReferenceAt(i,i))
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.Mul(A.ReferenceAt2(i,k), A.ReferenceAt2(j,k))
+        t.Mul(A.ReferenceAt(i,k), A.ReferenceAt(j,k))
         s.Add(s, t)
       }
       if i == j {
@@ -79,18 +79,18 @@ func choleskyInSitu(A Matrix) (Matrix, error) {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        A.ReferenceAt2(j, i).Sqrt(t)
+        A.ReferenceAt(j, i).Sqrt(t)
       } else {
-        t.Sub(A.ReferenceAt2(i, j), s)
-        A.ReferenceAt2(i, j).Div(t, A.ReferenceAt2(j, j))
+        t.Sub(A.ReferenceAt(i, j), s)
+        A.ReferenceAt(i, j).Div(t, A.ReferenceAt(j, j))
       }
     }
   }
   // move elements from upper triangular matrix
   for i := 0; i < n; i++ {
     for j := 0; j < i; j++ {
-      r := A.ReferenceAt2(j, i)
-      A.ReferenceAt2(j, i).Copy(r)
+      r := A.ReferenceAt(j, i)
+      A.ReferenceAt(j, i).Copy(r)
       r.Reset()
     }
   }

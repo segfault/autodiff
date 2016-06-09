@@ -51,7 +51,7 @@ func (r *DenseMatrix) MaddM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Add(a.ReferenceAt2(i, j), b.ReferenceAt2(i, j))
+      r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -76,7 +76,7 @@ func (r *DenseMatrix) MaddS(a Matrix, b Scalar) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Add(a.ReferenceAt2(i, j), b)
+      r.ReferenceAt(i, j).Add(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -102,7 +102,7 @@ func (r *DenseMatrix) MsubM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Sub(a.ReferenceAt2(i, j), b.ReferenceAt2(i, j))
+      r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -127,7 +127,7 @@ func (r *DenseMatrix) MsubS(a Matrix, b Scalar) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Sub(a.ReferenceAt2(i, j), b)
+      r.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -153,7 +153,7 @@ func (r *DenseMatrix) MmulM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Mul(a.ReferenceAt2(i, j), b.ReferenceAt2(i, j))
+      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -178,7 +178,7 @@ func (r *DenseMatrix) MmulS(a Matrix, b Scalar) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Mul(a.ReferenceAt2(i, j), b)
+      r.ReferenceAt(i, j).Mul(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -204,7 +204,7 @@ func (r *DenseMatrix) MdivM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Div(a.ReferenceAt2(i, j), b.ReferenceAt2(i, j))
+      r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b.ReferenceAt(i, j))
     }
   }
   return r
@@ -229,7 +229,7 @@ func (r *DenseMatrix) MdivS(a Matrix, b Scalar) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Div(a.ReferenceAt2(i, j), b)
+      r.ReferenceAt(i, j).Div(a.ReferenceAt(i, j), b)
     }
   }
   return r
@@ -256,10 +256,10 @@ func (r *DenseMatrix) MdotM(a, b Matrix) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Reset()
+      r.ReferenceAt(i, j).Reset()
       for k := 0; k < m1; k++ {
-        t.Mul(a.ReferenceAt2(i, k), b.ReferenceAt2(k, j))
-        r.ReferenceAt2(i, j).Add(r.ReferenceAt2(i, j), t)
+        t.Mul(a.ReferenceAt(i, k), b.ReferenceAt(k, j))
+        r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), t)
       }
     }
   }
@@ -287,7 +287,7 @@ func (r Vector) MdotV(a Matrix, b Vector) Vector {
   for i := 0; i < n; i++ {
     r[i].Reset()
     for j := 0; j < m; j++ {
-      t.Mul(a.ReferenceAt2(i, j), b[j])
+      t.Mul(a.ReferenceAt(i, j), b[j])
       r[i].Add(r[i], t)
     }
   }
@@ -314,7 +314,7 @@ func (r Vector) VdotM(a Vector, b Matrix) Vector {
   for i := 0; i < m; i++ {
     r[i].Reset()
     for j := 0; j < n; j++ {
-      t.Mul(a[j], b.ReferenceAt2(j, i))
+      t.Mul(a[j], b.ReferenceAt(j, i))
       r[i].Add(r[i], t)
     }
   }
@@ -339,7 +339,7 @@ func (r *DenseMatrix) Outer(a, b Vector) Matrix {
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).Mul(a[i], b[j])
+      r.ReferenceAt(i, j).Mul(a[i], b[j])
     }
   }
   return r
@@ -365,7 +365,7 @@ func Mtrace(a Matrix) Scalar {
   }
   t := a.At(0, 0)
   for i := 1; i < n; i++ {
-    t.Add(t, a.ReferenceAt2(i,i))
+    t.Add(t, a.ReferenceAt(i,i))
   }
   return t
 }
@@ -404,7 +404,7 @@ func (r *DenseMatrix) Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   // copy derivatives
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).SetValue(y[i].Derivative(1, j))
+      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
     }
   }
   return r
@@ -425,7 +425,7 @@ func Jacobian(f func(Vector) Vector, x_ Vector) Matrix {
   // copy derivatives
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt2(i, j).SetValue(y[i].Derivative(1, j))
+      r.ReferenceAt(i, j).SetValue(y[i].Derivative(1, j))
     }
   }
   return r

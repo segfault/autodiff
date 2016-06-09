@@ -35,17 +35,17 @@ func cholesky_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.RealMul(L.RealReferenceAt2(i,k), L.RealReferenceAt2(j,k))
+        t.RealMul(L.RealReferenceAt(i,k), L.RealReferenceAt(j,k))
         s.RealAdd(s, t)
       }
-      t.RealSub(A.RealReferenceAt2(i, j), s)
+      t.RealSub(A.RealReferenceAt(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        L.RealReferenceAt2(i, j).RealSqrt(t)
+        L.RealReferenceAt(i, j).RealSqrt(t)
       } else {
-        L.RealReferenceAt2(i, j).RealDiv(t, L.RealReferenceAt2(j, j))
+        L.RealReferenceAt(i, j).RealDiv(t, L.RealReferenceAt(j, j))
       }
     }
   }
@@ -59,11 +59,11 @@ func choleskyInSitu_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
   Aii   := NewReal(0.0)
 
   for i := 0; i < n; i++ {
-    Aii.Copy(A.RealReferenceAt2(i,i))
+    Aii.Copy(A.RealReferenceAt(i,i))
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.RealMul(A.RealReferenceAt2(i,k), A.RealReferenceAt2(j,k))
+        t.RealMul(A.RealReferenceAt(i,k), A.RealReferenceAt(j,k))
         s.RealAdd(s, t)
       }
       if i == j {
@@ -71,18 +71,18 @@ func choleskyInSitu_RealDense(A *DenseMatrix) (*DenseMatrix, error) {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        A.RealReferenceAt2(j, i).RealSqrt(t)
+        A.RealReferenceAt(j, i).RealSqrt(t)
       } else {
-        t.RealSub(A.RealReferenceAt2(i, j), s)
-        A.RealReferenceAt2(i, j).RealDiv(t, A.RealReferenceAt2(j, j))
+        t.RealSub(A.RealReferenceAt(i, j), s)
+        A.RealReferenceAt(i, j).RealDiv(t, A.RealReferenceAt(j, j))
       }
     }
   }
   // move elements from upper triangular matrix
   for i := 0; i < n; i++ {
     for j := 0; j < i; j++ {
-      r := A.RealReferenceAt2(j, i)
-      A.RealReferenceAt2(j, i).Copy(r)
+      r := A.RealReferenceAt(j, i)
+      A.RealReferenceAt(j, i).Copy(r)
       r.Reset()
     }
   }
@@ -101,17 +101,17 @@ func cholesky_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.BareRealMul(L.BareRealReferenceAt2(i,k), L.BareRealReferenceAt2(j,k))
+        t.BareRealMul(L.BareRealReferenceAt(i,k), L.BareRealReferenceAt(j,k))
         s.BareRealAdd(s, t)
       }
-      t.BareRealSub(A.BareRealReferenceAt2(i, j), s)
+      t.BareRealSub(A.BareRealReferenceAt(i, j), s)
       if i == j {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        L.BareRealReferenceAt2(i, j).BareRealSqrt(t)
+        L.BareRealReferenceAt(i, j).BareRealSqrt(t)
       } else {
-        L.BareRealReferenceAt2(i, j).BareRealDiv(t, L.BareRealReferenceAt2(j, j))
+        L.BareRealReferenceAt(i, j).BareRealDiv(t, L.BareRealReferenceAt(j, j))
       }
     }
   }
@@ -125,11 +125,11 @@ func choleskyInSitu_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
   Aii   := NewBareReal(0.0)
 
   for i := 0; i < n; i++ {
-    Aii.Copy(A.BareRealReferenceAt2(i,i))
+    Aii.Copy(A.BareRealReferenceAt(i,i))
     for j := 0; j < (i+1); j++ {
       s.Reset()
       for k := 0; k < j; k++ {
-        t.BareRealMul(A.BareRealReferenceAt2(i,k), A.BareRealReferenceAt2(j,k))
+        t.BareRealMul(A.BareRealReferenceAt(i,k), A.BareRealReferenceAt(j,k))
         s.BareRealAdd(s, t)
       }
       if i == j {
@@ -137,18 +137,18 @@ func choleskyInSitu_BareRealDense(A *DenseMatrix) (*DenseMatrix, error) {
         if t.Value() < 0.0 {
           return nil, errors.New("matrix is not positive definite")
         }
-        A.BareRealReferenceAt2(j, i).BareRealSqrt(t)
+        A.BareRealReferenceAt(j, i).BareRealSqrt(t)
       } else {
-        t.BareRealSub(A.BareRealReferenceAt2(i, j), s)
-        A.BareRealReferenceAt2(i, j).BareRealDiv(t, A.BareRealReferenceAt2(j, j))
+        t.BareRealSub(A.BareRealReferenceAt(i, j), s)
+        A.BareRealReferenceAt(i, j).BareRealDiv(t, A.BareRealReferenceAt(j, j))
       }
     }
   }
   // move elements from upper triangular matrix
   for i := 0; i < n; i++ {
     for j := 0; j < i; j++ {
-      r := A.BareRealReferenceAt2(j, i)
-      A.BareRealReferenceAt2(j, i).Copy(r)
+      r := A.BareRealReferenceAt(j, i)
+      A.BareRealReferenceAt(j, i).Copy(r)
       r.Reset()
     }
   }

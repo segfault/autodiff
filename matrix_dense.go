@@ -160,30 +160,30 @@ func (matrix *DenseMatrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
   return r
 }
 
-/* fast matrix access
+/* matrix access
  * -------------------------------------------------------------------------- */
 
-func (matrix *DenseMatrix) At2(i, j int) Scalar {
+func (matrix *DenseMatrix) At(i, j int) Scalar {
   return matrix.Values[matrix.index(i, j)].Clone()
 }
 
-func (matrix *DenseMatrix) ReferenceAt2(i, j int) Scalar {
+func (matrix *DenseMatrix) ReferenceAt(i, j int) Scalar {
   return matrix.Values[matrix.index(i, j)]
 }
 
-func (matrix *DenseMatrix) RealReferenceAt2(i, j int) *Real {
+func (matrix *DenseMatrix) RealReferenceAt(i, j int) *Real {
   return matrix.Values[matrix.index(i, j)].(*Real)
 }
 
-func (matrix *DenseMatrix) BareRealReferenceAt2(i, j int) *BareReal {
+func (matrix *DenseMatrix) BareRealReferenceAt(i, j int) *BareReal {
   return matrix.Values[matrix.index(i, j)].(*BareReal)
 }
 
-func (matrix *DenseMatrix) Set2(s Scalar, i, j int) {
+func (matrix *DenseMatrix) Set(s Scalar, i, j int) {
   matrix.Values[matrix.index(i, j)].Copy(s)
 }
 
-func (matrix *DenseMatrix) SetReference2(s Scalar, i, j int) {
+func (matrix *DenseMatrix) SetReference(s Scalar, i, j int) {
   k := matrix.index(i, j)
   matrix.Values[k] = s
 }
@@ -191,62 +191,26 @@ func (matrix *DenseMatrix) SetReference2(s Scalar, i, j int) {
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 
-func (matrix *DenseMatrix) At(args ...int) Scalar {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  // to avoid confusion we clone the value before
-  // returning a reference to it
-  //
-  // take for instane:
-  // c := m.At(0, 0)
-  // m.Set(1, 0, 0)
-  // which would alter the value of c!
-  return matrix.Values[k].Clone()
-}
-
-func (matrix *DenseMatrix) ReferenceAt(args ...int) Scalar {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  return matrix.Values[k]
-}
-
-func (matrix *DenseMatrix) Set(s Scalar, args ...int) {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  matrix.Values[k].Copy(s)
-}
-
-func (matrix *DenseMatrix) SetReference(s Scalar, args ...int) {
-  i := args[0]
-  j := args[1]
-  k := matrix.index(i, j)
-  matrix.Values[k] = s
-}
-
-func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) ScalarContainer {
+func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) {
   n, m := matrix.Dims()
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
       matrix.Set(f(matrix.At(i, j)), i, j)
     }
   }
-  return matrix
 }
 
 func (matrix *DenseMatrix) Reduce(f func(Scalar, Scalar) Scalar) Scalar {
   n, m := matrix.Dims()
-  r := matrix.At2(0, 0)
+  r := matrix.At(0, 0)
   // first row
   for j := 1; j < m; j++ {
-    r = f(r, matrix.ReferenceAt2(0, j))
+    r = f(r, matrix.ReferenceAt(0, j))
   }
   // all other rows
   for i := 1; i < n; i++ {
     for j := 0; j < m; j++ {
-      r = f(r, matrix.ReferenceAt2(i, j))
+      r = f(r, matrix.ReferenceAt(i, j))
     }
   }
   return r

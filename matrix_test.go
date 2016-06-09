@@ -160,7 +160,8 @@ func TestMatrixMapReduce(t *testing.T) {
   r1 := NewDenseMatrix(RealType, 2, 2, []float64{2.718282e+00, 7.389056e+00, 2.008554e+01, 5.459815e+01})
   r2 := 84.79103
   m := NewDenseMatrix(RealType, 2, 2, []float64{1, 2,3,4})
-  a := m.Map(Exp).Reduce(Add)
+  m.Map(Exp)
+  a := m.Reduce(Add)
 
   if Mnorm(MsubM(m, r1)).Value() > 1e-8  {
     t.Error("Matrix/Vector multiplication failed!")

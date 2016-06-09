@@ -87,56 +87,37 @@ func (v Vector) Copy(w Vector) {
 /* fast vector access
  * -------------------------------------------------------------------------- */
 
-func (v Vector) At1(i int) Scalar {
+func (v Vector) At(i int) Scalar {
   return v[i].Clone()
 }
 
-func (v Vector) ReferenceAt1(i int) Scalar {
+func (v Vector) ReferenceAt(i int) Scalar {
   return v[i]
 }
 
-func (v Vector) RealReferenceAt1(i int) *Real {
+func (v Vector) RealReferenceAt(i int) *Real {
   return v[i].(*Real)
 }
 
-func (v Vector) BareRealReferenceAt1(i int) *BareReal {
+func (v Vector) BareRealReferenceAt(i int) *BareReal {
   return v[i].(*BareReal)
 }
 
-func (v Vector) Set1(s Scalar, i, j int) {
+func (v Vector) Set(s Scalar, i int) {
   v[i].Copy(s)
 }
 
-func (v Vector) SetReference1(s Scalar, i, j int) {
+func (v Vector) SetReference(s Scalar, i, j int) {
   v[i] = s
 }
 
 /* imlement ScalarContainer
  * -------------------------------------------------------------------------- */
 
-// Return the scalar at the given position. For vectors only a single
-// argument should be passed.
-func (v Vector) At(args ...int) Scalar {
-  return v[args[0]].Clone()
-}
-
-func (v Vector) ReferenceAt(args ...int) Scalar {
-  return v[args[0]]
-}
-
-func (v Vector) Set(value Scalar, args ...int) {
-  v[args[0]].Copy(value)
-}
-
-func (v Vector) SetReference(value Scalar, args ...int) {
-  v[args[0]] = value
-}
-
-func (v Vector) Map(f func(Scalar) Scalar) ScalarContainer {
+func (v Vector) Map(f func(Scalar) Scalar) {
   for i := 0; i < len(v); i++ {
     v[i] = f(v[i])
   }
-  return v
 }
 
 func (v Vector) Reduce(f func(Scalar, Scalar) Scalar) Scalar {

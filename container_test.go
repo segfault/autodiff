@@ -24,9 +24,10 @@ import "testing"
 
 func TestContainer(t *testing.T) {
 
-  var c ScalarContainer = NewVector(RealType, []float64{1,2,3,4})
+  c := NewVector(RealType, []float64{1,2,3,4})
+  c.Map(func(x Scalar) Scalar { return Mul(x,x) })
 
-  if c.At(1).Value() != 2.0 {
+  if c.At(1).Value() != 4.0 {
     t.Error("Vector initialization failed!")
   }
 
