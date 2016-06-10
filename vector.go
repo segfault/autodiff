@@ -135,6 +135,12 @@ func (v Vector) ElementType() ScalarType {
   return nil
 }
 
+func (v Vector) ConvertElementType(t ScalarType) {
+  v.Map(func(x Scalar) Scalar {
+    return NewScalar(t, x.GetValue())
+  })
+}
+
 func (v Vector) Variables(order int) {
   Variables(order, v...)
 }

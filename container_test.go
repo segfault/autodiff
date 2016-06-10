@@ -24,10 +24,23 @@ import "testing"
 
 func TestContainer(t *testing.T) {
 
-  c := NewVector(RealType, []float64{1,2,3,4})
-  c.Map(func(x Scalar) Scalar { return Mul(x,x) })
+  v := NewVector(RealType, []float64{1,2,3,4})
+  m := NewDenseMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
-  if c.At(1).GetValue() != 4.0 {
+  // test if container interface is implements
+  var c1 ScalarContainer
+  var c2 ScalarContainer
+
+  c1 = v
+  c2 = m
+
+  c1.Map(func(x Scalar) Scalar { return Mul(x,x) })
+  c2.Map(func(x Scalar) Scalar { return Mul(x,x) })
+
+  if v.At(1).GetValue() != 4.0 {
+    t.Error("Vector initialization failed!")
+  }
+  if m.At(0, 1).GetValue() != 4.0 {
     t.Error("Vector initialization failed!")
   }
 

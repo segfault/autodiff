@@ -26,6 +26,7 @@ type ScalarContainer interface {
   Map(f func(Scalar) Scalar)
   Reduce(f func(Scalar, Scalar) Scalar) Scalar
   ElementType() ScalarType
+  ConvertElementType(ScalarType)
   Variables(int)
   // nice printing
   fmt.Stringer

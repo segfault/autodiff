@@ -223,6 +223,12 @@ func (matrix *DenseMatrix) ElementType() ScalarType {
   return nil
 }
 
+func (matrix *DenseMatrix) ConvertElementType(t ScalarType) {
+  matrix.Map(func(x Scalar) Scalar {
+    return NewScalar(t, x.GetValue())
+  })
+}
+
 func (matrix *DenseMatrix) Variables(order int) {
   Variables(order, matrix.Values...)
 }
