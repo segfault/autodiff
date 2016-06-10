@@ -101,9 +101,9 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       for i, _ := range x1 {
         if gradient_new[i] != 0.0 {
           if gradient_new[i] > 0.0 {
-            x2[i] = Sub(x1[i], NewScalar(t, step[i]))
+            x2[i].Sub(x1[i], NewScalar(t, step[i]))
           } else {
-            x2[i] = Add(x1[i], NewScalar(t, step[i]))
+            x2[i].Add(x1[i], NewScalar(t, step[i]))
           }
         }
         if math.IsNaN(x2[i].GetValue()) {
