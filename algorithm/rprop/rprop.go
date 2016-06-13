@@ -18,7 +18,7 @@ package rprop
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
+import   "fmt"
 import   "math"
 import   "errors"
 
@@ -66,7 +66,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
   // evaluate objective function
   s, err := f(x1)
   if err != nil {
-    return x1, errors.New("invalid initial value")
+    return x1, fmt.Errorf("invalid initial value: %s", err)
   }
   for {
     for i, _ := range x1 {
