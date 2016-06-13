@@ -75,7 +75,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
     // compute partial derivatives and update x
     for i, _ := range x1 {
       // save derivative
-      gradient_new[i] = s.Derivative(1, i)
+      gradient_new[i] = s.GetDerivative(1, i)
     }
     // execute hook if available
     if hook != nil && hook(gradient_new, step, x1, s) {
@@ -101,12 +101,12 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       for i, _ := range x1 {
         if gradient_new[i] != 0.0 {
           if gradient_new[i] > 0.0 {
-            x2[i] = Sub(x1[i], NewScalar(t, step[i]))
+            x2[i].Sub(x1[i], NewScalar(t, step[i]))
           } else {
-            x2[i] = Add(x1[i], NewScalar(t, step[i]))
+            x2[i].Add(x1[i], NewScalar(t, step[i]))
           }
         }
-        if math.IsNaN(x2[i].Value()) {
+        if math.IsNaN(x2[i].GetValue()) {
           return x2, errors.New("Gradient descent diverged!")
         }
       }

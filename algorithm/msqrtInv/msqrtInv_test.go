@@ -31,7 +31,7 @@ func TestMSqrtInv(t *testing.T) {
   x, _ := Run(a)
   r := NewDenseMatrix(RealType, n, n, []float64{7.886751e-01, -2.113249e-01, -2.113249e-01, 7.886751e-01})
 
-  if Mnorm(MsubM(x, r)).Value() > 1e-8 {
+  if Mnorm(MsubM(x, r)).GetValue() > 1e-8 {
     t.Error("MSqrt failed!")
   }
 }

@@ -22,10 +22,10 @@ package autodiff
 type Matrix interface {
   ScalarContainer
   // matrix access with improved performance
-  At2          (i, j int)           Scalar
-  ReferenceAt2 (i, j int)           Scalar
-  Set2         (v Scalar, i, j int)
-  SetReference2(v Scalar, i, j int)
+  At           (i, j int)           Scalar
+  ReferenceAt  (i, j int)           Scalar
+  Set          (v Scalar, i, j int)
+  SetReference (v Scalar, i, j int)
   // basic methods
   Clone        ()                   Matrix
   Copy         (Matrix)

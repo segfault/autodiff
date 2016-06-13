@@ -62,5 +62,5 @@ func (a *Real) Type() ScalarType {
  * -------------------------------------------------------------------------- */
 
 func (a *Real) String() string {
-  return fmt.Sprintf("%e", a.Value())
+  return fmt.Sprintf("%e", a.GetValue())
 }

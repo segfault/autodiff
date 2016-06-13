@@ -144,11 +144,11 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
   // check if constraints need to be activated or deactivated
   for i := 0; i < n; i++ {
     // activate constraint
-    if px[i].Value() < 0.0 {
+    if px[i].GetValue() < 0.0 {
       active[i] = true
     }
     // deactivate constraint
-    if lambda[i].Value() > 0.0 {
+    if lambda[i].GetValue() > 0.0 {
       active[i] = false
     }
     if active[i] {
@@ -180,7 +180,7 @@ func objective_f(active []bool, channel Matrix, variables Vector) Vector {
       // t = p(y|x)
       t := channel.At(i, j)
       // p(x|y) log p(x|y)/p(y) - lambda
-      if t.Value() > 0.0 {
+      if t.GetValue() > 0.0 {
         gradient[i] = Add(gradient[i], Mul(t, Log(Div(t, py[j]))))
       }
     }

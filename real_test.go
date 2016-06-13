@@ -28,14 +28,14 @@ func TestReal(t *testing.T) {
 
   a := NewReal(1.0)
 
-  if a.Value() != 1.0 {
-    t.Error("a.Value() should be 1.0")
+  if a.GetValue() != 1.0 {
+    t.Error("a.GetValue() should be 1.0")
   }
 
   a.Add(a, NewReal(2.0))
 
-  if a.Value() != 3.0 {
-    t.Error("a.Value() should be 3.0")
+  if a.GetValue() != 3.0 {
+    t.Error("a.GetValue() should be 3.0")
   }
 }
 
@@ -50,10 +50,10 @@ func TestDiff1(t *testing.T) {
 
   y := f(x)
 
-  if y.Derivative(1, 0) != 486 {
+  if y.GetDerivative(1, 0) != 486 {
     t.Error("Differentiation failed!")
   }
-  if y.Derivative(2, 0) != 108 {
+  if y.GetDerivative(2, 0) != 108 {
     t.Error("Differentiation failed!")
   }
 }
@@ -73,10 +73,10 @@ func TestDiff2(t *testing.T) {
 
   y := f(x)
 
-  if y.Derivative(1, 0) != 486 {
+  if y.GetDerivative(1, 0) != 486 {
     t.Error("Differentiation failed!")
   }
-  if y.Derivative(2, 0) != 108 {
+  if y.GetDerivative(2, 0) != 108 {
     t.Error("Differentiation failed!")
   }
 }
@@ -92,13 +92,13 @@ func TestMul(t *testing.T) {
   a.Mul(a, a) // a^4
   a.Mul(a, b) // a^4 b
 
-  if math.Abs(a.Value() - 128149.4603376) > 1e-4 {
+  if math.Abs(a.GetValue() - 128149.4603376) > 1e-4 {
     t.Error("Multiplication failed!")
   }
-  if math.Abs(a.Derivative(1, 0) - 39061.025783) > 1e-4 {
+  if math.Abs(a.GetDerivative(1, 0) - 39061.025783) > 1e-4 {
     t.Error("Differentiation failed!")
   }
-  if math.Abs(a.Derivative(2, 0) - 8929.5951649) > 1e-4 {
+  if math.Abs(a.GetDerivative(2, 0) - 8929.5951649) > 1e-4 {
     t.Error("Differentiation failed!")
   }
 }
@@ -111,12 +111,12 @@ func TestPow1(t *testing.T) {
 
   r := Pow(x, k)
 
-  if math.Abs(r.Derivative(1, 0) - 182.124553) > 1e-4  ||
-    (math.Abs(r.Derivative(1, 1) - 184.826947) > 1e-4) {
+  if math.Abs(r.GetDerivative(1, 0) - 182.124553) > 1e-4  ||
+    (math.Abs(r.GetDerivative(1, 1) - 184.826947) > 1e-4) {
     t.Error("Pow failed!")
   }
-  if math.Abs(r.Derivative(2, 0) - 166.054739) > 1e-4  ||
-    (math.Abs(r.Derivative(2, 1) - 226.186676) > 1e-4) {
+  if math.Abs(r.GetDerivative(2, 0) - 166.054739) > 1e-4  ||
+    (math.Abs(r.GetDerivative(2, 1) - 226.186676) > 1e-4) {
     t.Error("Pow failed!")
   }
 }
@@ -129,12 +129,12 @@ func TestPow2(t *testing.T) {
 
   r := Pow(x, k)
 
-  if math.Abs(r.Derivative(1, 0) - -157.216) > 1e-4  ||
-    (math.Abs(r.Derivative(2, 0) -  138.720) > 1e-4) {
+  if math.Abs(r.GetDerivative(1, 0) - -157.216) > 1e-4  ||
+    (math.Abs(r.GetDerivative(2, 0) -  138.720) > 1e-4) {
     t.Error("Pow failed!")
   }
-  if !math.IsNaN(r.Derivative(1, 1))  ||
-    (!math.IsNaN(r.Derivative(2, 1))) {
+  if !math.IsNaN(r.GetDerivative(1, 1))  ||
+    (!math.IsNaN(r.GetDerivative(2, 1))) {
     t.Error("Pow failed!")
   }
 }
@@ -146,8 +146,8 @@ func TestTan(t *testing.T) {
 
   s := Tan(a)
 
-  if math.Abs(s.Derivative(1, 0) - 6.87184) > 0.0001 {
-    t.Error("Incorrect derivative for Tan()!", s.Derivative(1, 0))
+  if math.Abs(s.GetDerivative(1, 0) - 6.87184) > 0.0001 {
+    t.Error("Incorrect derivative for Tan()!", s.GetDerivative(1, 0))
   }
 }
 
@@ -158,10 +158,10 @@ func TestTanh1(t *testing.T) {
 
   s := Tanh(a)
 
-  if math.Abs(s.Derivative(1, 0) -  0.00070588) > 0.0000001 {
+  if math.Abs(s.GetDerivative(1, 0) -  0.00070588) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
-  if math.Abs(s.Derivative(2, 0) - -0.00141127) > 0.0000001 {
+  if math.Abs(s.GetDerivative(2, 0) - -0.00141127) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
 }
@@ -173,10 +173,10 @@ func TestTanh2(t *testing.T) {
 
   a.Tanh(a)
 
-  if math.Abs(a.Derivative(1, 0) -  0.00070588) > 0.0000001 {
+  if math.Abs(a.GetDerivative(1, 0) -  0.00070588) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
-  if math.Abs(a.Derivative(2, 0) - -0.00141127) > 0.0000001 {
+  if math.Abs(a.GetDerivative(2, 0) - -0.00141127) > 0.0000001 {
     t.Error("Incorrect derivative for Tanh()!")
   }
 }
@@ -188,8 +188,8 @@ func TestErf(t *testing.T) {
 
   s := Erf(a)
 
-  if math.Abs(s.Derivative(1, 0) -  1.07023926) > 1e-6 ||
-    (math.Abs(s.Derivative(2, 0) - -0.49231006) > 1e-6) {
+  if math.Abs(s.GetDerivative(1, 0) -  1.07023926) > 1e-6 ||
+    (math.Abs(s.GetDerivative(2, 0) - -0.49231006) > 1e-6) {
     t.Error("Incorrect derivative for Erf()!")
   }
 }
@@ -201,8 +201,8 @@ func TestErfc(t *testing.T) {
 
   s := Erfc(a)
 
-  if math.Abs(s.Derivative(1, 0) - -1.07023926) > 1e-6 ||
-    (math.Abs(s.Derivative(2, 0) -  0.49231006) > 1e-6) {
+  if math.Abs(s.GetDerivative(1, 0) - -1.07023926) > 1e-6 ||
+    (math.Abs(s.GetDerivative(2, 0) -  0.49231006) > 1e-6) {
     t.Error("Incorrect derivative for Erfc()!")
   }
 }
@@ -214,10 +214,10 @@ func TestLogErfc1(t *testing.T) {
 
   s := LogErfc(a)
 
-  if math.Abs(s.Derivative(1, 0) - -1.436606354) > 1e-6 {
+  if math.Abs(s.GetDerivative(1, 0) - -1.436606354) > 1e-6 {
     t.Error("Incorrect derivative for LogErfc()!")
   }
-  if math.Abs(s.Derivative(2, 0) - -1.402998894) > 1e-6 {
+  if math.Abs(s.GetDerivative(2, 0) - -1.402998894) > 1e-6 {
     t.Error("Incorrect derivative for LogErfc()!")
   }
 }
@@ -229,10 +229,10 @@ func TestLogErfc2(t *testing.T) {
 
   a.LogErfc(a)
 
-  if math.Abs(a.Derivative(1, 0) - -1.436606354) > 1e-6 {
+  if math.Abs(a.GetDerivative(1, 0) - -1.436606354) > 1e-6 {
     t.Error("Incorrect derivative for LogErfc()!")
   }
-  if math.Abs(a.Derivative(2, 0) - -1.402998894) > 1e-6 {
+  if math.Abs(a.GetDerivative(2, 0) - -1.402998894) > 1e-6 {
     t.Error("Incorrect derivative for LogErfc()!")
   }
 }
@@ -244,8 +244,8 @@ func TestGamma(t *testing.T) {
 
   s := Gamma(a)
 
-  if math.Abs(s.Derivative(1, 0) - 12.2353264) > 1e-6 ||
-    (math.Abs(s.Derivative(2, 0) - 18.8065398) > 1e-6) {
+  if math.Abs(s.GetDerivative(1, 0) - 12.2353264) > 1e-6 ||
+    (math.Abs(s.GetDerivative(2, 0) - 18.8065398) > 1e-6) {
     t.Error("Incorrect derivative for Gamma()!")
   }
 }

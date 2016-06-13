@@ -40,7 +40,7 @@ func mSqrtInv(matrix Matrix) (Matrix, error) {
     return nil, err
   }
   X1 := MmulS(MdotM(X0, t), c)
-  for Mnorm(MsubM(X0, X1)).Value() > 1e-8 {
+  for Mnorm(MsubM(X0, X1)).GetValue() > 1e-8 {
     X0 = X1
     t, err := matrixInverse.Run(MaddM(I, MdotM(A, MdotM(X0, X0))))
     if err != nil {

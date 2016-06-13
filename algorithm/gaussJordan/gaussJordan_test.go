@@ -34,7 +34,7 @@ func TestGaussJordan1(t *testing.T) {
 
   Run(a, x, b)
 
-  if Mnorm(MsubM(x, r)).Value() > 1e-4 {
+  if Mnorm(MsubM(x, r)).GetValue() > 1e-4 {
     t.Error("Gauss-Jordan method failed!")
   }
 }
@@ -58,7 +58,7 @@ func TestGaussJordan2(t *testing.T) {
 
   Run(a, x, b, Triangular{true})
 
-  if Mnorm(MsubM(x, r)).Value() > 1e-4 {
+  if Mnorm(MsubM(x, r)).GetValue() > 1e-4 {
     t.Error("Gauss-Jordan method failed!")
   }
 }

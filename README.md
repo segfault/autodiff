@@ -16,7 +16,7 @@ Compute the derivative of a function *f* at *x = 9*
   Variables(1, x)
   y := f(x)
 ```
-where *y.Value()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
+where *y.GetValue()* returns the function value and *y.Derivative()* the derivative at *x = 9*.
 
 ### Gradient descent
 

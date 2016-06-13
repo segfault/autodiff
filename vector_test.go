@@ -28,7 +28,7 @@ func TestVector(t *testing.T) {
 
   v := NewVector(RealType, []float64{1,2,3,4,5,6})
 
-  if v[1].Value() != 2.0 {
+  if v[1].GetValue() != 2.0 {
     t.Error("Vector initialization failed!")
   }
 }
@@ -41,10 +41,10 @@ func TestVectorSort(t *testing.T) {
   v1.Sort(false)
   v2.Sort(true)
 
-  if v1[6].Value() != 29.0 {
+  if v1[6].GetValue() != 29.0 {
     t.Error("Vector sorting failed!")
   }
-  if v2[6].Value() != 1.0 {
+  if v2[6].GetValue() != 1.0 {
     t.Error("Vector sorting failed!")
   }
 }
@@ -54,7 +54,7 @@ func TestVectorToMatrix(t *testing.T) {
   v := NewVector(RealType, []float64{1,2,3,4,5,6})
   m := v.Matrix(2, 3)
 
-  if m.At(1,0).Value() != 4 {
+  if m.At(1,0).GetValue() != 4 {
     t.Error("Vector to matrix conversion failed!")
   }
 }
@@ -65,7 +65,7 @@ func TestVdotV(t *testing.T) {
   b := NewVector(RealType, []float64{2,-1,1,7})
   r := VdotV(a, b)
 
-  if r.Value() != 31 {
+  if r.GetValue() != 31 {
     t.Error("VmulV() failed!")
   }
 }
@@ -76,7 +76,7 @@ func TestVmulV(t *testing.T) {
   b := NewVector(RealType, []float64{2,-1,1,7})
   r := VmulV(a, b)
 
-  if r[1].Value() != -2 {
+  if r[1].GetValue() != -2 {
     t.Error("VmulV() failed!")
   }
 }
@@ -89,7 +89,7 @@ func TestReadVector(t *testing.T) {
   }
   r := NewVector(RealType, []float64{1,2,3,4,5,6})
 
-  if Vnorm(VsubV(v, r)).Value() != 0.0 {
+  if Vnorm(VsubV(v, r)).GetValue() != 0.0 {
     t.Error("Read vector failed!")
   }
 }
@@ -99,12 +99,13 @@ func TestVectorMapReduce(t *testing.T) {
   r1 := NewVector(RealType, []float64{2.718282e+00, 7.389056e+00, 2.008554e+01, 5.459815e+01})
   r2 := 84.79103
   a := NewVector(RealType, []float64{1, 2,3,4})
-  b := a.Map(Exp).Reduce(Add)
+  a.Map(Exp)
+  b := a.Reduce(Add)
 
-  if Vnorm(VsubV(a,r1)).Value() > 1e-2 {
+  if Vnorm(VsubV(a,r1)).GetValue() > 1e-2 {
     t.Error("Vector map/reduce failed!")
   }
-  if math.Abs(b.Value() - r2) > 1e-2 {
+  if math.Abs(b.GetValue() - r2) > 1e-2 {
     t.Error("Vector map/reduce failed!")
   }
 }

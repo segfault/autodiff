@@ -39,7 +39,7 @@ func TestCholesky1(t *testing.T) {
     12.72792, 3.04604, 1.64974, 0.00000,
      9.89949, 1.62455, 1.84971, 1.39262 })
 
-  if Mnorm(MsubM(x, r)).Value() > 1e-8 {
+  if Mnorm(MsubM(x, r)).GetValue() > 1e-8 {
     t.Error("Cholesky failed!")
   }
 }
@@ -58,10 +58,10 @@ func TestCholesky2(t *testing.T) {
     12.72792, 3.04604, 1.64974, 0.00000,
      9.89949, 1.62455, 1.84971, 1.39262 })
 
-  if Mnorm(MsubM(x, r)).Value() > 1e-8 {
+  if Mnorm(MsubM(x, r)).GetValue() > 1e-8 {
     t.Error("Cholesky failed!")
   }
-  if Mnorm(MsubM(x, a)).Value() > 1e-8 {
+  if Mnorm(MsubM(x, a)).GetValue() > 1e-8 {
     t.Error("Cholesky failed!")
   }
 }

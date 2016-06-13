@@ -54,12 +54,12 @@ func (a *Probability) Copy(b Scalar) {
   if Smaller(b, NewReal(0.0)) {
     panic("Copy(): cannot set probability to a negative value!")
   }
-  a.order = b.Order()
-  a.value = b.LogValue()
-  a.Alloc(b.N())
-  for i := 0; i < b.N(); i++ {
-    a.derivative[i][0] = b.Derivative(1, i)
-    a.derivative[i][1] = b.Derivative(2, i)
+  a.Order = b.GetOrder()
+  a.Value = b.GetLogValue()
+  a.Alloc(b.GetN())
+  for i := 0; i < b.GetN(); i++ {
+    a.Derivative[i][0] = b.GetDerivative(1, i)
+    a.Derivative[i][1] = b.GetDerivative(2, i)
   }
 }
 
@@ -69,12 +69,12 @@ func (a *Probability) Clone() Scalar {
   return r
 }
 
-func (a *Probability) Value() float64 {
-  return math.Exp(a.value)
+func (a *Probability) GetValue() float64 {
+  return math.Exp(a.Value)
 }
 
-func (a *Probability) LogValue() float64 {
-  return a.value
+func (a *Probability) GetLogValue() float64 {
+  return a.Value
 }
 
 func (a *Probability) SetValue(v float64) {
@@ -95,5 +95,5 @@ func (a *Probability) Real() *Real {
 }
 
 func (a *Probability) String() string {
-  return fmt.Sprintf("exp(%e)", a.LogValue())
+  return fmt.Sprintf("exp(%e)", a.GetLogValue())
 }
