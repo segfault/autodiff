@@ -40,6 +40,7 @@ type Matrix interface {
   WriteMatrix  (string)             error
   Submatrix(rfrom, rto, cfrom, cto int) Matrix
   PermuteRows([]int)
+  Reshape      (int, int)           error
   // math operations
   MaddM(a, b Matrix) Matrix
   MaddS(a Matrix, b Scalar) Matrix

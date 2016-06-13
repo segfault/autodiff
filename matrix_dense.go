@@ -160,6 +160,15 @@ func (matrix *DenseMatrix) Submatrix(rfrom, rto, cfrom, cto int) Matrix {
   return r
 }
 
+func (matrix *DenseMatrix) Reshape(rows, cols int) error {
+  if len(matrix.Values) != rows*cols {
+    return errors.New("Reshape(): invalid parameters")
+  }
+  matrix.Rows = rows
+  matrix.Cols = cols
+  return nil
+}
+
 /* fast matrix access
  * -------------------------------------------------------------------------- */
 
