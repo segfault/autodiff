@@ -70,9 +70,19 @@ func NilDenseMatrix(rows, cols int) *DenseMatrix {
 /* copy and cloning
  * -------------------------------------------------------------------------- */
 
+// Clone matrix including data.
 func (matrix *DenseMatrix) Clone() Matrix {
   return &DenseMatrix{
     Values    : matrix.Values.Clone(),
+    Rows      : matrix.Rows,
+    Cols      : matrix.Cols,
+    Transposed: matrix.Transposed}
+}
+
+// Clone matrix without duplicating data.
+func (matrix *DenseMatrix) CloneShallow() Matrix {
+  return &DenseMatrix{
+    Values    : matrix.Values,
     Rows      : matrix.Rows,
     Cols      : matrix.Cols,
     Transposed: matrix.Transposed}
