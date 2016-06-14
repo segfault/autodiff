@@ -117,7 +117,7 @@ func NewScalar(t ScalarType, value float64) Scalar {
   return f(value)
 }
 
-func ZeroScalar(t ScalarType) Scalar {
+func NullScalar(t ScalarType) Scalar {
   f, ok := registry[t]
   if !ok {
     panic("invalid scalar type")

@@ -206,8 +206,8 @@ func VdotV(a, b Vector) Scalar {
   if len(a) != len(b) {
     panic("vector dimensions do not match")
   }
-  r := ZeroScalar(a.ElementType())
-  t := ZeroScalar(a.ElementType())
+  r := NullScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
   for i := 0; i < len(a); i++ {
     t.Mul(a[i], b[i])
     r.Add(r, t)
@@ -220,8 +220,8 @@ func VdotV(a, b Vector) Scalar {
 // Euclidean vector norm
 func Vnorm(a Vector) Scalar {
   c := NewBareReal(2.0)
-  t := ZeroScalar(a.ElementType())
-  r := ZeroScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
+  r := NullScalar(a.ElementType())
   for i := 0; i < len(a); i++ {
     t.Pow(a[i], c)
     r.Add(r, t)

@@ -250,7 +250,7 @@ func (r *DenseMatrix) MdotM(a, b Matrix) Matrix {
   n, m := r.Dims()
   n1, m1 := a.Dims()
   n2, m2 := b.Dims()
-  t := ZeroScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
   if n1 != n || m2 != m || n1 != m2 || m1 != n2 {
     panic("matrix dimensions do not match!")
   }
@@ -283,7 +283,7 @@ func (r Vector) MdotV(a Matrix, b Vector) Vector {
   if len(r) != n || len(b) != m {
     panic("matrix/vector dimensions do not match!")
   }
-  t := ZeroScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
   for i := 0; i < n; i++ {
     r[i].Reset()
     for j := 0; j < m; j++ {
@@ -310,7 +310,7 @@ func (r Vector) VdotM(a Vector, b Matrix) Vector {
   if len(r) != m || len(a) != n {
     panic("matrix/vector dimensions do not match!")
   }
-  t := ZeroScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
   for i := 0; i < m; i++ {
     r[i].Reset()
     for j := 0; j < n; j++ {
