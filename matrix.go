@@ -28,6 +28,7 @@ type Matrix interface {
   SetReference (v Scalar, i, j int)
   // basic methods
   Clone        ()                   Matrix
+  CloneShallow ()                   Matrix
   Copy         (Matrix)
   Dims         ()                   (int, int)
   GetValues    ()                   Vector
