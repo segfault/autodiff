@@ -123,6 +123,13 @@ func (a *BasicState) Reset() {
   }
 }
 
+func (a *BasicState) ResetDerivatives() {
+  for i := 0; i < a.N; i++ {
+    a.Derivative[i][0] = 0.0
+    a.Derivative[i][1] = 0.0
+  }
+}
+
 // Set the state to b. This includes the value and all derivatives.
 func (a *BasicState) Set(b Scalar) {
   a.Copy(b)

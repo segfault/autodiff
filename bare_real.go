@@ -106,6 +106,9 @@ func (a *BareReal) Reset() {
   *a = 0.0
 }
 
+func (a *BareReal) ResetDerivatives() {
+}
+
 func (a *BareReal) Set(b Scalar) {
   *a = BareReal(b.GetValue())
 }

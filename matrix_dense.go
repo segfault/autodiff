@@ -206,6 +206,18 @@ func (matrix *DenseMatrix) SetReference(s Scalar, i, j int) {
   matrix.Values[k] = s
 }
 
+func (matrix *DenseMatrix) Reset() {
+  for i := 0; i < len(matrix.Values); i++ {
+    matrix.Values[i].Reset()
+  }
+}
+
+func (matrix *DenseMatrix) ResetDerivatives() {
+  for i := 0; i < len(matrix.Values); i++ {
+    matrix.Values[i].ResetDerivatives()
+  }
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 

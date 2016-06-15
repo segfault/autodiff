@@ -27,26 +27,27 @@ import "reflect"
 type ScalarType reflect.Type
 
 type ScalarState interface {
-  Copy          (Scalar)
+  Copy            (Scalar)
   // allocate memory for derivatives of n variables
-  Alloc         (int)
+  Alloc           (int)
   // allocate enough memory for the derivatives of the given
   // variable(s) and copy the order
-  AllocForOne   (Scalar)
-  AllocForTwo   (Scalar, Scalar)
+  AllocForOne     (Scalar)
+  AllocForTwo     (Scalar, Scalar)
   // read access
-  GetOrder      ()             int
-  GetValue      ()             float64
-  GetLogValue   ()             float64
-  GetDerivative (int, int)     float64
-  GetN          ()             int
+  GetOrder        ()             int
+  GetValue        ()             float64
+  GetLogValue     ()             float64
+  GetDerivative   (int, int)     float64
+  GetN            ()             int
   // set value and derivatives to zero
-  Reset         ()
+  Reset           ()
+  ResetDerivatives()
   // write access
-  Set           (Scalar)
-  SetValue      (float64)
-  SetDerivative (int, int, float64)
-  SetVariable   (int, int, int)
+  Set             (Scalar)
+  SetValue        (float64)
+  SetDerivative   (int, int, float64)
+  SetVariable     (int, int, int)
 }
 
 type Scalar interface {

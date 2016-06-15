@@ -58,11 +58,11 @@ func gradientDescent(f func(Vector) (Scalar, error), x0 Vector, step, epsilon fl
     }
     // execute hook if available
     if hook != nil && hook(gradient, x, s) {
-      break;
+      break
     }
     // evaluate stop criterion
-    if (Norm(gradient) < epsilon) {
-      break;
+    if Norm(gradient) < epsilon {
+      break
     }
     // update variables
     for i, _ := range x {

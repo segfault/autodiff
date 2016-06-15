@@ -22,26 +22,28 @@ package autodiff
 type Matrix interface {
   ScalarContainer
   // matrix access with improved performance
-  At           (i, j int)           Scalar
-  ReferenceAt  (i, j int)           Scalar
-  Set          (v Scalar, i, j int)
-  SetReference (v Scalar, i, j int)
+  At              (i, j int)           Scalar
+  ReferenceAt     (i, j int)           Scalar
+  Set             (v Scalar, i, j int)
+  SetReference    (v Scalar, i, j int)
+  Reset           ()
+  ResetDerivatives()
   // basic methods
-  Clone        ()                   Matrix
-  CloneShallow ()                   Matrix
-  Copy         (Matrix)
-  Dims         ()                   (int, int)
-  GetValues    ()                   Vector
-  SetValues    (v Vector)
-  Row          (i int)              Vector
-  Col          (j int)              Vector
-  Diag         ()                   Vector
-  T            ()                   Matrix
-  Table        ()                   string
-  WriteMatrix  (string)             error
-  Submatrix(rfrom, rto, cfrom, cto int) Matrix
-  PermuteRows([]int)
-  Reshape      (int, int)           error
+  Clone           ()                   Matrix
+  CloneShallow    ()                   Matrix
+  Copy            (Matrix)
+  Dims            ()                   (int, int)
+  GetValues       ()                   Vector
+  SetValues       (v Vector)
+  Row             (i int)              Vector
+  Col             (j int)              Vector
+  Diag            ()                   Vector
+  T               ()                   Matrix
+  Table           ()                   string
+  WriteMatrix     (string)             error
+  Submatrix       (rfrom, rto, cfrom, cto int) Matrix
+  PermuteRows     ([]int)
+  Reshape         (int, int)           error
   // math operations
   MaddM(a, b Matrix) Matrix
   MaddS(a Matrix, b Scalar) Matrix

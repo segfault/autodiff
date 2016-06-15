@@ -84,8 +84,7 @@ func (v Vector) Copy(w Vector) {
   }
 }
 
-/* fast vector access
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 func (v Vector) At(i int) Scalar {
   return v[i].Clone()
@@ -109,6 +108,18 @@ func (v Vector) Set(s Scalar, i int) {
 
 func (v Vector) SetReference(s Scalar, i, j int) {
   v[i] = s
+}
+
+func (v Vector) Reset() {
+  for i := 0; i < len(v); i++ {
+    v[i].Reset()
+  }
+}
+
+func (v Vector) ResetDerivatives() {
+  for i := 0; i < len(v); i++ {
+    v[i].ResetDerivatives()
+  }
 }
 
 /* imlement ScalarContainer
