@@ -44,6 +44,11 @@ func NewBareReal(v float64) *BareReal {
   return &r
 }
 
+func NullBareReal() *BareReal {
+  r := BareReal(0.0)
+  return &r
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (a *BareReal) Clone() Scalar {

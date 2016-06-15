@@ -245,3 +245,17 @@ func (c *BareReal) Mlgamma(a Scalar, k int) Scalar {
   *c = BareReal(special.Mlgamma(a.GetValue(), k))
   return c
 }
+
+/* -------------------------------------------------------------------------- */
+
+func (r *BareReal) VdotV(a, b Vector) Scalar {
+  if len(a) != len(b) {
+    panic("vector dimensions do not match")
+  }
+  t := NullBareReal()
+  for i := 0; i < len(a); i++ {
+    t.Mul(a[i], b[i])
+    r.Add(r, t)
+  }
+  return r
+}

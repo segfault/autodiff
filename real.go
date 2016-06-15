@@ -46,6 +46,11 @@ func NewReal(v float64) *Real {
   return &s
 }
 
+func NullReal() *Real {
+  s := Real{*NewBasicState(0.0)}
+  return &s
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Clone() Scalar {

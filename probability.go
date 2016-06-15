@@ -48,6 +48,10 @@ func NewProbability(value float64) *Probability {
   return &Probability{*NewBasicState(math.Log(value))}
 }
 
+func NullProbability() *Probability {
+  return &Probability{*NewBasicState(math.Inf(-1))}
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (a *Probability) Copy(b Scalar) {

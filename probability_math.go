@@ -404,3 +404,17 @@ func (c *Probability) Mlgamma(a Scalar, k int) Scalar {
   c.SetValue(special.Mlgamma(a.GetValue(), k))
   return c
 }
+
+/* -------------------------------------------------------------------------- */
+
+func (r *Probability) VdotV(a, b Vector) Scalar {
+  if len(a) != len(b) {
+    panic("vector dimensions do not match")
+  }
+  t := NullProbability()
+  for i := 0; i < len(a); i++ {
+    t.Mul(a[i], b[i])
+    r.Add(r, t)
+  }
+  return r
+}

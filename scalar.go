@@ -80,6 +80,8 @@ type Scalar interface {
   Gamma     (Scalar)          Scalar
   Lgamma    (Scalar)          Scalar
   Mlgamma   (Scalar, int)     Scalar // multivariate log gamma
+  // vector operations
+  VdotV     (a, b Vector)     Scalar
   // nice printing
   fmt.Stringer
 }
