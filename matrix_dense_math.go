@@ -250,17 +250,19 @@ func (r *DenseMatrix) MdotM(a, b Matrix) Matrix {
   n, m := r.Dims()
   n1, m1 := a.Dims()
   n2, m2 := b.Dims()
-  t := NullScalar(a.ElementType())
+  t1 := NullScalar(a.ElementType())
+  t2 := NullScalar(a.ElementType())
   if n1 != n || m2 != m || n1 != m2 || m1 != n2 {
     panic("matrix dimensions do not match!")
   }
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      r.ReferenceAt(i, j).Reset()
+      t2.Reset()
       for k := 0; k < m1; k++ {
-        t.Mul(a.ReferenceAt(i, k), b.ReferenceAt(k, j))
-        r.ReferenceAt(i, j).Add(r.ReferenceAt(i, j), t)
+        t1.Mul(a.ReferenceAt(i, k), b.ReferenceAt(k, j))
+        t2.Add(t2, t1)
       }
+      r.ReferenceAt(i, j).Copy(t2)
     }
   }
   return r
