@@ -100,7 +100,7 @@ func (a *BasicState) GetDerivative(i, j int) float64 {
   if i != 1 && i != 2 {
     panic("Invalid order!")
   }
-  if a.N > 0 {
+  if j < a.N {
     return a.Derivative[j][i-1]
   } else {
     return 0.0
