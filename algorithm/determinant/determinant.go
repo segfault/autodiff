@@ -38,9 +38,9 @@ type LogScale struct {
 
 func determinantNaive(a Matrix) Scalar {
   n, _ := a.Dims()
-  t1   := ZeroScalar(a.ElementType())
-  t2   := ZeroScalar(a.ElementType())
-  det  := ZeroScalar(a.ElementType())
+  t1   := NullScalar(a.ElementType())
+  t2   := NullScalar(a.ElementType())
+  det  := NullScalar(a.ElementType())
 
   if (n < 1) {
     /* nothing to do */
@@ -77,8 +77,8 @@ func determinantNaive(a Matrix) Scalar {
 
 func determinantPD(a Matrix, logScale bool) (Scalar, error) {
   n, m := a.Dims()
-  r := ZeroScalar(a.ElementType())
-  t := ZeroScalar(a.ElementType())
+  r := NullScalar(a.ElementType())
+  t := NullScalar(a.ElementType())
   if n != m {
     panic("Matrix is not a square matrix!")
   }
