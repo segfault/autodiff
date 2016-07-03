@@ -37,8 +37,10 @@ func Neg(a Scalar) Scalar {
 
 func Abs(a Scalar) Scalar {
   c := a.Clone()
-  c.Pow(a, NewBareReal(2.0))
-  return c.Sqrt(c)
+  if c.GetValue() < 0.0 {
+    c.Neg(c)
+  }
+  return c
 }
 
 func Add(a, b Scalar) Scalar {
