@@ -46,6 +46,10 @@ func (a *Probability) Smaller(b Scalar) bool {
   return a.GetLogValue() < b.GetLogValue()
 }
 
+func (a *Probability) Negative() bool {
+  return false
+}
+
 func (c *Probability) Neg(a Scalar) Scalar {
   c.AllocForOne(a)
   if c.Order >= 2 {

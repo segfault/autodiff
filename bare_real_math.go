@@ -64,6 +64,16 @@ func (a *BareReal) BareRealSmaller(b *BareReal) bool {
 
 /* -------------------------------------------------------------------------- */
 
+func (a *BareReal) Negative() bool {
+  return a.GetValue() < 0.0
+}
+
+func (a *BareReal) RealNegative() bool {
+  return a.GetValue() < 0.0
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *BareReal) Neg(a Scalar) Scalar {
   checkBare(a)
   *c = BareReal(-a.GetValue())

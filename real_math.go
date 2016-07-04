@@ -57,6 +57,16 @@ func (a *Real) RealSmaller(b *Real) bool {
 
 /* -------------------------------------------------------------------------- */
 
+func (a *Real) Negative() bool {
+  return a.GetValue() < 0.0
+}
+
+func (a *Real) RealNegative() bool {
+  return a.GetValue() < 0.0
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (c *Real) Neg(a Scalar) Scalar {
   c.AllocForOne(a)
   if c.Order >= 2 {
