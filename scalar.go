@@ -59,7 +59,7 @@ type Scalar interface {
   Equals    (Scalar)          bool
   Greater   (Scalar)          bool
   Smaller   (Scalar)          bool
-  Negative  ()                bool
+  Sign      ()                int
   Neg       (Scalar)          Scalar
   Add       (Scalar, Scalar)  Scalar
   Sub       (Scalar, Scalar)  Scalar
