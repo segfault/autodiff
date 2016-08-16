@@ -89,12 +89,24 @@ func (a *Real) RealMax(b *Real) Scalar {
 
 /* -------------------------------------------------------------------------- */
 
-func (a *Real) Negative() bool {
-  return a.GetValue() < 0.0
+func (a *Real) Sign() int {
+  if a.GetValue() < 0.0 {
+    return -1
+  }
+  if a.GetValue() > 0.0 {
+    return  1
+  }
+  return 0
 }
 
-func (a *Real) RealNegative() bool {
-  return a.GetValue() < 0.0
+func (a *Real) RealSing() int {
+  if a.GetValue() < 0.0 {
+    return -1
+  }
+  if a.GetValue() > 0.0 {
+    return  1
+  }
+  return 0
 }
 
 /* -------------------------------------------------------------------------- */

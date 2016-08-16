@@ -37,7 +37,7 @@ func Neg(a Scalar) Scalar {
 
 func Abs(a Scalar) Scalar {
   c := a.Clone()
-  if c.Negative() {
+  if c.Sign() == -1 {
     c.Neg(c)
   }
   return c

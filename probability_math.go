@@ -60,8 +60,11 @@ func (a *Probability) Max(b Scalar) Scalar {
   return b
 }
 
-func (a *Probability) Negative() bool {
-  return false
+func (a *Probability) Sign() int {
+  if math.IsInf(a.Value, -1) {
+    return 0
+  }
+  return 1
 }
 
 func (c *Probability) Neg(a Scalar) Scalar {
