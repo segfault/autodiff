@@ -46,6 +46,20 @@ func (a *Probability) Smaller(b Scalar) bool {
   return a.GetLogValue() < b.GetLogValue()
 }
 
+func (a *Probability) Min(b Scalar) Scalar {
+  if a.GetLogValue() < b.GetLogValue() {
+    return a
+  }
+  return b
+}
+
+func (a *Probability) Max(b Scalar) Scalar {
+  if a.GetLogValue() > b.GetLogValue() {
+    return a
+  }
+  return b
+}
+
 func (a *Probability) Negative() bool {
   return false
 }

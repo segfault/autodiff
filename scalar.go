@@ -59,6 +59,8 @@ type Scalar interface {
   Equals    (Scalar)          bool
   Greater   (Scalar)          bool
   Smaller   (Scalar)          bool
+  Min       (Scalar)          Scalar
+  Max       (Scalar)          Scalar
   Negative  ()                bool
   Neg       (Scalar)          Scalar
   Add       (Scalar, Scalar)  Scalar

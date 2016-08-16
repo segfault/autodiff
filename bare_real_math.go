@@ -64,6 +64,38 @@ func (a *BareReal) BareRealSmaller(b *BareReal) bool {
 
 /* -------------------------------------------------------------------------- */
 
+func (a *BareReal) Min(b Scalar) Scalar {
+  if a.GetValue() < b.GetValue() {
+    return a
+  }
+  return b
+}
+
+func (a *BareReal) BareRealMin(b *BareReal) Scalar {
+  if a.GetValue() < b.GetValue() {
+    return a
+  }
+  return b
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (a *BareReal) Max(b Scalar) Scalar {
+  if a.GetValue() > b.GetValue() {
+    return a
+  }
+  return b
+}
+
+func (a *BareReal) BareRealMax(b *BareReal) Scalar {
+  if a.GetValue() > b.GetValue() {
+    return a
+  }
+  return b
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *BareReal) Negative() bool {
   return a.GetValue() < 0.0
 }

@@ -57,6 +57,38 @@ func (a *Real) RealSmaller(b *Real) bool {
 
 /* -------------------------------------------------------------------------- */
 
+func (a *Real) Min(b Scalar) Scalar {
+  if a.GetValue() < b.GetValue() {
+    return a
+  }
+  return b
+}
+
+func (a *Real) RealMin(b *Real) Scalar {
+  if a.GetValue() < b.GetValue() {
+    return a
+  }
+  return b
+}
+
+/* -------------------------------------------------------------------------- */
+
+func (a *Real) Max(b Scalar) Scalar {
+  if a.GetValue() > b.GetValue() {
+    return a
+  }
+  return b
+}
+
+func (a *Real) RealMax(b *Real) Scalar {
+  if a.GetValue() > b.GetValue() {
+    return a
+  }
+  return b
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *Real) Negative() bool {
   return a.GetValue() < 0.0
 }

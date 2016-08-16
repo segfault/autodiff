@@ -142,3 +142,11 @@ func Mlgamma(a Scalar, k int) Scalar {
   c := a.Clone()
   return c.Mlgamma(a, k)
 }
+
+func Min(a, b Scalar) Scalar {
+  return a.Min(b)
+}
+
+func Max(a, b Scalar) Scalar {
+  return a.Max(b)
+}
