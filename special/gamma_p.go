@@ -140,6 +140,10 @@ func tgammap1m1_imp(dz float64) float64 {
   return result
 }
 
+func tgamma1pm1(z float64) float64 {
+  return tgammap1m1_imp(z)
+}
+
 func tgamma_small_upper_part(a, x float64, invert bool) (float64, float64) {
   //
   // Compute the full upper fraction (Q) when a is very small:
@@ -151,9 +155,9 @@ func tgamma_small_upper_part(a, x float64, invert bool) (float64, float64) {
   result /= a
 //   detail::small_gamma2_series<T> s(a, x);
   p += 1.0
-  init_value := 0
+  init_value := 0.0
   if invert {
-    init_value = *pgam
+    init_value = pgam
   }
 //  result = -p * tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, (init_value - result) / p);
   if invert {
