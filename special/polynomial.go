@@ -38,7 +38,7 @@ func NewEvenPolynomial(coefficients []float64) EvenPolynomial {
 
 /* -------------------------------------------------------------------------- */
 
-func (p *Polynomial) Eval(z float64) float64 {
+func (p Polynomial) Eval(z float64) float64 {
   count := len(p.coefficients)
   sum := p.coefficients[count - 1];
   for i := count - 2; i >= 0; i-- {
@@ -48,6 +48,6 @@ func (p *Polynomial) Eval(z float64) float64 {
   return sum;
 }
 
-func (p *EvenPolynomial) Eval(z float64) float64 {
+func (p EvenPolynomial) Eval(z float64) float64 {
   return p.Polynomial.Eval(z*z)
 }
