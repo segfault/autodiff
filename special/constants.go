@@ -28,6 +28,7 @@ const M_PI     = 3.14159265358979323846264338328
 /* -------------------------------------------------------------------------- */
 
 var MaxLogFloat64       float64
+var MinLogFloat64       float64
 var EpsilonFloat64      float64
 var PrecisionFloat64    int
 var SeriesIterationsMax int
@@ -36,6 +37,7 @@ var SeriesIterationsMax int
 
 func init() {
   MaxLogFloat64       = math.Floor(math.Log(math.MaxFloat64))
+  MinLogFloat64       = math.Ceil (math.Log(math.SmallestNonzeroFloat64))
   EpsilonFloat64      = math.Nextafter(1.0,2.0)-1.0
   PrecisionFloat64    = 53
   SeriesIterationsMax = 1000000
