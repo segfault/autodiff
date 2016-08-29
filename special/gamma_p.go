@@ -116,6 +116,52 @@ func full_igamma_prefix(a, z float64) float64 {
    return prefix
 }
 
+func tgammap1m1_imp(dz float64) float64 {
+
+  result := 0.0
+
+  if dz < 0.0 {
+    if dz < -0.5 {
+      // Best method is simply to subtract 1 from tgamma:
+      result = math.Gamma(1+dz) - 1.0
+    } else {
+      // Use expm1 on lgamma:
+      result = math.Expm1(-math.Log1p(dz) + lgamma_small_imp(dz+2.0, dz+1.0, dz))
+    }
+  } else {
+    if dz < 2 {
+      // Use expm1 on lgamma:
+      result = math.Expm1(lgamma_small_imp(dz+1.0, dz, dz-1.0))
+    } else {
+      // Best method is simply to subtract 1 from tgamma:
+      result = math.Gamma(dz+1.0) - 1.0
+    }
+  }
+  return result
+}
+
+func tgamma_small_upper_part(a, x float64, invert bool) (float64, float64) {
+  //
+  // Compute the full upper fraction (Q) when a is very small:
+  //
+  result := tgamma1pm1(a)
+  pgam   := (result + 1.0)/a
+  p      := Powm1(x, a);
+  result -= p
+  result /= a
+//   detail::small_gamma2_series<T> s(a, x);
+  p += 1.0
+  init_value := 0
+  if invert {
+    init_value = *pgam
+  }
+//  result = -p * tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, (init_value - result) / p);
+  if invert {
+    result = -result
+  }
+  return result, pgam
+}
+
 func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
 
   result := 0.0
@@ -277,10 +323,10 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
       }
     }
   case 3:
+    g := 0.0
     // Compute Q:
     invert = !invert
-    g := 0.0
-    result = tgamma_small_upper_part(a, x, &g, invert)
+    result, g = tgamma_small_upper_part(a, x, invert)
     invert = false
     if normalised {
       result /= g
