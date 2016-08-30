@@ -17,6 +17,30 @@ import "math"
 
 /* -------------------------------------------------------------------------- */
 
+type SmallGamma2Series struct {
+  result float64
+  x      float64
+  apn    float64
+  n      int
+}
+
+func NewSmallGamma2Series(a, x float64) SmallGamma2Series {
+  return SmallGamma2Series{-x, -x, a+1.0, 1}
+}
+
+func (series SmallGamma2Series) Eval() float64 {
+  // result at this step
+  r := series.result/series.apn
+  // update variables
+  series.result *= series.x
+  series.n      += 1
+  series.result /= float64(series.n)
+  series.apn    += 1.0
+  return r
+}
+
+/* -------------------------------------------------------------------------- */
+
 func finite_gamma_q(a, x float64) float64 {
   //
   // Calculates normalised Q when a is an integer:
@@ -452,13 +476,13 @@ func tgamma_small_upper_part(a, x float64, invert bool) (float64, float64) {
   p      := Powm1(x, a)
   result -= p
   result /= a
-//   detail::small_gamma2_series<T> s(a, x);
+  s := NewSmallGamma2Series(a, x)
   p += 1.0
   init_value := 0.0
   if invert {
     init_value = pgam
   }
-//  result = -p * tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, (init_value - result) / p);
+  result = -p * SumSeries(s, (init_value - result)/p, 2.22045e-16, SeriesIterationsMax)
   if invert {
     result = -result
   }
