@@ -69,6 +69,19 @@ void test_regularised_gamma_prefix() {
                              << endl;
                 }
         }
+        for (double  a = 10.0; a <= 14.0; a += 0.4) {
+                for (double z = 0.05; z <= 4; z += 0.05) {
+                        cout << "{"
+                             << setw(4)
+                             << setprecision( 1) << fixed << a << ", "
+                             << setw(8)
+                             << setprecision( 6) << fixed << z << ", "
+                             << setprecision(20) << fixed << scientific
+                             << detail::regularised_gamma_prefix(a, z, Policy(), lanczos_type())
+                             << "},"
+                             << endl;
+                }
+        }
 }
 
 void test_lower_incomplete_gamma() {
