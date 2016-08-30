@@ -129,7 +129,7 @@ func upper_gamma_fraction(a, z float64) float64 {
 func regularised_gamma_prefix(a, z float64) float64 {
   limit := math.Max(10.0, a)
   sum   := lower_gamma_series  (a, limit, 0.0)/a
-  sum   += upper_gamma_fraction(a, limit, )
+  sum   += upper_gamma_fraction(a, limit)
 
   if a < 10.0 {
     // special case for small a:
