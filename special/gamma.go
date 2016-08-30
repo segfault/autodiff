@@ -67,7 +67,7 @@ type UpperIncompleteGammaFraction struct {
 }
 
 func NewUpperIncompleteGammaFraction(a1, z1 float64) *UpperIncompleteGammaFraction {
-  return &UpperIncompleteGammaFraction{a1, z1, 0}
+  return &UpperIncompleteGammaFraction{a1, z1-a1+1.0, 0}
 }
 
 func (fraction *UpperIncompleteGammaFraction) Eval() (float64, float64) {
