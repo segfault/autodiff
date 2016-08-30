@@ -28,7 +28,7 @@ type ContinuedFraction interface {
 
 /* -------------------------------------------------------------------------- */
 
-func EvalContinuedFraction(fraction ContinuedFraction,factor float64, max_terms int) float64 {
+func EvalContinuedFraction(fraction ContinuedFraction, factor float64, max_terms int) float64 {
 
   tiny := math.SmallestNonzeroFloat64
   a, b := fraction.Eval()
