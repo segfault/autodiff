@@ -52,7 +52,7 @@ func finite_half_gamma_q(a, x float64) float64 {
     }
     e += sum
   }
-  return e;
+  return e
 }
 
 func regularised_gamma_prefix(a, z float64) float64 {
@@ -114,6 +114,178 @@ func full_igamma_prefix(a, z float64) float64 {
    }
 
    return prefix
+}
+
+func lgamma_small_imp(z, zm1, zm2 float64) float64 {
+  // This version uses rational approximations for small
+  // values of z accurate enough for 64-bit mantissas
+  // (80-bit long doubles), works well for 53-bit doubles as well.
+
+  result := 0.0
+  if z < EpsilonFloat64 {
+    result = -math.Log(z)
+  } else
+  if zm1 == 0.0 || zm2 == 0.0 {
+      // nothing to do, result is zero....
+  } else
+  if z > 2.0 {
+    //
+    // Begin by performing argument reduction until
+    // z is in [2,3):
+    //
+    if z >= 3.0 {
+      for {
+        z      -= 1.0
+        zm2    -= 1.0
+        result += math.Log(z)
+        if z >= 3.0 {
+          break
+        }
+      }
+      // Update zm2, we need it below:
+      zm2 = z - 2
+    }
+
+    //
+    // Use the following form:
+    //
+    // lgamma(z) = (z-2)(z+1)(Y + R(z-2))
+    //
+    // where R(z-2) is a rational approximation optimised for
+    // low absolute error - as long as it's absolute error
+    // is small compared to the constant Y - then any rounding
+    // error in it's computation will get wiped out.
+    //
+    // R(z-2) has the following properties:
+    //
+    // At double: Max error found:                    4.231e-18
+    // At long double: Max error found:               1.987e-21
+    // Maximum Deviation Found (approximation error): 5.900e-24
+    //
+    P := NewPolynomial([]float64{
+      -0.180355685678449379109e-1,
+       0.25126649619989678683e-1,
+       0.494103151567532234274e-1,
+       0.172491608709613993966e-1,
+      -0.259453563205438108893e-3,
+      -0.541009869215204396339e-3,
+      -0.324588649825948492091e-4 })
+    Q := NewPolynomial([]float64{
+       0.1e1,
+       0.196202987197795200688e1,
+       0.148019669424231326694e1,
+       0.541391432071720958364e0,
+       0.988504251128010129477e-1,
+       0.82130967464889339326e-2,
+       0.224936291922115757597e-3,
+      -0.223352763208617092964e-6 })
+
+    Y := 0.158963680267333984375
+
+    r := zm2 * (z + 1)
+    R := P.Eval(zm2)
+    R /= Q.Eval(zm2)
+
+    result +=  r*Y + r*R
+  } else {
+    //
+    // If z is less than 1 use recurrance to shift to
+    // z in the interval [1,2]:
+    //
+    if z < 1.0 {
+      result += -math.Log(z)
+      zm2 = zm1
+      zm1 = z
+      z  += 1.0
+    }
+    //
+    // Two approximations, on for z in [1,1.5] and
+    // one for z in [1.5,2]:
+    //
+    if z <= 1.5 {
+      //
+      // Use the following form:
+      //
+      // lgamma(z) = (z-1)(z-2)(Y + R(z-1))
+      //
+      // where R(z-1) is a rational approximation optimised for
+      // low absolute error - as long as it's absolute error
+      // is small compared to the constant Y - then any rounding
+      // error in it's computation will get wiped out.
+      //
+      // R(z-1) has the following properties:
+      //
+      // At double precision: Max error found:                1.230011e-17
+      // At 80-bit long double precision:   Max error found:  5.631355e-21
+      // Maximum Deviation Found:                             3.139e-021
+      // Expected Error Term:                                 3.139e-021
+
+      //
+      Y := 0.52815341949462890625
+
+      P := NewPolynomial([]float64{
+         0.490622454069039543534e-1,
+        -0.969117530159521214579e-1,
+        -0.414983358359495381969e0,
+        -0.406567124211938417342e0,
+        -0.158413586390692192217e0,
+        -0.240149820648571559892e-1,
+        -0.100346687696279557415e-2 })
+      Q := NewPolynomial([]float64{
+         0.1e1,
+         0.302349829846463038743e1,
+         0.348739585360723852576e1,
+         0.191415588274426679201e1,
+         0.507137738614363510846e0,
+         0.577039722690451849648e-1,
+         0.195768102601107189171e-2 })
+
+      r := P.Eval(zm1)/Q.Eval(zm1)
+      prefix := zm1*zm2
+
+      result += prefix*Y + prefix*r
+    } else {
+      //
+      // Use the following form:
+      //
+      // lgamma(z) = (2-z)(1-z)(Y + R(2-z))
+      //
+      // where R(2-z) is a rational approximation optimised for
+      // low absolute error - as long as it's absolute error
+      // is small compared to the constant Y - then any rounding
+      // error in it's computation will get wiped out.
+      //
+      // R(2-z) has the following properties:
+      //
+      // At double precision, max error found:              1.797565e-17
+      // At 80-bit long double precision, max error found:  9.306419e-21
+      // Maximum Deviation Found:                           2.151e-021
+      // Expected Error Term:                               2.150e-021
+      //
+      Y := 0.452017307281494140625
+
+      P := NewPolynomial([]float64{
+        -0.292329721830270012337e-1, 
+         0.144216267757192309184e0,
+        -0.142440390738631274135e0,
+         0.542809694055053558157e-1,
+        -0.850535976868336437746e-2,
+         0.431171342679297331241e-3 })
+      Q := NewPolynomial([]float64{
+         0.1e1,
+        -0.150169356054485044494e1,
+         0.846973248876495016101e0,
+        -0.220095151814995745555e0,
+         0.25582797155975869989e-1,
+        -0.100666795539143372762e-2,
+        -0.827193521891290553639e-6 })
+      r := zm2 * zm1
+      R := P.Eval(-zm2)/Q.Eval(-zm2)
+
+      result += r*Y + r*R
+      }
+   }
+   return result
 }
 
 func igamma_temme_large(a, x float64) float64 {
@@ -277,7 +449,7 @@ func tgamma_small_upper_part(a, x float64, invert bool) (float64, float64) {
   //
   result := tgamma1pm1(a)
   pgam   := (result + 1.0)/a
-  p      := Powm1(x, a);
+  p      := Powm1(x, a)
   result -= p
   result /= a
 //   detail::small_gamma2_series<T> s(a, x);
