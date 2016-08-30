@@ -712,7 +712,7 @@ func TestRegularisedGammaPrefix(t *testing.T) {
     { 3.8, 4.000000, 7.56991210244976064914e-01} }
 
   for i := 0; i < len(r); i++ {
-    epsilon := 1e-15*math.Pow(10,math.Floor(math.Log10(math.Abs(r[i][2]))))
+    epsilon := 1e-13*math.Pow(10,math.Floor(math.Log10(math.Abs(r[i][2]))))
     value   := regularised_gamma_prefix(r[i][0], r[i][1])
     target  := r[i][2]
     error   := math.Abs(value - target)
