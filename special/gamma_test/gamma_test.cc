@@ -24,13 +24,26 @@
 using namespace std;
 using namespace boost::math;
 
+typedef policies::policy<> Policy;
+typedef lanczos::undefined_lanczos lanczos_type;
+//typedef lanczos::lanczos<double, Policy>::type lanczos_type;
+
 /* -------------------------------------------------------------------------- */
 
-void test_regularised_gamma_prefix() {
-        typedef policies::policy<> Policy;
-        typedef lanczos::undefined_lanczos lanczos_type;
-//        typedef lanczos::lanczos<double, Policy>::type lanczos_type;
+void test_lower_gamma_series() {
+        for (double  a = 1.0; a <= 4.0; a += 0.4) {
+                cout << "{"
+                     << setw(4)
+                     << setprecision( 1) << fixed << a << ", "
+                     << setprecision(20) << fixed << scientific
+                     << detail::lower_gamma_series(a, 10.0, Policy())
+                     << "},"
+                     << endl;
+        }
+}
 
+
+void test_regularised_gamma_prefix() {
         for (double  a = 1.0; a <= 4.0; a += 0.4) {
                 for (double z = 0.05; z <= 4; z += 0.05) {
                         cout << "{"
@@ -63,6 +76,7 @@ void test_lower_incomplete_gamma() {
 }
 
 int main() {
-        test_regularised_gamma_prefix();
+        test_lower_gamma_series();
+        //test_regularised_gamma_prefix();
         //test_lower_incomplete_gamma();
 }

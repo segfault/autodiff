@@ -24,6 +24,28 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
+func TestLowerGammaSeries(t *testing.T) {
+  r := [][]float64{
+    { 1.0, 2.20254657948067233519e+03},
+    { 1.4, 1.08909982078011330486e+03},
+    { 1.8, 5.85062015121666263440e+02},
+    { 2.2, 3.36630021968105666019e+02},
+    { 2.6, 2.05351415906378463205e+02},
+    { 3.0, 1.31792794768840280994e+02},
+    { 3.4, 8.84489453756573453802e+01},
+    { 3.8, 6.17641984089453046636e+01} }
+  for i := 0; i < len(r); i++ {
+    epsilon := 1e-14*math.Pow(10,math.Floor(math.Log10(math.Abs(r[i][1]))))
+    value   := lower_gamma_series(r[i][0], 10, 0)
+    target  := r[i][1]
+    error   := math.Abs(value - target)
+    if error > epsilon {
+      t.Errorf("lower_gamma_series() failed for `(%f) with error `%e', value=%e, target=%e\n",
+        r[i][0], error, value, target)
+    }
+  }
+}
+
 func TestRegularisedGammaPrefix(t *testing.T) {
   r := [][]float64{
     { 1.0, 0.050000, 4.75614712250356994061e-02},
