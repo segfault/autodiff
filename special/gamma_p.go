@@ -39,6 +39,8 @@ func (series *SmallGamma2Series) Eval() float64 {
   return r
 }
 
+/* -------------------------------------------------------------------------- */
+
 type LowerIncompleteGammaSeries struct {
   result float64
   a      float64
@@ -54,6 +56,24 @@ func (series *LowerIncompleteGammaSeries) Eval() float64 {
   series.a      += 1.0
   series.result *= series.z/series.a
   return r
+}
+
+/* -------------------------------------------------------------------------- */
+
+type UpperIncompleteGammaFraction struct {
+  a float64
+  z float64
+  k int
+}
+
+func NewUpperIncompleteGammaFraction(a1, z1 float64) *UpperIncompleteGammaFraction {
+  return &UpperIncompleteGammaFraction{a1, z1, 0}
+}
+
+func (fraction *UpperIncompleteGammaFraction) Eval() (float64, float64) {
+  fraction.k += 1
+  fraction.z += 2.0
+  return float64(fraction.k)*(fraction.a - float64(fraction.k)), fraction.z
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,10 +121,15 @@ func lower_gamma_series(a, z, init_value float64) float64 {
   return SumSeries(s, init_value, 2.22045e-16, SeriesIterationsMax)
 }
 
+func upper_gamma_fraction(a, z float64) float64 {
+  f := NewUpperIncompleteGammaFraction(a, z)
+  return 1.0/(z - a + 1.0 + EvalContinuedFraction(f, 2.22045e-16, SeriesIterationsMax))
+}
+
 func regularised_gamma_prefix(a, z float64) float64 {
   limit := math.Max(10.0, a)
   sum   := lower_gamma_series  (a, limit, 0.0)/a
-  sum   += upper_gamma_fraction(a, limit, 2.22045e-16)
+  sum   += upper_gamma_fraction(a, limit, )
 
   if a < 10.0 {
     // special case for small a:
@@ -688,7 +713,7 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
       result = full_igamma_prefix(a, x)
     }
     if result != 0 {
-      result *= upper_gamma_fraction(a, x, 2.22045e-16)
+      result *= upper_gamma_fraction(a, x)
     }
   case 5:
     result = igamma_temme_large(a, x)
