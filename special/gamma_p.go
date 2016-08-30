@@ -784,3 +784,33 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
 
   return result
 }
+
+/* -------------------------------------------------------------------------- */
+
+//
+// Full upper incomplete gamma:
+//
+func GammaUpper(a, z float64) float64 {
+  return gamma_incomplete_imp(a, z, false, true)
+}
+
+//
+// Full lower incomplete gamma:
+//
+func GammaLower(a, z float64) float64 {
+  return gamma_incomplete_imp(a, z, false, false)
+}
+
+//
+// Regularised lower incomplete gamma:
+//
+func GammaP(a, z float64) float64 {
+  return gamma_incomplete_imp(a, z, true, false)
+}
+
+//
+// Regularised upper incomplete gamma:
+//
+func GammaQ(a, z float64) float64 {
+  return gamma_incomplete_imp(a, z, true, true)
+}
