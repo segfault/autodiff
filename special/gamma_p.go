@@ -1,7 +1,7 @@
 /* Copyright (C) 2016 Philipp Benner
  *
  * Code ported from boost (boost.org).
- * boost/math/special_functions/digamma.hpp
+ * boost/math/special_functions/gamma.hpp
  */
 
 //  Copyright John Maddock 2006-7, 2013-14.
