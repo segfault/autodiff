@@ -24,6 +24,28 @@ import "testing"
 
 /* -------------------------------------------------------------------------- */
 
+func TestUpperGammaFraction(t *testing.T) {
+  r := [][]float64{
+    { 1.0, 1.00000000000000005551e-01},
+    { 1.4, 1.03790927378330108399e-01},
+    { 1.8, 1.07855946289002427307e-01},
+    { 2.2, 1.12223541871388027280e-01},
+    { 2.6, 1.16925996415812985529e-01},
+    { 3.0, 1.22000000000000011213e-01},
+    { 3.4, 1.27487375159911875411e-01},
+    { 3.8, 1.33435939692965688241e-01} }
+  for i := 0; i < len(r); i++ {
+    epsilon := 1e-14*math.Pow(10,math.Floor(math.Log10(math.Abs(r[i][1]))))
+    value   := upper_gamma_fraction(r[i][0], 10)
+    target  := r[i][1]
+    error   := math.Abs(value - target)
+    if error > epsilon {
+      t.Errorf("upper_gamma_fraction() failed for `(%f) with error `%e', value=%e, target=%e\n",
+        r[i][0], error, value, target)
+    }
+  }
+}
+
 func TestLowerGammaSeries(t *testing.T) {
   r := [][]float64{
     { 1.0, 2.20254657948067233519e+03},

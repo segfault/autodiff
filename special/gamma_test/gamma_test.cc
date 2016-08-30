@@ -30,6 +30,18 @@ typedef lanczos::undefined_lanczos lanczos_type;
 
 /* -------------------------------------------------------------------------- */
 
+void test_upper_gamma_fraction() {
+        for (double  a = 1.0; a <= 4.0; a += 0.4) {
+                cout << "{"
+                     << setw(4)
+                     << setprecision( 1) << fixed << a << ", "
+                     << setprecision(20) << fixed << scientific
+                     << detail::upper_gamma_fraction(a, 10.0, policies::get_epsilon<double, Policy>())
+                     << "},"
+                     << endl;
+        }
+}
+
 void test_lower_gamma_series() {
         for (double  a = 1.0; a <= 4.0; a += 0.4) {
                 cout << "{"
@@ -76,7 +88,8 @@ void test_lower_incomplete_gamma() {
 }
 
 int main() {
-        test_lower_gamma_series();
+        test_upper_gamma_fraction();
+        //test_lower_gamma_series();
         //test_regularised_gamma_prefix();
         //test_lower_incomplete_gamma();
 }
