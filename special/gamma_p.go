@@ -540,6 +540,48 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
 
   result := 0.0
 
+  if(int(a) >= MaxFactorial && !normalised) {
+    //
+    // When we're computing the non-normalized incomplete gamma
+    // and a is large the result is rather hard to compute unless
+    // we use logs.  There are really two options - if x is a long
+    // way from a in value then we can reliably use methods 2 and 4
+    // below in logarithmic form and go straight to the result.
+    // Otherwise we let the regularized gamma take the strain
+    // (the result is unlikely to unerflow in the central region anyway)
+    // and combine with lgamma in the hopes that we get a finite result.
+    //
+    if invert && a*4.0 < x {
+      // This is method 4 below, done in logs:
+      result  = a*math.Log(x) - x
+      result += math.Log(upper_gamma_fraction(a, x))
+    } else
+    if !invert && a > 4.0*x {
+      // This is method 2 below, done in logs:
+      result  = a*math.Log(x) - x
+      result += math.Log(lower_gamma_series(a, x, 0) / a)
+    } else {
+      result = gamma_incomplete_imp(a, x, true, invert)
+      if result == 0.0 {
+        if invert {
+          // Try http://functions.wolfram.com/06.06.06.0039.01
+          result = 1.0 + 1.0/(12.0*a) + 1.0/(288.0*a*a)
+          result = math.Log(result) - a + (a - 0.5)*math.Log(a) + math.Log(M_ROOT_TWO_PI)
+        } else {
+          // This is method 2 below, done in logs, we're really outside the
+          // range of this method, but since the result is almost certainly
+          // infinite, we should probably be OK:
+          result  = a*math.Log(x) - x
+          result += math.Log(lower_gamma_series(a, x, 0)/a)
+        }
+      } else {
+        v, _  := math.Lgamma(a)
+        result = math.Log(result) + v
+      }
+    }
+    return math.Exp(result)
+   }
+
   is_int      := false
   is_half_int := false
   is_small_a  := a < 30 && a <= x + 1.0 && x < MaxLogFloat64
