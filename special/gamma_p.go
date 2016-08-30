@@ -24,11 +24,11 @@ type SmallGamma2Series struct {
   n      int
 }
 
-func NewSmallGamma2Series(a, x float64) SmallGamma2Series {
-  return SmallGamma2Series{-x, -x, a+1.0, 1}
+func NewSmallGamma2Series(a, x float64) *SmallGamma2Series {
+  return &SmallGamma2Series{-x, -x, a+1.0, 1}
 }
 
-func (series SmallGamma2Series) Eval() float64 {
+func (series *SmallGamma2Series) Eval() float64 {
   // result at this step
   r := series.result/series.apn
   // update variables
@@ -36,6 +36,23 @@ func (series SmallGamma2Series) Eval() float64 {
   series.n      += 1
   series.result /= float64(series.n)
   series.apn    += 1.0
+  return r
+}
+
+type LowerIncompleteGammaSeries struct {
+  result float64
+  a      float64
+  z      float64
+}
+
+func NewLowerIncompleteGammaSeries(a1, z1 float64) *LowerIncompleteGammaSeries {
+  return &LowerIncompleteGammaSeries{1, a1, z1}
+}
+
+func (series *LowerIncompleteGammaSeries) Eval() float64 {
+  r := series.result
+  series.a      += 1.0
+  series.result *= series.z/series.a
   return r
 }
 
@@ -79,9 +96,14 @@ func finite_half_gamma_q(a, x float64) float64 {
   return e
 }
 
+func lower_gamma_series(a, z, init_value float64) float64 {
+  s := NewLowerIncompleteGammaSeries(a, z)
+  return SumSeries(s, init_value, 2.22045e-16, SeriesIterationsMax)
+}
+
 func regularised_gamma_prefix(a, z float64) float64 {
   limit := math.Max(10.0, a)
-  sum   := lower_gamma_series  (a, limit)/a
+  sum   := lower_gamma_series  (a, limit, 0.0)/a
   sum   += upper_gamma_fraction(a, limit, 2.22045e-16)
 
   if a < 10.0 {
