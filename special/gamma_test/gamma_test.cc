@@ -28,7 +28,8 @@ using namespace boost::math;
 
 void test_regularised_gamma_prefix() {
         typedef policies::policy<> Policy;
-        typedef lanczos::lanczos<double, Policy>::type lanczos_type;
+        typedef lanczos::undefined_lanczos lanczos_type;
+//        typedef lanczos::lanczos<double, Policy>::type lanczos_type;
 
         for (double  a = 1.0; a <= 4.0; a += 0.4) {
                 for (double z = 0.05; z <= 4; z += 0.05) {
