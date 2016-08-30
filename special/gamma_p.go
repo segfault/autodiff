@@ -584,9 +584,8 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
 
   is_int      := false
   is_half_int := false
-  is_small_a  := a < 30 && a <= x + 1.0 && x < MaxLogFloat64
 
-  if is_small_a {
+  if a < 30 && a <= x + 1.0 && x < MaxLogFloat64 {
     fa := math.Floor(a)
     if fa == a {
       is_int = true
