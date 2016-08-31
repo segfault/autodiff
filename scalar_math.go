@@ -143,6 +143,11 @@ func Mlgamma(a Scalar, k int) Scalar {
   return c.Mlgamma(a, k)
 }
 
+func GammaP(a float64, x Scalar) Scalar {
+  c := x.Clone()
+  return c.GammaP(a, x)
+}
+
 func Min(a, b Scalar) Scalar {
   return a.Min(b)
 }

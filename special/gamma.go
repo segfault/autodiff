@@ -860,11 +860,11 @@ func GammaP(a, z float64) float64 {
 }
 
 func GammaPfirstDerivative(a, z float64) float64 {
-  return gamma_p_second_derivative_imp(a, z)
+  return gamma_p_derivative_imp(a, z)
 }
 
 func GammaPsecondDerivative(a, z float64) float64 {
-  return gamma_p_derivative_imp(a, z)
+  return gamma_p_second_derivative_imp(a, z)
 }
 
 //

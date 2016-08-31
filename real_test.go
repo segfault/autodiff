@@ -249,3 +249,17 @@ func TestGamma(t *testing.T) {
     t.Error("Incorrect derivative for Gamma()!")
   }
 }
+
+func TestGammaP(t *testing.T) {
+
+  x := NewReal(4.321)
+  Variables(2, x)
+
+  s := GammaP(9.125, x)
+
+  if math.Abs(s.GetValue() - 0.029234) > 1e-6           ||
+    (math.Abs(s.GetDerivative(1, 0) - 0.036763) > 1e-6) ||
+    (math.Abs(s.GetDerivative(2, 0) - 0.032364) > 1e-6) {
+    t.Error("Incorrect derivative for Gamma()!")
+  }
+}
