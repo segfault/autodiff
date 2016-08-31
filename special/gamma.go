@@ -789,6 +789,48 @@ func gamma_incomplete_imp(a, x float64, normalised, invert bool) float64 {
   return result
 }
 
+func gamma_p_derivative_imp(a, x float64) float64 {
+  //
+  // Usual error checks first:
+  //
+  if a <= 0 {
+    return math.NaN()
+  }
+  if x < 0 {
+    return math.NaN()
+  }
+  //
+  // Now special cases:
+  //
+  if x == 0.0 {
+    if a > 1.0 {
+      return 0.0
+    } else
+    if a == 1.0 {
+      return 1.0
+    } else {
+      return math.Inf(1)
+    }
+  }
+  //
+  // Normal case:
+  //
+  f1 := regularised_gamma_prefix(a, x)
+  if x < 1.0 && math.MaxFloat64*x < f1 {
+    // overflow:
+    return math.Inf(1)
+   }
+   if f1 == 0.0 {
+     // Underflow in calculation, use logs instead:
+     v, _ := math.Lgamma(a)
+     f1 = a*math.Log(x) - x - v - math.Log(x)
+     f1 = math.Exp(f1)
+   } else {
+     f1 /= x
+   }
+   return f1
+}
+
 /* -------------------------------------------------------------------------- */
 
 //
