@@ -854,6 +854,10 @@ func GammaP(a, z float64) float64 {
   return gamma_incomplete_imp(a, z, true, false)
 }
 
+func GammaPderivative(a, z float64) float64 {
+  return gamma_p_derivative_imp(a, z)
+}
+
 //
 // Regularised upper incomplete gamma:
 //
