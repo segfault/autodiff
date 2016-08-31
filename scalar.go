@@ -83,6 +83,7 @@ type Scalar interface {
   Gamma     (Scalar)          Scalar
   Lgamma    (Scalar)          Scalar
   Mlgamma   (Scalar, int)     Scalar // multivariate log gamma
+  GammaP    (float64, Scalar) Scalar // regularized lower incomplete gamma
   // vector operations
   VdotV     (a, b Vector)     Scalar
   // nice printing

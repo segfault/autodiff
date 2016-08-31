@@ -300,6 +300,12 @@ func (c *BareReal) Mlgamma(a Scalar, k int) Scalar {
   return c
 }
 
+func (c *BareReal) GammaP(a float64, x Scalar) Scalar {
+  checkBare(x)
+  *c = BareReal(special.GammaP(a, x.GetValue()))
+  return c
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (r *BareReal) VdotV(a, b Vector) Scalar {

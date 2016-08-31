@@ -594,6 +594,17 @@ func (c *Real) Mlgamma(a Scalar, k int) Scalar {
   return c
 }
 
+func (c *Real) GammaP(a float64, x Scalar) Scalar {
+  c.AllocForOne(x)
+  if c.Order >= 1 {
+    for i := 0; i < x.GetN(); i++ {
+      c.SetDerivative(1, i, special.GammaPderivative(a, x.GetValue()))
+    }
+  }
+  c.SetValue(special.GammaP(a, x.GetValue()))
+  return c
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (r *Real) VdotV(a, b Vector) Scalar {
