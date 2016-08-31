@@ -596,14 +596,17 @@ func (c *Real) Mlgamma(a Scalar, k int) Scalar {
 
 func (c *Real) GammaP(a float64, x Scalar) Scalar {
   c.AllocForOne(x)
+  // preevaluate some expressions
+  v1 := special.GammaPfirstDerivative(a, x.GetValue())
+  v2 := special.GammaPsecondDerivative(a, x.GetValue())
   if c.Order >= 2 {
     for i := 0; i < x.GetN(); i++ {
-      c.SetDerivative(2, i, special.GammaPsecondDerivative(a, x.GetValue()))
+      c.SetDerivative(2, i, x.GetDerivative(2, i)*v1 + x.GetDerivative(1, i)*x.GetDerivative(1, i)*v2)
     }
   }
   if c.Order >= 1 {
     for i := 0; i < x.GetN(); i++ {
-      c.SetDerivative(1, i, special.GammaPfirstDerivative(a, x.GetValue()))
+      c.SetDerivative(1, i, x.GetDerivative(1, i)*v1)
     }
   }
   c.SetValue(special.GammaP(a, x.GetValue()))
