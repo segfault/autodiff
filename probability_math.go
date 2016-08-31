@@ -403,45 +403,46 @@ func (c *Probability) Lgamma(a Scalar) Scalar {
 
 func (c *Probability) Mlgamma(a Scalar, k int) Scalar {
   c.AllocForOne(a)
-  // preevaluate some expressions
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      sum := 0.0
-      for j := 1; j <= k; j++ {
-        sum += special.Trigamma(a.GetValue() + float64(1-j)/2.0)
-      }
-      c.SetDerivative(2, i, sum)
-    }
-  }
+  v1 := special.Mlgamma(a.GetValue(), k)
   if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      sum := 0.0
+    v2 := 0.0
+    for j := 1; j <= k; j++ {
+      v2 += special.Digamma(a.GetValue() + float64(1-j)/2.0)
+    }
+    if c.Order >= 2 {
+      v3 := 0.0
       for j := 1; j <= k; j++ {
-        sum += special.Digamma(a.GetValue() + float64(1-j)/2.0)
+        v3 += special.Trigamma(a.GetValue() + float64(1-j)/2.0)
       }
-      c.SetDerivative(1, i, sum)
+      for i := 0; i < a.GetN(); i++ {
+        c.SetDerivative(2, i, a.GetDerivative(2, i)*v2 + a.GetDerivative(1, i)*a.GetDerivative(1, i)*v3)
+      }
+    }
+    for i := 0; i < a.GetN(); i++ {
+      c.SetDerivative(1, i, v2*c.GetDerivative(1, i))
     }
   }
-  c.SetValue(special.Mlgamma(a.GetValue(), k))
+  c.SetValue(v1)
   return c
 }
 
 func (c *Probability) GammaP(a float64, x Scalar) Scalar {
   c.AllocForOne(x)
   // preevaluate some expressions
-  v1 := special.GammaPfirstDerivative(a, x.GetValue())
-  v2 := special.GammaPsecondDerivative(a, x.GetValue())
-  if c.Order >= 2 {
-    for i := 0; i < x.GetN(); i++ {
-      c.SetDerivative(2, i, x.GetDerivative(2, i)*v1 + x.GetDerivative(1, i)*x.GetDerivative(1, i)*v2)
-    }
-  }
+  v1 := special.GammaP(a, x.GetValue())
   if c.Order >= 1 {
+    v2 := special.GammaPfirstDerivative(a, x.GetValue())
+    if c.Order >= 2 {
+      v3 := special.GammaPsecondDerivative(a, x.GetValue())
+      for i := 0; i < x.GetN(); i++ {
+        c.SetDerivative(2, i, x.GetDerivative(2, i)*v2 + x.GetDerivative(1, i)*x.GetDerivative(1, i)*v3)
+      }
+    }
     for i := 0; i < x.GetN(); i++ {
-      c.SetDerivative(1, i, x.GetDerivative(1, i)*v1)
+      c.SetDerivative(1, i, x.GetDerivative(1, i)*v2)
     }
   }
-  c.SetValue(special.GammaP(a, x.GetValue()))
+  c.SetValue(v1)
   return c
 }
 
