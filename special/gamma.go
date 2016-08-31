@@ -831,6 +831,11 @@ func gamma_p_derivative_imp(a, x float64) float64 {
    return f1
 }
 
+func gamma_p_second_derivative_imp(a, x float64) float64 {
+  t := gamma_p_derivative_imp(a, x)
+  return (a-1.0)*t/x - t
+}
+
 /* -------------------------------------------------------------------------- */
 
 //
@@ -854,7 +859,11 @@ func GammaP(a, z float64) float64 {
   return gamma_incomplete_imp(a, z, true, false)
 }
 
-func GammaPderivative(a, z float64) float64 {
+func GammaPfirstDerivative(a, z float64) float64 {
+  return gamma_p_second_derivative_imp(a, z)
+}
+
+func GammaPsecondDerivative(a, z float64) float64 {
   return gamma_p_derivative_imp(a, z)
 }
 

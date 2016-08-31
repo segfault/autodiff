@@ -428,9 +428,14 @@ func (c *Probability) Mlgamma(a Scalar, k int) Scalar {
 
 func (c *Probability) GammaP(a float64, x Scalar) Scalar {
   c.AllocForOne(x)
+  if c.Order >= 2 {
+    for i := 0; i < x.GetN(); i++ {
+      c.SetDerivative(2, i, special.GammaPsecondDerivative(a, x.GetValue()))
+    }
+  }
   if c.Order >= 1 {
     for i := 0; i < x.GetN(); i++ {
-      c.SetDerivative(1, i, special.GammaPderivative(a, x.GetValue()))
+      c.SetDerivative(1, i, special.GammaPfirstDerivative(a, x.GetValue()))
     }
   }
   c.SetValue(special.GammaP(a, x.GetValue()))
