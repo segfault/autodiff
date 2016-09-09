@@ -77,6 +77,7 @@ type Scalar interface {
   Tanh      (Scalar)          Scalar
   Exp       (Scalar)          Scalar
   Log       (Scalar)          Scalar
+  Log1p     (Scalar)          Scalar
   Erf       (Scalar)          Scalar
   Erfc      (Scalar)          Scalar
   LogErfc   (Scalar)          Scalar

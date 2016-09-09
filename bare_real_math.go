@@ -260,6 +260,12 @@ func (c *BareReal) Log(a Scalar) Scalar {
   return c
 }
 
+func (c *BareReal) Log1p(a Scalar) Scalar {
+  checkBare(a)
+  *c = BareReal(math.Log1p(a.GetValue()))
+  return c
+}
+
 func (c *BareReal) Erf(a Scalar) Scalar {
   checkBare(a)
   *c = BareReal(math.Erf(a.GetValue()))

@@ -298,7 +298,7 @@ func (c *Probability) Log(a Scalar) Scalar {
   c.AllocForOne(a)
   if c.GetOrder() >= 2 {
     for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, (a.GetDerivative(2, i)*a.GetValue() - a.GetDerivative(1, i)*a.GetDerivative(1, i))/(a.GetValue()*a.GetValue()))
+      c.SetDerivative(2, i, a.GetDerivative(2, i)/a.GetValue() - a.GetDerivative(1, i)*a.GetDerivative(1, i)/(a.GetValue()*a.GetValue()))
     }
   }
   if c.GetOrder() >= 1 {
@@ -307,6 +307,22 @@ func (c *Probability) Log(a Scalar) Scalar {
     }
   }
   c.Value = math.Log(a.GetLogValue())
+  return c
+}
+
+func (c *Probability) Log1p(a Scalar) Scalar {
+  c.AllocForOne(a)
+  if c.Order >= 2 {
+    for i := 0; i < a.GetN(); i++ {
+      c.SetDerivative(2, i, a.GetDerivative(2, i)/(1.0 + a.GetValue()) - a.GetDerivative(1, i)*a.GetDerivative(1, i)/((1.0 + a.GetValue())*(1.0 + a.GetValue())))
+    }
+  }
+  if c.Order >= 1 {
+    for i := 0; i < a.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)/(1.0 + a.GetValue()))
+    }
+  }
+  c.SetValue(math.Log1p(a.GetValue()))
   return c
 }
 
