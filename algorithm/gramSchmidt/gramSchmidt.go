@@ -1,0 +1,59 @@
+/* Copyright (C) 2015 Philipp Benner
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package gradientDescent
+
+/* -------------------------------------------------------------------------- */
+
+import . "github.com/pbenner/autodiff"
+//import . "github.com/pbenner/autodiff/algorithm"
+
+/* -------------------------------------------------------------------------- */
+
+func gramSchmidt(a Matrix) (Matrix, Matrix, error) {
+
+  n, m := a.Dims()
+
+  t := a.ElementType()
+  v := a.Clone()
+  q := NullDenseMatrix(t, n, m)
+  r := NullDenseMatrix(t, n, m)
+  s := NullScalar(t)
+
+  for i := 0; i < m; i++ {
+    // r_ii = ||v_i||
+    r.Set(Vnorm(v.Col(i)), i, i)
+    for k := 0; k < n; k++ {
+      q.ReferenceAt(k, i).Div(v.ReferenceAt(k, i), r.ReferenceAt(i, i))
+    }
+    for j := i+1; j < m; j++ {
+      w := v.Col(j)
+      r.ReferenceAt(i, j).VdotV(q.Col(i), w)
+      for k := 0; k < n; k++ {
+        s.Mul(r.ReferenceAt(i, j), q.ReferenceAt(k, i))
+        w[k].Sub(w[k], s)
+      }
+    }
+  }
+  return q, r, nil
+}
+
+/* -------------------------------------------------------------------------- */
+
+func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
+
+  return gramSchmidt(a)
+}
