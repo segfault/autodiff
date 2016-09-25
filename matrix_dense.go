@@ -132,9 +132,11 @@ func (matrix *DenseMatrix) SetValues(v Vector) {
 }
 
 func (matrix *DenseMatrix) Row(i int) Vector {
-  n := matrix.index(i, 0)
-  m := matrix.index(i, matrix.Cols)
-  return matrix.Values[n:m]
+  v := NilVector(matrix.Cols)
+  for j := 0; j < matrix.Cols; j++ {
+    v[j] = matrix.Values[matrix.index(i, j)]
+  }
+  return v
 }
 
 func (matrix *DenseMatrix) Col(j int) Vector {
