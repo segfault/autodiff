@@ -18,19 +18,23 @@ package gradientDescent
 
 /* -------------------------------------------------------------------------- */
 
+import   "fmt"
+
 import . "github.com/pbenner/autodiff"
 //import . "github.com/pbenner/autodiff/algorithm"
 
 /* -------------------------------------------------------------------------- */
 
-func gramSchmidt(a Matrix) (Matrix, Matrix, error) {
+type InSitu struct {
+  Q Matrix
+  R Matrix
+}
 
-  n, m := a.Dims()
+/* -------------------------------------------------------------------------- */
 
-  t := a.ElementType()
+func gramSchmidt(a, q, r Matrix, t ScalarType, n, m int) (Matrix, Matrix, error) {
+
   v := a.Clone()
-  q := NullDenseMatrix(t, n, m)
-  r := NullDenseMatrix(t, n, m)
   s := NullScalar(t)
 
   for i := 0; i < m; i++ {
@@ -55,5 +59,33 @@ func gramSchmidt(a Matrix) (Matrix, Matrix, error) {
 
 func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
 
-  return gramSchmidt(a)
+  n, m := a.Dims()
+  t := a.ElementType()
+
+  var q Matrix
+  var r Matrix
+
+  // loop over optional arguments
+  for _, arg := range args {
+    switch a := arg.(type) {
+    case InSitu:
+      q = a.Q
+      r = a.R
+    }
+  }
+  if q == nil {
+    q = NullDenseMatrix(t, n, m)
+  } else {
+    if u, v := q.Dims(); u != n || v != m {
+      return nil, nil, fmt.Errorf("q has invalid dimension")
+    }
+  }
+  if r == nil {
+    r = NullDenseMatrix(t, n, m)
+  } else {
+    if u, v := r.Dims(); u != n || v != m {
+      return nil, nil, fmt.Errorf("r has invalid dimension")
+    }
+  }
+  return gramSchmidt(a, q, r, t, n, m)
 }
