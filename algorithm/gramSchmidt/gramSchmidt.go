@@ -77,14 +77,14 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
     q = NullDenseMatrix(t, n, m)
   } else {
     if u, v := q.Dims(); u != n || v != m {
-      return nil, nil, fmt.Errorf("q has invalid dimension")
+      return nil, nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
     }
   }
   if r == nil {
     r = NullDenseMatrix(t, n, m)
   } else {
     if u, v := r.Dims(); u != n || v != m {
-      return nil, nil, fmt.Errorf("r has invalid dimension")
+      return nil, nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
     }
   }
   return gramSchmidt(a, q, r, t, n, m)
