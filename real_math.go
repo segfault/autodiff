@@ -644,3 +644,14 @@ func (r *Real) VdotV(a, b Vector) Scalar {
   }
   return r
 }
+
+func (r *Real) Vnorm(a Vector) Scalar {
+  c := NewBareReal(2.0)
+  t := NullScalar(a.ElementType())
+  for i := 0; i < len(a); i++ {
+    t.Pow(a[i], c)
+    r.Add(r, t)
+  }
+  r.Sqrt(r)
+  return r
+}

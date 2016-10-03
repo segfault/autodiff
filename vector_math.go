@@ -201,31 +201,16 @@ func VdivS(a Vector, s Scalar) Vector {
 
 /* -------------------------------------------------------------------------- */
 
-// Dot product of two vectors.
 func VdotV(a, b Vector) Scalar {
-  if len(a) != len(b) {
-    panic("vector dimensions do not match")
-  }
   r := NullScalar(a.ElementType())
-  t := NullScalar(a.ElementType())
-  for i := 0; i < len(a); i++ {
-    t.Mul(a[i], b[i])
-    r.Add(r, t)
-  }
+  r.VdotV(a, b)
   return r
 }
 
 /* -------------------------------------------------------------------------- */
 
-// Euclidean vector norm
 func Vnorm(a Vector) Scalar {
-  c := NewBareReal(2.0)
-  t := NullScalar(a.ElementType())
   r := NullScalar(a.ElementType())
-  for i := 0; i < len(a); i++ {
-    t.Pow(a[i], c)
-    r.Add(r, t)
-  }
-  r.Sqrt(r)
+  r.Vnorm(a)
   return r
 }

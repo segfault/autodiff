@@ -87,6 +87,7 @@ type Scalar interface {
   GammaP    (float64, Scalar) Scalar // regularized lower incomplete gamma
   // vector operations
   VdotV     (a, b Vector)     Scalar
+  Vnorm     (a    Vector)     Scalar
   // nice printing
   fmt.Stringer
 }
