@@ -318,6 +318,7 @@ func (r *BareReal) VdotV(a, b Vector) Scalar {
   if len(a) != len(b) {
     panic("vector dimensions do not match")
   }
+  r.Reset()
   t := NullBareReal()
   for i := 0; i < len(a); i++ {
     t.Mul(a[i], b[i])
@@ -327,6 +328,7 @@ func (r *BareReal) VdotV(a, b Vector) Scalar {
 }
 
 func (r *BareReal) Vnorm(a Vector) Scalar {
+  r.Reset()
   c := NewBareReal(2.0)
   t := NullScalar(a.ElementType())
   for i := 0; i < len(a); i++ {

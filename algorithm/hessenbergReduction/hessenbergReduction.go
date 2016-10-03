@@ -34,9 +34,12 @@ type InSitu struct {
 /* -------------------------------------------------------------------------- */
 
 func fu(x, u Vector, s Scalar) Vector {
-  // s = -||x||
+  // s = ||x||
   s.Vnorm(x)
-  s.Neg(s)
+  // s = -sign(x[0]) ||x||
+  if x[0].GetValue() >= 0.0 {
+    s.Neg(s)
+  }
   // u = x - s e_1
   u[0].Sub(x[0], s)
   for i := 1; i < len(x); i++ {
