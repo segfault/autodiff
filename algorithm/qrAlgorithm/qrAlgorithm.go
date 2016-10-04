@@ -19,12 +19,17 @@ package qrAlgorithm
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
+import   "math"
 
 import . "github.com/pbenner/autodiff"
 import   "github.com/pbenner/autodiff/algorithm/gramSchmidt"
 import   "github.com/pbenner/autodiff/algorithm/hessenbergReduction"
 
 /* -------------------------------------------------------------------------- */
+
+type Epsilon struct {
+  Value float64
+}
 
 type InSitu struct {
   // Hessenberg QR algorithm
@@ -100,7 +105,7 @@ func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2 Scalar, n int) {
 
 }
 
-func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar) (Matrix, error) {
+func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar, epsilon float64) (Matrix, error) {
   n, _ := a.Dims()
 
   h, err := hessenbergReduction.Run(a)
@@ -108,9 +113,13 @@ func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar) (Matrix, error)
     return nil, err
   }
 
-  for k := 0; k < 100; k++ {
+  for n > 1 {
 
-    hessenbergQrAlgorithmStep(h, c, s, t1, t2, n)
+    if v := h.ReferenceAt(n-1, n-2); math.Abs(v.GetValue()) < epsilon {
+      n--
+    } else {
+      hessenbergQrAlgorithmStep(h, c, s, t1, t2, n)
+    }
 
   }
   return h, nil
@@ -158,6 +167,8 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   var t1 Scalar
   var t2 Scalar
 
+  epsilon := 1e-12
+
   // loop over optional arguments
   for _, arg := range args {
     switch tmp := arg.(type) {
@@ -169,6 +180,8 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
       s = tmp.S
       t1 = tmp.T1
       t2 = tmp.T2
+    case Epsilon:
+      epsilon = tmp.Value
     }
   }
   if b == nil {
@@ -212,5 +225,5 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   if t2 == nil {
     t2 = NullScalar(t)
   }
-  return hessenbergQrAlgorithm(a, c, s, t1, t2)
+  return hessenbergQrAlgorithm(a, c, s, t1, t2, epsilon)
 }
