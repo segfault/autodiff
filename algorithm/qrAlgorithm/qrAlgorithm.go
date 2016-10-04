@@ -58,6 +58,48 @@ func givens(a, b, c, s Scalar) {
   s.Div(b, t1)
 }
 
+func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2 Scalar, n int) {
+
+  for i := 0; i < n-1; i++ {
+    givens(h.ReferenceAt(i, i), h.ReferenceAt(i+1, i), c[i], s[i])
+    // multiply with Givens matrix (G H)
+    for j := i; j < n; j++ {
+      h1 := h.ReferenceAt(i+0, j)
+      h2 := h.ReferenceAt(i+1, j)
+      // backup h1
+      t1.Set(h1)       // t1 = h1
+      // update h1
+      h1.Mul(c[i], h1) // h1 = c h1
+      t2.Mul(s[i], h2) // t2 = s h2
+      h1.Add(h1, t2)   // h1 = c h1 + s h2
+      // update h2
+      t1.Mul(s[i], t1) // t1 =  s h1
+      t1.Neg(t1)       // t1 = -s h1
+      t2.Mul(c[i], h2) // t2 =  c h2
+      h2.Add(t1, t2)   // h2 = -s h1 + c h2
+    }
+  }
+  for i := 0; i < n-1; i++ {
+    // multiply with Givens matrix (H G)
+    for j := 0; j <= i+1; j++ {
+      h1 := h.ReferenceAt(j, i+0)
+      h2 := h.ReferenceAt(j, i+1)
+      // backup h1
+      t1.Set(h1)       // t1 = h1
+      // update h1
+      h1.Mul(c[i], h1) // h1 = c h1
+      t2.Mul(s[i], h2) // t2 = s h2
+      h1.Add(h1, t2)   // h1 = c h1 + s h2
+      // update h2
+      t1.Mul(s[i], t1) // t1 =  s h1
+      t1.Neg(t1)       // t1 = -s h1
+      t2.Mul(c[i], h2) // t2 =  c h2
+      h2.Add(t1, t2)   // h2 = -s h1 + c h2
+    }
+  }
+
+}
+
 func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar) (Matrix, error) {
   n, _ := a.Dims()
 
@@ -68,44 +110,8 @@ func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar) (Matrix, error)
 
   for k := 0; k < 100; k++ {
 
-    for i := 0; i < n-1; i++ {
-      givens(h.ReferenceAt(i, i), h.ReferenceAt(i+1, i), c[i], s[i])
-      // multiply with Givens matrix (G H)
-      for j := i; j < n; j++ {
-        h1 := h.ReferenceAt(i+0, j)
-        h2 := h.ReferenceAt(i+1, j)
-        // backup h1
-        t1.Set(h1)       // t1 = h1
-        // update h1
-        h1.Mul(c[i], h1) // h1 = c h1
-        t2.Mul(s[i], h2) // t2 = s h2
-        h1.Add(h1, t2)   // h1 = c h1 + s h2
-        // update h2
-        t1.Mul(s[i], t1) // t1 =  s h1
-        t1.Neg(t1)       // t1 = -s h1
-        t2.Mul(c[i], h2) // t2 =  c h2
-        h2.Add(t1, t2)   // h2 = -s h1 + c h2
-      }
-    }
-    for i := 0; i < n-1; i++ {
-      // multiply with Givens matrix (H G)
-      for j := 0; j <= i+1; j++ {
-        h1 := h.ReferenceAt(j, i+0)
-        h2 := h.ReferenceAt(j, i+1)
-        // backup h1
-        t1.Set(h1)       // t1 = h1
-        // update h1
-        h1.Mul(c[i], h1) // h1 = c h1
-        t2.Mul(s[i], h2) // t2 = s h2
-        h1.Add(h1, t2)   // h1 = c h1 + s h2
-        // update h2
-        t1.Mul(s[i], t1) // t1 =  s h1
-        t1.Neg(t1)       // t1 = -s h1
-        t2.Mul(c[i], h2) // t2 =  c h2
-        h2.Add(t1, t2)   // h2 = -s h1 + c h2
-      }
+    hessenbergQrAlgorithmStep(h, c, s, t1, t2, n)
 
-    }
   }
   return h, nil
 }
