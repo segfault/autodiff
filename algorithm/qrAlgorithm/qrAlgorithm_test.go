@@ -18,7 +18,9 @@ package qrAlgorithm
 
 /* -------------------------------------------------------------------------- */
 
-import   "fmt"
+//import   "fmt"
+import   "math"
+import   "sort"
 import   "testing"
 
 import . "github.com/pbenner/autodiff"
@@ -34,21 +36,18 @@ func TestRProp(t *testing.T) {
 
   h, _ := Run(a)
 
-  fmt.Println("H:",h)
-  
-  // q, r, _ := Run(a)
+  eigenvalues := []float64{-1.561553e+00, -7.416574e-01, 2.561553e+00, 6.741657e+00}
 
-  // r1 := NewDenseMatrix(RealType, 2, 2, []float64{
-  //   1, 0,
-  //   0, 1})
-  // r2 := NewDenseMatrix(RealType, 2, 2, []float64{
-  //   4, -1,
-  //   0,  1})
+  r := []float64{}
+  for i := 0; i < 4; i++ {
+    r = append(r, h.At(i, i).GetValue())
+  }
+  sort.Float64s(r)
 
-  // if Mnorm(MsubM(r1, q)).GetValue() > 1e-8 {
-  //   t.Error("QR-Algorithm failed!")
-  // }
-  // if Mnorm(MsubM(r2, r)).GetValue() > 1e-8 {
-  //   t.Error("QR-Algorithm failed!")
-  // }
+  for i := 0; i < 4; i++ {
+    if math.Abs(r[i]-eigenvalues[i]) > 1e-5 {
+      t.Errorf("test failed for eigenvalue `%d'", i)
+    }
+  }
+
 }
