@@ -108,7 +108,8 @@ func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2 Scalar, n int) {
 func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2 Scalar, epsilon float64) (Matrix, error) {
   n, _ := a.Dims()
 
-  h, err := hessenbergReduction.Run(a)
+  h, err := hessenbergReduction.Run(a, hessenbergReduction.InSitu{
+    H: a, X: c, U: s, S: t1})
   if err != nil {
     return nil, err
   }
