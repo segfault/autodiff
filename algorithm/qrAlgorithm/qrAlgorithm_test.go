@@ -18,7 +18,7 @@ package qrAlgorithm
 
 /* -------------------------------------------------------------------------- */
 
-//import   "fmt"
+import   "fmt"
 import   "testing"
 
 import . "github.com/pbenner/autodiff"
@@ -26,23 +26,29 @@ import . "github.com/pbenner/autodiff"
 /* -------------------------------------------------------------------------- */
 
 func TestRProp(t *testing.T) {
-  a := NewDenseMatrix(RealType, 2, 2, []float64{
-    2, 1,
-    2, 3})
+  a := NewDenseMatrix(RealType, 4, 4, []float64{
+    1, 2,  3, 4,
+    4, 4,  4, 4,
+    0, 1, -1, 1,
+    0, 0,  2, 3 })
 
-  q, r, _ := Run(a)
+  h, _ := Run(a)
 
-  r1 := NewDenseMatrix(RealType, 2, 2, []float64{
-    1, 0,
-    0, 1})
-  r2 := NewDenseMatrix(RealType, 2, 2, []float64{
-    4, -1,
-    0,  1})
+  fmt.Println("H:",h)
+  
+  // q, r, _ := Run(a)
 
-  if Mnorm(MsubM(r1, q)).GetValue() > 1e-8 {
-    t.Error("QR-Algorithm failed!")
-  }
-  if Mnorm(MsubM(r2, r)).GetValue() > 1e-8 {
-    t.Error("QR-Algorithm failed!")
-  }
+  // r1 := NewDenseMatrix(RealType, 2, 2, []float64{
+  //   1, 0,
+  //   0, 1})
+  // r2 := NewDenseMatrix(RealType, 2, 2, []float64{
+  //   4, -1,
+  //   0,  1})
+
+  // if Mnorm(MsubM(r1, q)).GetValue() > 1e-8 {
+  //   t.Error("QR-Algorithm failed!")
+  // }
+  // if Mnorm(MsubM(r2, r)).GetValue() > 1e-8 {
+  //   t.Error("QR-Algorithm failed!")
+  // }
 }

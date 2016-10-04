@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package hessnebergReduction
+package hessenbergReduction
 
 /* -------------------------------------------------------------------------- */
 
@@ -114,13 +114,16 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
 
   // loop over optional arguments
   for _, arg := range args {
-    switch a := arg.(type) {
+    switch tmp := arg.(type) {
     case InSitu:
-      h = a.H
+      h = tmp.H
+      x = tmp.X
+      u = tmp.U
+      s = tmp.S
     }
   }
   if h == nil {
-    h = NullDenseMatrix(t, n, m)
+    h = a.Clone()
   } else {
     if u, v := h.Dims(); u != n || v != m {
       return nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
@@ -143,5 +146,5 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   if s == nil {
     s = NullScalar(t)
   }
-  return hessenbergReduction(a, x, u, s)
+  return hessenbergReduction(h, x, u, s)
 }
