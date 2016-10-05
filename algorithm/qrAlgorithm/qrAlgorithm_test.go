@@ -35,9 +35,9 @@ func TestRProp(t *testing.T) {
     0, 0,  2, 3 })
 
   h, u, _ := Run(a)
-  fmt.Println(h)
+  fmt.Println(a)
 
-  b := MdotM(MdotM(u, a), u.T())
+  b := MdotM(MdotM(u, h), u.T())
   fmt.Println(b)
 
   eigenvalues := []float64{-1.561553e+00, -7.416574e-01, 2.561553e+00, 6.741657e+00}
@@ -53,5 +53,7 @@ func TestRProp(t *testing.T) {
       t.Errorf("test failed for eigenvalue `%d'", i)
     }
   }
-
+  if math.Abs(Mnorm(MsubM(a, b)).GetValue()) > 1e-4 {
+    t.Errorf("test failed")
+  }
 }
