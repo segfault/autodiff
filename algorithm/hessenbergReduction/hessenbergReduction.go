@@ -34,6 +34,18 @@ type InSitu struct {
   S Scalar
 }
 
+func NewInSitu(t ScalarType, n int) InSitu {
+  s := InSitu{}
+  s.InitializeH = true
+  s.InitializeV = true
+  s.H = NullDenseMatrix(t, n, n)
+  s.V = NullDenseMatrix(t, n, n)
+  s.X = NullVector(t, n)
+  s.U = NullVector(t, n)
+  s.S = NullScalar(t)
+  return s
+}
+
 /* -------------------------------------------------------------------------- */
 
 func fu(x, u Vector, s Scalar) Vector {
@@ -128,6 +140,10 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
 
   n, m := a.Dims()
   t := a.ElementType()
+
+  if n != m {
+    return nil, nil, fmt.Errorf("`a' must be a square matrix")
+  }
 
   initializeH := true
   initializeV := true

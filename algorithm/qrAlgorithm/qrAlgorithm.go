@@ -45,6 +45,20 @@ type InSitu struct {
   T1, T2, T3 Scalar
 }
 
+func NewInSitu(t ScalarType, n int) InSitu {
+  s := InSitu{}
+  s.InitializeH = true
+  s.InitializeU = true
+  s.H = NullDenseMatrix(t, n, n)
+  s.U = NullDenseMatrix(t, n, n)
+  s.C = NullVector(t, n)
+  s.S = NullVector(t, n)
+  s.T1 = NullScalar(t)
+  s.T2 = NullScalar(t)
+  s.T3 = NullScalar(t)
+  return s
+}
+
 /* -------------------------------------------------------------------------- */
 
 func givens(a, b, c, s Scalar) {
@@ -165,7 +179,7 @@ func hessenbergQrAlgorithm(h, u Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon 
 func qrAlgorithm(a, b, q, r Matrix, t ScalarType) (Matrix, Matrix, error) {
 
   n, m := a.Dims()
-  
+
   a = a.Clone()
 
   for {
@@ -194,6 +208,9 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   n, m := a.Dims()
   t := a.ElementType()
 
+  if n != m {
+    return nil, nil, fmt.Errorf("`a' must be a square matrix")
+  }
   initializeH := true
   initializeU := true
 
