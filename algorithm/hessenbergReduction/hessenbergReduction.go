@@ -26,6 +26,7 @@ import . "github.com/pbenner/autodiff"
 
 type InSitu struct {
   H Matrix
+  V Matrix
   X Vector
   U Vector
   S Scalar
@@ -37,7 +38,7 @@ func fu(x, u Vector, s Scalar) Vector {
   // s = ||x||
   s.Vnorm(x)
   // s = -sign(x[0]) ||x||
-  if x[0].GetValue() >= 0.0 {
+  if x[0].GetValue() > 0.0 {
     s.Neg(s)
   }
   // u = x - s e_1
@@ -52,7 +53,7 @@ func fu(x, u Vector, s Scalar) Vector {
   return u
 }
 
-func hessenbergReduction(a Matrix, x, u Vector, s Scalar) (Matrix, error) {
+func hessenbergReduction(a, v Matrix, x, u Vector, s Scalar) (Matrix, Matrix, error) {
   n, _ := a.Dims()
 
   for k := 0; k < n-2; k++ {
@@ -96,18 +97,38 @@ func hessenbergReduction(a Matrix, x, u Vector, s Scalar) (Matrix, error) {
         a.ReferenceAt(i, j).Sub(a.ReferenceAt(i, j), s)
       }
     }
+    if v != nil {
+      // A <- A P_k = A - 2 (A u) u^t
+      // i) compute A u and store it in x
+      for i := 0; i < n; i++ {
+        x[i].Reset()
+        for j := k+1; j < n; j++ {
+          s.Mul(v.ReferenceAt(i, j), u[j])
+          x[i].Add(x[i], s)
+        }
+      }
+      // ii) compute A - 2 (A u) u^t = A - 2 x u^t
+      for i := 0; i < n; i++ {
+        for j := k+1; j < n; j++ {
+          s.Mul(x[i], u[j])
+          s.Add(s, s)
+          v.ReferenceAt(i, j).Sub(v.ReferenceAt(i, j), s)
+        }
+      }
+    }
   }
-  return a, nil
+  return a, v, nil
 }
 
 /* -------------------------------------------------------------------------- */
 
-func Run(a Matrix, args ...interface{}) (Matrix, error) {
+func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
 
   n, m := a.Dims()
   t := a.ElementType()
 
   var h Matrix
+  var v Matrix
   var x Vector
   var u Vector
   var s Scalar
@@ -117,6 +138,7 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
     switch tmp := arg.(type) {
     case InSitu:
       h = tmp.H
+      v = tmp.V
       x = tmp.X
       u = tmp.U
       s = tmp.S
@@ -125,26 +147,33 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   if h == nil {
     h = a.Clone()
   } else {
-    if u, v := h.Dims(); u != n || v != m {
-      return nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
+    if n1, m1 := h.Dims(); n1 != n || m1 != m {
+      return nil, nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
+    }
+  }
+  if v == nil {
+    v = IdentityMatrix(t, n)
+  } else {
+    if n1, m1 := v.Dims(); n1 != n || m1 != m {
+      return nil, nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
     }
   }
   if x == nil {
     x = NullVector(t, n)
   } else {
-    if u := len(x); u != n {
-      return nil, fmt.Errorf("x has invalid dimension (%d instead of %d)", u, n)
+    if n1 := len(x); n1 != n {
+      return nil, nil, fmt.Errorf("x has invalid dimension (%d instead of %d)", n1, n)
     }
   }
   if u == nil {
     u = NullVector(t, n)
   } else {
-    if u := len(u); u != n {
-      return nil, fmt.Errorf("u has invalid dimension (%d instead of %d)", u, n)
+    if n1 := len(u); n1 != n {
+      return nil, nil, fmt.Errorf("u has invalid dimension (%d instead of %d)", n1, n)
     }
   }
   if s == nil {
     s = NullScalar(t)
   }
-  return hessenbergReduction(h, x, u, s)
+  return hessenbergReduction(h, v, x, u, s)
 }

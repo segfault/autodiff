@@ -18,7 +18,7 @@ package qrAlgorithm
 
 /* -------------------------------------------------------------------------- */
 
-import   "fmt"
+//import   "fmt"
 import   "math"
 import   "sort"
 import   "testing"
@@ -35,10 +35,8 @@ func TestRProp(t *testing.T) {
     0, 0,  2, 3 })
 
   h, u, _ := Run(a)
-  fmt.Println(a)
 
   b := MdotM(MdotM(u, h), u.T())
-  fmt.Println(b)
 
   eigenvalues := []float64{-1.561553e+00, -7.416574e-01, 2.561553e+00, 6.741657e+00}
 

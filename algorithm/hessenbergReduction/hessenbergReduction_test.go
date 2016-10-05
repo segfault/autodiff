@@ -41,9 +41,14 @@ func Test(t *testing.T) {
       0.0,      0.0,     1.73313,  3.73586,  -0.400312,
       0.0,      0.0,     0.0,     -0.400312, -0.0328116 })
 
-  b, _ := Run(a)
+  b, u, _ := Run(a)
+  // apply similarity transform
+  c := MdotM(MdotM(u.T(), a), u)
 
   if Mnorm(MsubM(b, r)).GetValue() > 1e-4 {
+    t.Error("test failed")
+  }
+  if Mnorm(MsubM(b, c)).GetValue() > 1e-4 {
     t.Error("test failed")
   }
 }
