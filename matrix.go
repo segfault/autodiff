@@ -26,6 +26,8 @@ type Matrix interface {
   ReferenceAt     (i, j int)           Scalar
   Set             (v Scalar, i, j int)
   SetReference    (v Scalar, i, j int)
+  // set to identity matrix
+  SetIdentity     ()
   Reset           ()
   ResetDerivatives()
   // basic methods

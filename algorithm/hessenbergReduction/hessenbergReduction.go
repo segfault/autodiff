@@ -25,6 +25,8 @@ import . "github.com/pbenner/autodiff"
 /* -------------------------------------------------------------------------- */
 
 type InSitu struct {
+  InitializeH bool
+  InitializeV bool
   H Matrix
   V Matrix
   X Vector
@@ -127,6 +129,9 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   n, m := a.Dims()
   t := a.ElementType()
 
+  initializeH := true
+  initializeV := true
+
   var h Matrix
   var v Matrix
   var x Vector
@@ -137,6 +142,8 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   for _, arg := range args {
     switch tmp := arg.(type) {
     case InSitu:
+      initializeH = tmp.InitializeH
+      initializeV = tmp.InitializeV
       h = tmp.H
       v = tmp.V
       x = tmp.X
@@ -150,12 +157,18 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
     if n1, m1 := h.Dims(); n1 != n || m1 != m {
       return nil, nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
     }
+    if a != h && initializeH {
+      h.Copy(a)
+    }
   }
   if v == nil {
     v = IdentityMatrix(t, n)
   } else {
     if n1, m1 := v.Dims(); n1 != n || m1 != m {
       return nil, nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
+    }
+    if initializeV {
+      v.SetIdentity()
     }
   }
   if x == nil {

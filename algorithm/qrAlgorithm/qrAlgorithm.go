@@ -36,6 +36,8 @@ type Epsilon struct {
 }
 
 type InSitu struct {
+  InitializeH bool
+  InitializeU bool
   H Matrix
   U Matrix
   C Vector
@@ -192,6 +194,9 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   n, m := a.Dims()
   t := a.ElementType()
 
+  initializeH := true
+  initializeU := true
+
   var h Matrix
   var u Matrix
   var c Vector
@@ -207,6 +212,8 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   for _, arg := range args {
     switch tmp := arg.(type) {
     case InSitu:
+      initializeH = tmp.InitializeH
+      initializeU = tmp.InitializeU
       h = tmp.H
       u = tmp.U
       c = tmp.C
@@ -227,7 +234,7 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
       return nil, nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
     }
     // initialize h if necessary
-    if h != a {
+    if h != a && initializeH {
       h.Copy(a)
     }
   }
@@ -236,6 +243,9 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   } else {
     if n1, m1 := u.Dims(); n1 != n || m1 != m {
       return nil, nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
+    }
+    if initializeU {
+      u.SetIdentity()
     }
   }
   if c == nil {

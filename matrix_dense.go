@@ -220,6 +220,20 @@ func (matrix *DenseMatrix) ResetDerivatives() {
   }
 }
 
+func (matrix *DenseMatrix) SetIdentity() {
+  n, m := matrix.Dims()
+  c := NewScalar(matrix.ElementType(), 1.0)
+  for i := 0; i < n; i++ {
+    for j := 0; j < m; j++ {
+      if i == j {
+        matrix.ReferenceAt(i, j).Set(c)
+      } else {
+        matrix.ReferenceAt(i, j).Reset()
+      }
+    }
+  }
+}
+
 /* implement ScalarContainer
  * -------------------------------------------------------------------------- */
 
