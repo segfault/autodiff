@@ -36,6 +36,7 @@ type Epsilon struct {
 }
 
 type InSitu struct {
+  H Matrix
   U Matrix
   C Vector
   S Vector
@@ -63,7 +64,7 @@ func givens(a, b, c, s Scalar) {
   s.Div(b, t1)
 }
 
-func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2, t3 Scalar, n int, shift bool) {
+func hessenbergQrAlgorithmStep(h, u Matrix, c, s Vector, t1, t2, t3 Scalar, n int, shift bool) {
 
   if shift {
     t3.Set(h.ReferenceAt(n-1, n-1))
@@ -115,13 +116,32 @@ func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2, t3 Scalar, n int, 
       g.Add(g, t3)
     }
   }
+  if u != nil {
+    for i := 0; i < n-1; i++ {
+      for j := 0; j < n; j++ {
+        u1 := u.ReferenceAt(j, i+0)
+        u2 := u.ReferenceAt(j, i+1)
+        // backup u1
+        t1.Set(u1)       // t1 = u1
+        // update u1
+        u1.Mul(c[i], u1) // u1 = c u1
+        t2.Mul(s[i], u2) // t2 = s u2
+        u1.Add(u1, t2)   // u1 = c u1 + s u2
+        // update u2
+        t1.Mul(s[i], t1) // t1 =  s u1
+        t1.Neg(t1)       // t1 = -s u1
+        t2.Mul(c[i], u2) // t2 =  c u2
+        u2.Add(t1, t2)   // u2 = -s u1 + c u2
+      }
+    }
+  }
 }
 
-func hessenbergQrAlgorithm(a, u Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon float64, shift bool) (Matrix, Matrix, error) {
-  n, _ := a.Dims()
+func hessenbergQrAlgorithm(h, u Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon float64, shift bool) (Matrix, Matrix, error) {
+  n, _ := h.Dims()
 
-  h, err := hessenbergReduction.Run(a, hessenbergReduction.InSitu{
-    H: a, X: c, U: s, S: t1})
+  _, err := hessenbergReduction.Run(h, hessenbergReduction.InSitu{
+    H: h, X: c, U: s, S: t1})
   if err != nil {
     return nil, nil, err
   }
@@ -131,7 +151,7 @@ func hessenbergQrAlgorithm(a, u Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon 
     if v := h.ReferenceAt(n-1, n-2); math.Abs(v.GetValue()) < epsilon {
       n--
     } else {
-      hessenbergQrAlgorithmStep(h, c, s, t1, t2, t3, n, false)
+      hessenbergQrAlgorithmStep(h, u, c, s, t1, t2, t3, n, false)
     }
   }
   return h, u, nil
@@ -171,6 +191,7 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   n, m := a.Dims()
   t := a.ElementType()
 
+  var h Matrix
   var u Matrix
   var c Vector
   var s Vector
@@ -185,6 +206,7 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   for _, arg := range args {
     switch tmp := arg.(type) {
     case InSitu:
+      h = tmp.H
       u = tmp.U
       c = tmp.C
       s = tmp.S
@@ -195,6 +217,17 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
       epsilon = tmp.Value
     case Shift:
       shift = tmp.Value
+    }
+  }
+  if h == nil {
+    h = a.Clone()
+  } else {
+    if n1, m1 := u.Dims(); n1 != n || m1 != m {
+      return nil, nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
+    }
+    // initialize h if necessary
+    if h != a {
+      h.Copy(a)
     }
   }
   if u == nil {
@@ -227,5 +260,5 @@ func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
   if t3 == nil {
     t3 = NullScalar(t)
   }
-  return hessenbergQrAlgorithm(a, u, c, s, t1, t2, t3, epsilon, shift)
+  return hessenbergQrAlgorithm(h, u, c, s, t1, t2, t3, epsilon, shift)
 }
