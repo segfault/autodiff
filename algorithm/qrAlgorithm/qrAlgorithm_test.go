@@ -34,7 +34,7 @@ func TestRProp(t *testing.T) {
     0, 1, -1, 1,
     0, 0,  2, 3 })
 
-  h, _ := Run(a)
+  h, _, _ := Run(a)
 
   eigenvalues := []float64{-1.561553e+00, -7.416574e-01, 2.561553e+00, 6.741657e+00}
 

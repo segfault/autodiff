@@ -36,14 +36,10 @@ type Epsilon struct {
 }
 
 type InSitu struct {
-  // Hessenberg QR algorithm
+  U Matrix
   C Vector
   S Vector
   T1, T2, T3 Scalar
-  // vanilla QR algorithm
-  B Matrix
-  Q Matrix
-  R Matrix
 }
 
 /* -------------------------------------------------------------------------- */
@@ -121,13 +117,13 @@ func hessenbergQrAlgorithmStep(h Matrix, c, s Vector, t1, t2, t3 Scalar, n int, 
   }
 }
 
-func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon float64, shift bool) (Matrix, error) {
+func hessenbergQrAlgorithm(a, u Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon float64, shift bool) (Matrix, Matrix, error) {
   n, _ := a.Dims()
 
   h, err := hessenbergReduction.Run(a, hessenbergReduction.InSitu{
     H: a, X: c, U: s, S: t1})
   if err != nil {
-    return nil, err
+    return nil, nil, err
   }
 
   for n > 1 {
@@ -138,7 +134,7 @@ func hessenbergQrAlgorithm(a Matrix, c, s Vector, t1, t2, t3 Scalar, epsilon flo
       hessenbergQrAlgorithmStep(h, c, s, t1, t2, t3, n, false)
     }
   }
-  return h, nil
+  return h, u, nil
 }
 
 /* -------------------------------------------------------------------------- */
@@ -170,14 +166,12 @@ func qrAlgorithm(a, b, q, r Matrix, t ScalarType) (Matrix, Matrix, error) {
 
 /* -------------------------------------------------------------------------- */
 
-func Run(a Matrix, args ...interface{}) (Matrix, error) {
+func Run(a Matrix, args ...interface{}) (Matrix, Matrix, error) {
 
   n, m := a.Dims()
   t := a.ElementType()
 
-  var b Matrix
-  var q Matrix
-  var r Matrix
+  var u Matrix
   var c Vector
   var s Vector
   var t1 Scalar
@@ -191,9 +185,7 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   for _, arg := range args {
     switch tmp := arg.(type) {
     case InSitu:
-      b = tmp.B
-      q = tmp.Q
-      r = tmp.R
+      u = tmp.U
       c = tmp.C
       s = tmp.S
       t1 = tmp.T1
@@ -205,39 +197,25 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
       shift = tmp.Value
     }
   }
-  if b == nil {
-    b = NullDenseMatrix(t, n, m)
+  if u == nil {
+    u = IdentityMatrix(t, n)
   } else {
-    if u, v := b.Dims(); u != n || v != m {
-      return nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
-    }
-  }
-  if q == nil {
-    q = NullDenseMatrix(t, n, m)
-  } else {
-    if u, v := q.Dims(); u != n || v != m {
-      return nil, fmt.Errorf("q has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
-    }
-  }
-  if r == nil {
-    r = NullDenseMatrix(t, n, m)
-  } else {
-    if u, v := r.Dims(); u != n || v != m {
-      return nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", u, v, n, m)
+    if n1, m1 := u.Dims(); n1 != n || m1 != m {
+      return nil, nil, fmt.Errorf("r has invalid dimension (%dx%d instead of %dx%d)", n1, m1, n, m)
     }
   }
   if c == nil {
     c = NullVector(t, n)
   } else {
-    if u := len(c); u != n {
-      return nil, fmt.Errorf("c has invalid dimension (%d instead of %d)", u, n)
+    if n1 := len(c); n1 != n {
+      return nil, nil, fmt.Errorf("c has invalid dimension (%d instead of %d)", n1, n)
     }
   }
   if s == nil {
     s = NullVector(t, n)
   } else {
-    if u := len(s); u != n {
-      return nil, fmt.Errorf("c has invalid dimension (%d instead of %d)", u, n)
+    if n1 := len(s); n1 != n {
+      return nil, nil, fmt.Errorf("c has invalid dimension (%d instead of %d)", n1, n)
     }
   }
   if t1 == nil {
@@ -249,5 +227,5 @@ func Run(a Matrix, args ...interface{}) (Matrix, error) {
   if t3 == nil {
     t3 = NullScalar(t)
   }
-  return hessenbergQrAlgorithm(a, c, s, t1, t2, t3, epsilon, shift)
+  return hessenbergQrAlgorithm(a, u, c, s, t1, t2, t3, epsilon, shift)
 }
