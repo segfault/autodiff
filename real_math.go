@@ -89,6 +89,22 @@ func (a *Real) RealMax(b *Real) Scalar {
 
 /* -------------------------------------------------------------------------- */
 
+func (c *Real) Abs(a Scalar) Scalar {
+  if c.Sign() == -1 {
+    c.Neg(a)
+  }
+  return c
+}
+
+func (c *Real) RealAbs(a *Real) Scalar {
+  if c.Sign() == -1 {
+    c.Neg(a)
+  }
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *Real) Sign() int {
   if a.GetValue() < 0.0 {
     return -1

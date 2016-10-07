@@ -96,6 +96,22 @@ func (a *BareReal) BareRealMax(b *BareReal) Scalar {
 
 /* -------------------------------------------------------------------------- */
 
+func (c *BareReal) Abs(a Scalar) Scalar {
+  if c.Sign() == -1 {
+    c.Neg(a)
+  }
+  return c
+}
+
+func (c *BareReal) BareRealAbs(a *BareReal) Scalar {
+  if c.Sign() == -1 {
+    c.Neg(a)
+  }
+  return c
+}
+
+/* -------------------------------------------------------------------------- */
+
 func (a *BareReal) Sign() int {
   if a.GetValue() < 0.0 {
     return -1

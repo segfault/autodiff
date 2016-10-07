@@ -60,6 +60,13 @@ func (a *Probability) Max(b Scalar) Scalar {
   return b
 }
 
+func (c *Probability) Abs(a Scalar) Scalar {
+  if c.Sign() == -1 {
+    c.Neg(a)
+  }
+  return c
+}
+
 func (a *Probability) Sign() int {
   if math.IsInf(a.Value, -1) {
     return 0
