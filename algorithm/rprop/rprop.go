@@ -63,6 +63,14 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
   }
   x1.Variables(1)
 
+  gradient_is_nan := func(s Scalar) bool {
+    for i := 0; i < s.GetN(); i++ {
+      if math.IsNaN(s.GetDerivative(1, i)) {
+        return true
+      }
+    }
+    return false
+  }
   // evaluate objective function
   s, err := f(x1)
   if err != nil {
@@ -112,7 +120,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       }
       // evaluate objective function
       s, err = f(x2)
-      if err != nil {
+      if err != nil || gradient_is_nan(s) {
         // if the updated is invalid reduce step size
         for i, _ := range x1 {
           if gradient_new[i] != 0.0 {
