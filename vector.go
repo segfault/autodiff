@@ -49,9 +49,11 @@ func NewVector(t ScalarType, values []float64) Vector {
 // Allocate an empty vector of type t. All values are initialized to zero.
 func NullVector(t ScalarType, length int) Vector {
   v := NilVector(length)
-  f := ScalarConstructor(t)
-  for i := 0; i < length; i++ {
-    v[i] = f(0.0)
+  if length > 0 {
+    f := ScalarConstructor(t)
+    for i := 0; i < length; i++ {
+      v[i] = f(0.0)
+    }
   }
   return v
 }
@@ -181,8 +183,12 @@ func (v Vector) Matrix(n, m int) Matrix {
   if n*m != len(v) {
     panic("Matrix dimension does not fit input vector!")
   }
-  return &DenseMatrix{v, n, m, false}
-
+  matrix := DenseMatrix{}
+  matrix.Values = v
+  matrix.Rows   = n
+  matrix.Cols   = m
+  matrix.initTmp()
+  return &matrix
 }
 
 func (v Vector) Slice() []float64 {

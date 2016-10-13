@@ -36,6 +36,8 @@ type DenseMatrix struct {
   Rows       int
   Cols       int
   Transposed bool
+  Tmp1       Vector
+  Tmp2       Vector
 }
 
 /* constructors
@@ -56,15 +58,36 @@ func NewDenseMatrix(t ScalarType, rows, cols int, values []float64) *DenseMatrix
   } else {
     panic("NewDenseMatrix(): Matrix dimension does not fit input values!")
   }
+  m.initTmp()
+
   return m
 }
 
 func NullDenseMatrix(t ScalarType, rows, cols int) *DenseMatrix {
-  return &DenseMatrix{NullVector(t, rows*cols), rows, cols, false}
+  m := DenseMatrix{}
+  m.Values = NullVector(t, rows*cols)
+  m.Rows   = rows
+  m.Cols   = cols
+  m.initTmp()
+  return &m
 }
 
 func NilDenseMatrix(rows, cols int) *DenseMatrix {
-  return &DenseMatrix{NilVector(rows*cols), rows, cols, false}
+  m := DenseMatrix{}
+  m.Values = NilVector(rows*cols)
+  m.Rows   = rows
+  m.Cols   = cols
+  return &m
+}
+
+func (matrix *DenseMatrix) initTmp() {
+  t := matrix.ElementType()
+  if len(matrix.Tmp1) == 0 {
+    matrix.Tmp1 = NullVector(t, matrix.Rows)
+  }
+  if len(matrix.Tmp2) == 0 {
+    matrix.Tmp2 = NullVector(t, matrix.Cols)
+  }
 }
 
 /* copy and cloning

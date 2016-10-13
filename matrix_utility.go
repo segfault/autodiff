@@ -23,7 +23,9 @@ func (matrix *DenseMatrix) T() Matrix {
     Values    :  matrix.Values,
     Rows      :  matrix.Cols,
     Cols      :  matrix.Rows,
-    Transposed: !matrix.Transposed}
+    Transposed: !matrix.Transposed,
+    Tmp1      :  matrix.Tmp2,
+    Tmp2      :  matrix.Tmp1 }
 }
 
 func (matrix *DenseMatrix) PermuteRows(_p []int) {

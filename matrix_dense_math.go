@@ -252,7 +252,7 @@ func (r *DenseMatrix) MdotM(a, b Matrix) Matrix {
   n2, m2 := b.Dims()
   t1 := NullScalar(a.ElementType())
   t2 := NullScalar(a.ElementType())
-  t3 := NullVector(a.ElementType(), m)
+  t3 := r.Tmp2[0:m]
   if n1 != n || m2 != m || n1 != m2 || m1 != n2 {
     panic("matrix dimensions do not match!")
   }
