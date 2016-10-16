@@ -405,19 +405,11 @@ func (c *Real) Erf(a Scalar) Scalar {
 }
 
 func (c *Real) Erfc(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, -(2.0*a.GetDerivative(2, i) - 4.0*a.GetValue()*a.GetDerivative(1, i)*a.GetDerivative(1, i))/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, -2.0*a.GetDerivative(1, i)/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI))
-    }
-  }
-  c.SetValue(math.Erfc(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Erf(x)
+  f1 := -2.0/(math.Exp(x*x)*special.M_SQRTPI)
+  f2 :=  4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) LogErfc(a Scalar) Scalar {
