@@ -413,20 +413,12 @@ func (c *Real) Erfc(a Scalar) Scalar {
 }
 
 func (c *Real) LogErfc(a Scalar) Scalar {
-  c.AllocForOne(a)
-  t := math.Erfc(a.GetValue())
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, (math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t*(4*a.GetValue()*a.GetDerivative(1, i)*a.GetDerivative(1, i) - 2*a.GetDerivative(2, i)) - 4*a.GetDerivative(1, i)*a.GetDerivative(1, i))/(math.Exp(2*a.GetValue()*a.GetValue())*math.Pi*t*t))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, -2.0*a.GetDerivative(1, i)/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t))
-    }
-  }
-  c.SetValue(special.LogErfc(a.GetValue()))
-  return c
+  x := a.GetValue()
+  t := math.Erfc(x)
+  f0 :=  special.LogErfc(x)
+  f1 := -2.0/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t)
+  f2 :=  4.0*(math.Exp(x*x)*special.M_SQRTPI*t*x - 1)/(math.Exp(2*x*x)*math.Pi*t*t)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Gamma(a Scalar) Scalar {
