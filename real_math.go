@@ -373,51 +373,27 @@ func (c *Real) Tanh(a Scalar) Scalar {
 }
 
 func (c *Real) Exp(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, (a.GetDerivative(2, i) + math.Pow(a.GetDerivative(1, i), 2))*math.Exp(a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*math.Exp(a.GetValue()))
-    }
-  }
-  c.SetValue(math.Exp(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Exp(x)
+  f1 :=  f0
+  f2 :=  f0
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Log(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i)/a.GetValue() - a.GetDerivative(1, i)*a.GetDerivative(1, i)/(a.GetValue()*a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)/a.GetValue())
-    }
-  }
-  c.SetValue(a.GetLogValue())
-  return c
+  x := a.GetValue()
+  f0 :=  math.Log(x)
+  f1 :=  1/x
+  f2 := -1/(x*x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Log1p(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i)/(1.0 + a.GetValue()) - a.GetDerivative(1, i)*a.GetDerivative(1, i)/((1.0 + a.GetValue())*(1.0 + a.GetValue())))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)/(1.0 + a.GetValue()))
-    }
-  }
-  c.SetValue(math.Log1p(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Log1p(x)
+  f1 :=  1/ (1+x)
+  f2 := -1/((1+x)*(1+x))
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Erf(a Scalar) Scalar {
