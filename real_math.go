@@ -333,51 +333,27 @@ func (c *Real) Sin(a Scalar) Scalar {
 }
 
 func (c *Real) Sinh(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i)*math.Cosh(a.GetValue()) + math.Pow(a.GetDerivative(1, i), 2)*math.Sinh(a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*math.Cosh(a.GetValue()))
-    }
-  }
-  c.SetValue(math.Sinh(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Sinh(x)
+  f1 :=  math.Cosh(x)
+  f2 :=  math.Sinh(x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Cos(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, -a.GetDerivative(2, i)*math.Sin(a.GetValue()) - math.Pow(a.GetDerivative(1, i), 2)*math.Cos(a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, -a.GetDerivative(1, i)*math.Sin(a.GetValue()))
-    }
-  }
-  c.SetValue(math.Cos(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Cos(x)
+  f1 := -math.Sin(x)
+  f2 := -math.Cos(x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Cosh(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i)*math.Sin(a.GetValue()) + math.Pow(a.GetDerivative(1, i), 2)*math.Cos(a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*math.Sin(a.GetValue()))
-    }
-  }
-  c.SetValue(math.Cosh(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Cosh(x)
+  f1 :=  math.Sinh(x)
+  f2 :=  math.Cosh(x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Tan(a Scalar) Scalar {
