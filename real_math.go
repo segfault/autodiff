@@ -39,10 +39,10 @@ func (c *Real) generic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar
             b.GetDerivative(1, i)*b.GetDerivative(1, i)*f02 +
             a.GetDerivative(1, i)*b.GetDerivative(1, i)*f11*2)
       }
-      // compute first derivatives
-      for i := 0; i < c.GetN(); i++ {
-        c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
-      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
     }
   }
   // compute new value
@@ -213,35 +213,15 @@ func (c *Real) RealNeg(a *Real) *Real {
 /* -------------------------------------------------------------------------- */
 
 func (c *Real) Add(a, b Scalar) Scalar {
-  c.AllocForTwo(a, b)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i) + b.GetDerivative(2, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i) + b.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(a.GetValue() + b.GetValue())
-  return c
+  x := a.GetValue()
+  y := b.GetValue()
+  return c.generic(a, b, x+y, 1, 1, 0, 0, 0)
 }
 
 func (c *Real) RealAdd(a, b *Real) *Real {
-  c.AllocForTwo(a, b)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i) + b.GetDerivative(2, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i) + b.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(a.GetValue() + b.GetValue())
-  return c
+  x := a.GetValue()
+  y := b.GetValue()
+  return c.realGeneric(a, b, x+y, 1, 1, 0, 0, 0)
 }
 
 /* -------------------------------------------------------------------------- */

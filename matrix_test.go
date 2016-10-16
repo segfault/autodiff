@@ -207,7 +207,7 @@ func TestMatrixJacobian(t *testing.T) {
   m2 := NewDenseMatrix(RealType, 3, 2, []float64{2, 2, 3, -2, 0, 0})
 
   if Mnorm(MsubM(m1, m2)).GetValue() > 1e-8 {
-    t.Error("Inverting matrix failed!")
+    t.Error("Jacobian test failed!")
   }
 }
 
