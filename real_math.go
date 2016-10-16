@@ -115,7 +115,7 @@ func (a *Real) Sign() int {
   return 0
 }
 
-func (a *Real) RealSing() int {
+func (a *Real) RealSign() int {
   if a.GetValue() < 0.0 {
     return -1
   }
