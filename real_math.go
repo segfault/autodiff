@@ -23,6 +23,57 @@ import "math"
 
 import "github.com/pbenner/autodiff/special"
 
+/* derivatives of a generic function
+ * -------------------------------------------------------------------------- */
+
+func (c *Real) generic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar {
+  c.AllocForTwo(a, b)
+  if c.Order >= 1 {
+    if c.Order >= 2 {
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(2, i)*f10 +
+            b.GetDerivative(2, i)*f01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*f02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*f11*2)
+      }
+      // compute first derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
+      }
+    }
+  }
+  // compute new value
+  c.SetValue(f00)
+  return c
+}
+
+func (c *Real) realGeneric(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) *Real {
+  c.AllocForTwo(a, b)
+  if c.Order >= 1 {
+    if c.Order >= 2 {
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(2, i)*f10 +
+            b.GetDerivative(2, i)*f01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*f02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*f11*2)
+      }
+      // compute first derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
+      }
+    }
+  }
+  // compute new value
+  c.SetValue(f00)
+  return c
+}
+
 /* -------------------------------------------------------------------------- */
 
 func (a *Real) Equals(b Scalar) bool {
@@ -230,35 +281,15 @@ func (c *Real) RealSub(a, b *Real) *Real {
 /* -------------------------------------------------------------------------- */
 
 func (c *Real) Mul(a, b Scalar) Scalar {
-  c.AllocForTwo(a, b)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetValue()*b.GetDerivative(2, i) + a.GetDerivative(2, i)*b.GetValue() + 2*a.GetDerivative(1, i)*b.GetDerivative(1, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetValue()*b.GetDerivative(1, i) + a.GetDerivative(1, i)*b.GetValue())
-    }
-  }
-  c.SetValue(a.GetValue() * b.GetValue())
-  return c
+  x := a.GetValue()
+  y := b.GetValue()
+  return c.generic(a, b, x*y, y, x, 1, 0, 0)
 }
 
 func (c *Real) RealMul(a, b *Real) *Real {
-  c.AllocForTwo(a, b)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetValue()*b.GetDerivative(2, i) + a.GetDerivative(2, i)*b.GetValue() + 2*a.GetDerivative(1, i)*b.GetDerivative(1, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetValue()*b.GetDerivative(1, i) + a.GetDerivative(1, i)*b.GetValue())
-    }
-  }
-  c.SetValue(a.GetValue() * b.GetValue())
-  return c
+  x := a.GetValue()
+  y := b.GetValue()
+  return c.realGeneric(a, b, x*y, y, x, 1, 0, 0)
 }
 
 /* -------------------------------------------------------------------------- */
