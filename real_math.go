@@ -23,10 +23,10 @@ import "math"
 
 import "github.com/pbenner/autodiff/special"
 
-/* derivatives of a generic function
+/* derivatives of a generic functions
  * -------------------------------------------------------------------------- */
 
-func (c *Real) generic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar {
+func (c *Real) dyadic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar {
   c.AllocForTwo(a, b)
   if c.Order >= 1 {
     if c.Order >= 2 {
@@ -50,7 +50,7 @@ func (c *Real) generic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar
   return c
 }
 
-func (c *Real) realGeneric(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) *Real {
+func (c *Real) realDyadic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) *Real {
   c.AllocForTwo(a, b)
   if c.Order >= 1 {
     if c.Order >= 2 {
@@ -215,13 +215,13 @@ func (c *Real) RealNeg(a *Real) *Real {
 func (c *Real) Add(a, b Scalar) Scalar {
   x := a.GetValue()
   y := b.GetValue()
-  return c.generic(a, b, x+y, 1, 1, 0, 0, 0)
+  return c.dyadic(a, b, x+y, 1, 1, 0, 0, 0)
 }
 
 func (c *Real) RealAdd(a, b *Real) *Real {
   x := a.GetValue()
   y := b.GetValue()
-  return c.realGeneric(a, b, x+y, 1, 1, 0, 0, 0)
+  return c.realDyadic(a, b, x+y, 1, 1, 0, 0, 0)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -229,13 +229,13 @@ func (c *Real) RealAdd(a, b *Real) *Real {
 func (c *Real) Sub(a, b Scalar) Scalar {
   x := a.GetValue()
   y := b.GetValue()
-  return c.generic(a, b, x-y, 1, -1, 0, 0, 0)
+  return c.dyadic(a, b, x-y, 1, -1, 0, 0, 0)
 }
 
 func (c *Real) RealSub(a, b *Real) *Real {
   x := a.GetValue()
   y := b.GetValue()
-  return c.realGeneric(a, b, x-y, 1, -1, 0, 0, 0)
+  return c.realDyadic(a, b, x-y, 1, -1, 0, 0, 0)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -243,13 +243,13 @@ func (c *Real) RealSub(a, b *Real) *Real {
 func (c *Real) Mul(a, b Scalar) Scalar {
   x := a.GetValue()
   y := b.GetValue()
-  return c.generic(a, b, x*y, y, x, 1, 0, 0)
+  return c.dyadic(a, b, x*y, y, x, 1, 0, 0)
 }
 
 func (c *Real) RealMul(a, b *Real) *Real {
   x := a.GetValue()
   y := b.GetValue()
-  return c.realGeneric(a, b, x*y, y, x, 1, 0, 0)
+  return c.realDyadic(a, b, x*y, y, x, 1, 0, 0)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -257,13 +257,13 @@ func (c *Real) RealMul(a, b *Real) *Real {
 func (c *Real) Div(a, b Scalar) Scalar {
   x := a.GetValue()
   y := b.GetValue()
-  return c.generic(a, b, x/y, 1/y, -x/(y*y), -1/(y*y), 0, 2*x/(y*y*y))
+  return c.dyadic(a, b, x/y, 1/y, -x/(y*y), -1/(y*y), 0, 2*x/(y*y*y))
 }
 
 func (c *Real) RealDiv(a, b *Real) *Real {
   x := a.GetValue()
   y := b.GetValue()
-  return c.realGeneric(a, b, x/y, 1/y, -x/(y*y), -1/(y*y), 0, 2*x/(y*y*y))
+  return c.realDyadic(a, b, x/y, 1/y, -x/(y*y), -1/(y*y), 0, 2*x/(y*y*y))
 }
 
 /* -------------------------------------------------------------------------- */
@@ -277,7 +277,7 @@ func (c *Real) Pow(a, k Scalar) Scalar {
   f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
   f20 := math.Pow(x, y-2)*(y - 1)*y
   f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-  return c.generic(a, k, f00, f10, f01, f11, f20, f02)
+  return c.dyadic(a, k, f00, f10, f01, f11, f20, f02)
 }
 
 func (c *Real) RealPow(a, k *Real) *Real {
@@ -289,7 +289,7 @@ func (c *Real) RealPow(a, k *Real) *Real {
   f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
   f20 := math.Pow(x, y-2)*(y - 1)*y
   f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-  return c.realGeneric(a, k, f00, f10, f01, f11, f20, f02)
+  return c.realDyadic(a, k, f00, f10, f01, f11, f20, f02)
 }
 
 /* -------------------------------------------------------------------------- */
