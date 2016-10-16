@@ -325,19 +325,11 @@ func (c *Real) RealSqrt(a *Real) *Real {
 /* -------------------------------------------------------------------------- */
 
 func (c *Real) Sin(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, a.GetDerivative(2, i)*math.Cos(a.GetValue()) - math.Pow(a.GetDerivative(1, i), 2)*math.Sin(a.GetValue()))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*math.Cos(a.GetValue()))
-    }
-  }
-  c.SetValue(math.Sin(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Sin(x)
+  f1 :=  math.Cos(x)
+  f2 := -math.Sin(x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Sinh(a Scalar) Scalar {
