@@ -26,6 +26,48 @@ import "github.com/pbenner/autodiff/special"
 /* derivatives of a generic functions
  * -------------------------------------------------------------------------- */
 
+func (c *Real) monadic(a Scalar, f0, f1, f2 float64) Scalar {
+  c.AllocForOne(a)
+  if c.Order >= 1 {
+    if c.Order >= 2 {
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(i, 1)*a.GetDerivative(i, 1)*f2 +
+            a.GetDerivative(i, 2)*f1)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*f1)
+    }
+  }
+  // compute new value
+  c.SetValue(f0)
+  return c
+}
+
+func (c *Real) realMonadic(a *Real, f0, f1, f2 float64) *Real {
+  c.AllocForOne(a)
+  if c.Order >= 1 {
+    if c.Order >= 2 {
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(i, 1)*a.GetDerivative(i, 1)*f2 +
+            a.GetDerivative(i, 2)*f1)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*f1)
+    }
+  }
+  // compute new value
+  c.SetValue(f0)
+  return c
+}
+
 func (c *Real) dyadic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar {
   c.AllocForTwo(a, b)
   if c.Order >= 1 {
@@ -179,35 +221,13 @@ func (a *Real) RealSign() int {
 /* -------------------------------------------------------------------------- */
 
 func (c *Real) Neg(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, -a.GetDerivative(2, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, -a.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(-a.GetValue())
-  return c
+  x := a.GetValue()
+  return c.monadic(a, -x, -1, 0)
 }
 
 func (c *Real) RealNeg(a *Real) *Real {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, -a.GetDerivative(2, i))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, -a.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(-a.GetValue())
-  return c
+  x := a.GetValue()
+  return c.realMonadic(a, -x, -1, 0)
 }
 
 /* -------------------------------------------------------------------------- */
