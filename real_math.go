@@ -33,8 +33,8 @@ func (c *Real) monadic(a Scalar, f0, f1, f2 float64) Scalar {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(i, 1)*a.GetDerivative(i, 1)*f2 +
-            a.GetDerivative(i, 2)*f1)
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f2 +
+            a.GetDerivative(2, i)*f1)
       }
     }
     // compute first derivatives
@@ -54,8 +54,8 @@ func (c *Real) realMonadic(a *Real, f0, f1, f2 float64) *Real {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(i, 1)*a.GetDerivative(i, 1)*f2 +
-            a.GetDerivative(i, 2)*f1)
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f2 +
+            a.GetDerivative(2, i)*f1)
       }
     }
     // compute first derivatives
@@ -357,35 +357,19 @@ func (c *Real) Cosh(a Scalar) Scalar {
 }
 
 func (c *Real) Tan(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, (1.0+math.Pow(math.Tan(a.GetValue()), 2))*(a.GetDerivative(2, i) + 2*math.Tan(a.GetValue())*math.Pow(a.GetDerivative(1, i), 2)))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*(1.0+math.Pow(math.Tan(a.GetValue()), 2)))
-    }
-  }
-  c.SetValue(math.Tan(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Tan(x)
+  f1 :=  1.0+math.Pow(math.Tan(x), 2)
+  f2 :=  2.0*math.Tan(x)*f1
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Tanh(a Scalar) Scalar {
-  c.AllocForOne(a)
-  if c.Order >= 2 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(2, i, (1.0-math.Pow(math.Tanh(a.GetValue()), 2))*(a.GetDerivative(2, i) - 2*math.Tanh(a.GetValue())*math.Pow(a.GetDerivative(1, i), 2)))
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*(1.0-math.Pow(math.Tanh(a.GetValue()), 2)))
-    }
-  }
-  c.SetValue(math.Tanh(a.GetValue()))
-  return c
+  x := a.GetValue()
+  f0 :=  math.Tanh(x)
+  f1 :=  1.0-math.Pow(math.Tanh(x), 2)
+  f2 := -2.0*math.Tanh(x)*f1
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Exp(a Scalar) Scalar {
