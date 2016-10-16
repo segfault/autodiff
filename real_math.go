@@ -269,61 +269,27 @@ func (c *Real) RealDiv(a, b *Real) *Real {
 /* -------------------------------------------------------------------------- */
 
 func (c *Real) Pow(a, k Scalar) Scalar {
-  c.AllocForTwo(a, k)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      if k.GetOrder() >= 1 && k.GetDerivative(1, i) != 0.0 {
-        c.SetDerivative(2, i,
-          math.Pow(a.GetValue(), k.GetValue())*(
-            (k.GetValue()-1.0)*k.GetValue()*math.Pow(a.GetDerivative(1, i), 2)/math.Pow(a.GetValue(), 2) +
-              (2.0*(1.0 + k.GetValue()*math.Log(a.GetValue()))*a.GetDerivative(1, i)*k.GetDerivative(1, i) + k.GetValue()*a.GetDerivative(2, i))/a.GetValue() +
-              math.Log(a.GetValue())*(math.Log(a.GetValue())*math.Pow(k.GetDerivative(1, i), 2.0) + k.GetDerivative(2, i))))
-      } else {
-        c.SetDerivative(2, i, k.GetValue()*math.Pow(a.GetValue(), k.GetValue()-1)*a.GetDerivative(2, i) + k.GetValue()*(k.GetValue()-1)*math.Pow(a.GetValue(), k.GetValue()-2)*math.Pow(a.GetDerivative(1, i), 2))
-      }
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      if k.GetOrder() >= 1 && k.GetDerivative(1, i) != 0.0 {
-        c.SetDerivative(1, i, math.Pow(a.GetValue(), k.GetValue()-1)*(
-          k.GetValue()*a.GetDerivative(1, i) + a.GetValue()*math.Log(a.GetValue())*k.GetDerivative(1, i)))
-      } else {
-        c.SetDerivative(1, i, math.Pow(a.GetValue(), k.GetValue()-1)*k.GetValue()*a.GetDerivative(1, i))
-      }
-    }
-  }
-  c.SetValue(math.Pow(a.GetValue(), k.GetValue()))
-  return c
+  x := a.GetValue()
+  y := k.GetValue()
+  f00 := math.Pow(x, y)
+  f10 := math.Pow(x, y-1)*y
+  f01 := math.Pow(x, y-0)*math.Log(x)
+  f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+  f20 := math.Pow(x, y-2)*(y - 1)*y
+  f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+  return c.generic(a, k, f00, f10, f01, f11, f20, f02)
 }
 
 func (c *Real) RealPow(a, k *Real) *Real {
-  c.AllocForTwo(a, k)
-  if c.Order >= 2 {
-    for i := 0; i < c.GetN(); i++ {
-      if k.GetOrder() >= 1 && k.GetDerivative(1, i) != 0.0 {
-        c.SetDerivative(2, i,
-          math.Pow(a.GetValue(), k.GetValue())*(
-            (k.GetValue()-1.0)*k.GetValue()*math.Pow(a.GetDerivative(1, i), 2)/math.Pow(a.GetValue(), 2) +
-              (2.0*(1.0 + k.GetValue()*math.Log(a.GetValue()))*a.GetDerivative(1, i)*k.GetDerivative(1, i) + k.GetValue()*a.GetDerivative(2, i))/a.GetValue() +
-              math.Log(a.GetValue())*(math.Log(a.GetValue())*math.Pow(k.GetDerivative(1, i), 2.0) + k.GetDerivative(2, i))))
-      } else {
-        c.SetDerivative(2, i, k.GetValue()*math.Pow(a.GetValue(), k.GetValue()-1)*a.GetDerivative(2, i) + k.GetValue()*(k.GetValue()-1)*math.Pow(a.GetValue(), k.GetValue()-2)*math.Pow(a.GetDerivative(1, i), 2))
-      }
-    }
-  }
-  if c.Order >= 1 {
-    for i := 0; i < c.GetN(); i++ {
-      if k.GetOrder() >= 1 && k.GetDerivative(1, i) != 0.0 {
-        c.SetDerivative(1, i, math.Pow(a.GetValue(), k.GetValue()-1)*(
-          k.GetValue()*a.GetDerivative(1, i) + a.GetValue()*math.Log(a.GetValue())*k.GetDerivative(1, i)))
-      } else {
-        c.SetDerivative(1, i, math.Pow(a.GetValue(), k.GetValue()-1)*k.GetValue()*a.GetDerivative(1, i))
-      }
-    }
-  }
-  c.SetValue(math.Pow(a.GetValue(), k.GetValue()))
-  return c
+  x := a.GetValue()
+  y := k.GetValue()
+  f00 := math.Pow(x, y)
+  f10 := math.Pow(x, y-1)*y
+  f01 := math.Pow(x, y-0)*math.Log(x)
+  f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+  f20 := math.Pow(x, y-2)*(y - 1)*y
+  f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+  return c.realGeneric(a, k, f00, f10, f01, f11, f20, f02)
 }
 
 /* -------------------------------------------------------------------------- */
