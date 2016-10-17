@@ -391,9 +391,15 @@ func (c *Real) Pow(a, k Scalar) Scalar {
   y := k.GetValue()
   v0 := math.Pow(x, y)
   f1 := func() (float64, float64) {
-    f10 := math.Pow(x, y-1)*y
-    f01 := math.Pow(x, y-0)*math.Log(x)
-    return f10, f01
+    if k.GetOrder() >= 1 {
+      f10 := math.Pow(x, y-1)*y
+      f01 := math.Pow(x, y-0)*math.Log(x)
+      return f10, f01
+    } else {
+      f10 := math.Pow(x, y-1)*y
+      f01 := 0.0
+      return f10, f01
+    }
   }
   f2 := func() (float64, float64, float64) {
     f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
