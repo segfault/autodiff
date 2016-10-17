@@ -442,111 +442,111 @@ func (c *Real) RealSqrt(a *Real) *Real {
 
 func (c *Real) Sin(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Sin(x)
+  v0 := math.Sin(x)
   f1 := func() float64 { return  math.Cos(x) }
   f2 := func() float64 { return -math.Sin(x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Sinh(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Sinh(x)
+  v0 := math.Sinh(x)
   f1 := func() float64 { return  math.Cosh(x) }
   f2 := func() float64 { return  math.Sinh(x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Cos(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Cos(x)
+  v0 := math.Cos(x)
   f1 := func() float64 { return -math.Sin(x) }
   f2 := func() float64 { return -math.Cos(x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Cosh(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Cosh(x)
+  v0 := math.Cosh(x)
   f1 := func() float64 { return  math.Sinh(x) }
   f2 := func() float64 { return  math.Cosh(x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Tan(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Tan(x)
+  v0 := math.Tan(x)
   f1 := func() float64 { return  1.0+math.Pow(math.Tan(x), 2) }
   f2 := func() float64 { return  2.0*math.Tan(x)*f1() }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Tanh(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Tanh(x)
+  v0 :=  math.Tanh(x)
   f1 := func() float64 { return  1.0-math.Pow(math.Tanh(x), 2) }
   f2 := func() float64 { return -2.0*math.Tanh(x)*f1() }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Exp(a Scalar) Scalar {
   x := a.GetValue()
-  f0 := math.Exp(x)
-  f1 := func() float64 { return f0 }
-  f2 := func() float64 { return f0 }
-  return c.monadicLazy(a, f0, f1, f2)
+  v0 := math.Exp(x)
+  f1 := func() float64 { return v0 }
+  f2 := func() float64 { return v0 }
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Log(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Log(x)
+  v0 :=  math.Log(x)
   f1 := func() float64 { return  1/x }
   f2 := func() float64 { return -1/(x*x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Log1p(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Log1p(x)
+  v0 :=  math.Log1p(x)
   f1 := func() float64 { return  1/ (1+x) }
   f2 := func() float64 { return -1/((1+x)*(1+x)) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Erf(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Erf(x)
+  v0 :=  math.Erf(x)
   f1 := func() float64 {
     return  2.0/(math.Exp(x*x)*special.M_SQRTPI)
   }
   f2 := func() float64 {
     return -4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
   }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Erfc(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Erf(x)
+  v0 :=  math.Erf(x)
   f1 := func() float64 {
     return -2.0/(math.Exp(x*x)*special.M_SQRTPI)
   }
   f2 := func() float64 {
     return  4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
   }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) LogErfc(a Scalar) Scalar {
   x := a.GetValue()
   t := math.Erfc(x)
-  f0 :=  special.LogErfc(x)
+  v0 :=  special.LogErfc(x)
   f1 := func() float64 {
     return -2.0/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t)
   }
   f2 := func() float64 {
     return  4.0*(math.Exp(x*x)*special.M_SQRTPI*t*x - 1)/(math.Exp(2*x*x)*math.Pi*t*t)
   }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Gamma(a Scalar) Scalar {
@@ -566,18 +566,18 @@ func (c *Real) Gamma(a Scalar) Scalar {
 
 func (c *Real) Lgamma(a Scalar) Scalar {
   x := a.GetValue()
-  f0, s := math.Lgamma(a.GetValue())
+  v0, s := math.Lgamma(a.GetValue())
   if s == -1 {
-    f0 = math.NaN()
+    v0 = math.NaN()
   }
   f1 := func() float64 { return special.Digamma(x) }
   f2 := func() float64 { return special.Trigamma(x) }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Mlgamma(a Scalar, k int) Scalar {
   x := a.GetValue()
-  f0 := special.Mlgamma(x, k)
+  v0 := special.Mlgamma(x, k)
   f1 := func() float64 {
     s := 0.0
     for j := 1; j <= k; j++ {
@@ -592,19 +592,19 @@ func (c *Real) Mlgamma(a Scalar, k int) Scalar {
     }
     return s
   }
-  return c.monadicLazy(a, f0, f1, f2)
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) GammaP(a float64, b Scalar) Scalar {
   x := b.GetValue()
-  f0 := special.GammaP(a, x)
+  v0 := special.GammaP(a, x)
   f1 := func() float64 {
     return special.GammaPfirstDerivative(a, x)
   }
   f2 := func() float64 {
     return special.GammaPsecondDerivative(a, x)
   }
-  return c.monadicLazy(b, f0, f1, f2)
+  return c.monadicLazy(b, v0, f1, f2)
 }
 
 /* -------------------------------------------------------------------------- */
