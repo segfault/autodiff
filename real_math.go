@@ -199,49 +199,56 @@ func (c *Real) Pow(a, k Scalar) Scalar {
   x := a.GetValue()
   y := k.GetValue()
   v0 := math.Pow(x, y)
-  f1 := func() (float64, float64) {
-    if k.GetOrder() >= 1 {
+  if k.GetOrder() >= 1 {
+    f1 := func() (float64, float64) {
       f10 := math.Pow(x, y-1)*y
       f01 := math.Pow(x, y-0)*math.Log(x)
       return f10, f01
-    } else {
-      f10 := math.Pow(x, y-1)*y
-      f01 := 0.0
-      return f10, f01
     }
-  }
-  f2 := func() (float64, float64, float64) {
-    if k.GetOrder() >= 1 {
+    f2 := func() (float64, float64, float64) {
       f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
       f20 := math.Pow(x, y-2)*(y - 1)*y
       f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
       return f11, f20, f02
-    } else {
-      f11 := 0.0
-      f20 := math.Pow(x, y-2)*(y - 1)*y
-      f02 := 0.0
-      return f11, f20, f02
     }
+    return c.dyadicLazy(a, k, v0, f1, f2)
+  } else {
+    f1 := func() (float64) {
+      return math.Pow(x, y-1)*y
+    }
+    f2 := func() (float64) {
+      return math.Pow(x, y-2)*(y - 1)*y
+    }
+    return c.monadicLazy(a, v0, f1, f2)
   }
-  return c.dyadicLazy(a, k, v0, f1, f2)
 }
 
 func (c *Real) RealPow(a, k *Real) *Real {
   x := a.GetValue()
   y := k.GetValue()
   v0 := math.Pow(x, y)
-  f1 := func() (float64, float64) {
-    f10 := math.Pow(x, y-1)*y
-    f01 := math.Pow(x, y-0)*math.Log(x)
-    return f10, f01
+  if k.GetOrder() >= 1 {
+    f1 := func() (float64, float64) {
+      f10 := math.Pow(x, y-1)*y
+      f01 := math.Pow(x, y-0)*math.Log(x)
+      return f10, f01
+    }
+    f2 := func() (float64, float64, float64) {
+      f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+      f20 := math.Pow(x, y-2)*(y - 1)*y
+      f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+      return f11, f20, f02
+    }
+    return c.realDyadicLazy(a, k, v0, f1, f2)
+  } else {
+    f1 := func() (float64) {
+      return math.Pow(x, y-1)*y
+    }
+    f2 := func() (float64) {
+      return math.Pow(x, y-2)*(y - 1)*y
+    }
+    return c.realMonadicLazy(a, v0, f1, f2)
   }
-  f2 := func() (float64, float64, float64) {
-    f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
-    f20 := math.Pow(x, y-2)*(y - 1)*y
-    f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-    return f11, f20, f02
-  }
-  return c.realDyadicLazy(a, k, v0, f1, f2)
 }
 
 /* -------------------------------------------------------------------------- */
