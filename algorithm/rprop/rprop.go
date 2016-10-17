@@ -73,8 +73,8 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
   }
   // evaluate objective function
   s, err := f(x1)
-  if err != nil {
-    return x1, fmt.Errorf("invalid initial value: %s", err)
+  if err != nil || gradient_is_nan(s) {
+    return x1, fmt.Errorf("invalid initial value: %v", x1)
   }
   for {
     for i, _ := range x1 {

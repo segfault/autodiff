@@ -56,9 +56,11 @@ func gradientDescent(x, y Vector, l *Line) *Line {
     return sumOfSquares(x, y, l), nil
   }
 //  GradientDescent(f, variables, step, epsilon)
-  rprop.Run(f, variables, step, []float64{1.2, 0.8},
+  _, err := rprop.Run(f, variables, step, []float64{1.2, 0.8},
     rprop.Epsilon{epsilon})
-
+  if err != nil {
+    panic(err)
+  }
   return l
 }
 
