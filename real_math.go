@@ -444,28 +444,17 @@ func (c *Real) Lgamma(a Scalar) Scalar {
 }
 
 func (c *Real) Mlgamma(a Scalar, k int) Scalar {
-  c.AllocForOne(a)
-  v1 := special.Mlgamma(a.GetValue(), k)
-  if c.Order >= 1 {
-    v2 := 0.0
-    for j := 1; j <= k; j++ {
-      v2 += special.Digamma(a.GetValue() + float64(1-j)/2.0)
-    }
-    if c.Order >= 2 {
-      v3 := 0.0
-      for j := 1; j <= k; j++ {
-        v3 += special.Trigamma(a.GetValue() + float64(1-j)/2.0)
-      }
-      for i := 0; i < a.GetN(); i++ {
-        c.SetDerivative(2, i, a.GetDerivative(2, i)*v2 + a.GetDerivative(1, i)*a.GetDerivative(1, i)*v3)
-      }
-    }
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, v2*c.GetDerivative(1, i))
-    }
+  x := a.GetValue()
+  f0 := special.Mlgamma(x, k)
+  f1 := 0.0
+  f2 := 0.0
+  for j := 1; j <= k; j++ {
+    f1 += special.Digamma(x + float64(1-j)/2.0)
   }
-  c.SetValue(v1)
-  return c
+  for j := 1; j <= k; j++ {
+    f2 += special.Trigamma(x + float64(1-j)/2.0)
+  }
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) GammaP(a float64, x Scalar) Scalar {
