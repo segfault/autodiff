@@ -433,25 +433,14 @@ func (c *Real) Gamma(a Scalar) Scalar {
 }
 
 func (c *Real) Lgamma(a Scalar) Scalar {
-  v1, s := math.Lgamma(a.GetValue())
+  x := a.GetValue()
+  f0, s := math.Lgamma(a.GetValue())
   if s == -1 {
-    v1 = math.NaN()
+    f0 = math.NaN()
   }
-  c.AllocForOne(a)
-  if c.Order >= 1 {
-    v2 := special.Digamma(a.GetValue())
-    if c.Order >= 2 {
-      v3 := special.Trigamma(a.GetValue())
-      for i := 0; i < a.GetN(); i++ {
-        c.SetDerivative(2, i, v3*math.Pow(a.GetDerivative(1, i), 2.0) + v2*a.GetDerivative(2, i))
-      }
-    }
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, v2*a.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(v1)
-  return c
+  f1 := special.Digamma(x)
+  f2 := special.Trigamma(x)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Mlgamma(a Scalar, k int) Scalar {
