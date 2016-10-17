@@ -26,93 +26,191 @@ import "github.com/pbenner/autodiff/special"
 /* derivatives of a generic functions
  * -------------------------------------------------------------------------- */
 
-func (c *Real) monadic(a Scalar, f0, f1, f2 float64) Scalar {
+func (c *Real) monadic(a Scalar, v0, v1, v2 float64) Scalar {
   c.AllocForOne(a)
   if c.Order >= 1 {
     if c.Order >= 2 {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f2 +
-            a.GetDerivative(2, i)*f1)
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v2 +
+            a.GetDerivative(2, i)*v1)
       }
     }
     // compute first derivatives
     for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*f1)
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v1)
     }
   }
   // compute new value
-  c.SetValue(f0)
+  c.SetValue(v0)
   return c
 }
 
-func (c *Real) realMonadic(a *Real, f0, f1, f2 float64) *Real {
+func (c *Real) monadicLazy(a Scalar, v0 float64, f1, f2 func () float64) Scalar {
+  c.AllocForOne(a)
+  if c.Order >= 1 {
+    v1 := f1()
+    if c.Order >= 2 {
+      v2 := f2()
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v2 +
+            a.GetDerivative(2, i)*v1)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v1)
+    }
+  }
+  // compute new value
+  c.SetValue(v0)
+  return c
+}
+
+func (c *Real) realMonadic(a *Real, v0, v1, v2 float64) *Real {
   c.AllocForOne(a)
   if c.Order >= 1 {
     if c.Order >= 2 {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f2 +
-            a.GetDerivative(2, i)*f1)
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v2 +
+            a.GetDerivative(2, i)*v1)
       }
     }
     // compute first derivatives
     for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*f1)
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v1)
     }
   }
   // compute new value
-  c.SetValue(f0)
+  c.SetValue(v0)
   return c
 }
 
-func (c *Real) dyadic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) Scalar {
+func (c *Real) realMonadicLazy(a *Real, v0 float64, f1, f2 func() float64) *Real {
+  c.AllocForOne(a)
+  if c.Order >= 1 {
+    v1 := f1()
+    if c.Order >= 2 {
+      v2 := f2()
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v2 +
+            a.GetDerivative(2, i)*v1)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v1)
+    }
+  }
+  // compute new value
+  c.SetValue(v0)
+  return c
+}
+
+func (c *Real) dyadicLazy(a, b Scalar, v0 float64, f1 func() (float64, float64), f2 func() (float64, float64, float64)) *Real {
+  c.AllocForTwo(a, b)
+  if c.Order >= 1 {
+    v10, v01 := f1()
+    if c.Order >= 2 {
+      v11, v20, v02 := f2()
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(2, i)*v10 +
+            b.GetDerivative(2, i)*v01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*v02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*v11*2)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v10 + b.GetDerivative(1, i)*v01)
+    }
+  }
+  // compute new value
+  c.SetValue(v0)
+  return c
+}
+
+func (c *Real) dyadic(a, b Scalar, v0, v10, v01, v11, v20, v02 float64) *Real {
   c.AllocForTwo(a, b)
   if c.Order >= 1 {
     if c.Order >= 2 {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(2, i)*f10 +
-            b.GetDerivative(2, i)*f01 +
-            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f20 +
-            b.GetDerivative(1, i)*b.GetDerivative(1, i)*f02 +
-            a.GetDerivative(1, i)*b.GetDerivative(1, i)*f11*2)
+            a.GetDerivative(2, i)*v10 +
+            b.GetDerivative(2, i)*v01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*v02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*v11*2)
       }
     }
     // compute first derivatives
     for i := 0; i < c.GetN(); i++ {
-      c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v10 + b.GetDerivative(1, i)*v01)
     }
   }
   // compute new value
-  c.SetValue(f00)
+  c.SetValue(v0)
   return c
 }
 
-func (c *Real) realDyadic(a, b Scalar, f00, f10, f01, f11, f20, f02 float64) *Real {
+func (c *Real) realDyadic(a, b *Real, v0, v10, v01, v11, v20, v02 float64) *Real {
   c.AllocForTwo(a, b)
   if c.Order >= 1 {
     if c.Order >= 2 {
       // compute second derivatives
       for i := 0; i < c.GetN(); i++ {
         c.SetDerivative(2, i,
-            a.GetDerivative(2, i)*f10 +
-            b.GetDerivative(2, i)*f01 +
-            a.GetDerivative(1, i)*a.GetDerivative(1, i)*f20 +
-            b.GetDerivative(1, i)*b.GetDerivative(1, i)*f02 +
-            a.GetDerivative(1, i)*b.GetDerivative(1, i)*f11*2)
+            a.GetDerivative(2, i)*v10 +
+            b.GetDerivative(2, i)*v01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*v02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*v11*2)
+      }
+    }
+    // compute first derivatives
+    for i := 0; i < c.GetN(); i++ {
+      c.SetDerivative(1, i, a.GetDerivative(1, i)*v10 + b.GetDerivative(1, i)*v01)
+    }
+  }
+  // compute new value
+  c.SetValue(v0)
+  return c
+}
+
+func (c *Real) realDyadicLazy(a, b Scalar, v0 float64, f1 func() (float64, float64), f2 func() (float64, float64, float64)) *Real {
+  c.AllocForTwo(a, b)
+  if c.Order >= 1 {
+    v10, v01 := f1()
+    if c.Order >= 2 {
+      v11, v20, v02 := f2()
+      // compute second derivatives
+      for i := 0; i < c.GetN(); i++ {
+        c.SetDerivative(2, i,
+            a.GetDerivative(2, i)*v10 +
+            b.GetDerivative(2, i)*v01 +
+            a.GetDerivative(1, i)*a.GetDerivative(1, i)*v20 +
+            b.GetDerivative(1, i)*b.GetDerivative(1, i)*v02 +
+            a.GetDerivative(1, i)*b.GetDerivative(1, i)*v11*2)
       }
       // compute first derivatives
       for i := 0; i < c.GetN(); i++ {
-        c.SetDerivative(1, i, a.GetDerivative(1, i)*f10 + b.GetDerivative(1, i)*f01)
+        c.SetDerivative(1, i, a.GetDerivative(1, i)*v10 + b.GetDerivative(1, i)*v01)
       }
     }
   }
   // compute new value
-  c.SetValue(f00)
+  c.SetValue(v0)
   return c
 }
 
@@ -291,25 +389,37 @@ func (c *Real) RealDiv(a, b *Real) *Real {
 func (c *Real) Pow(a, k Scalar) Scalar {
   x := a.GetValue()
   y := k.GetValue()
-  f00 := math.Pow(x, y)
-  f10 := math.Pow(x, y-1)*y
-  f01 := math.Pow(x, y-0)*math.Log(x)
-  f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
-  f20 := math.Pow(x, y-2)*(y - 1)*y
-  f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-  return c.dyadic(a, k, f00, f10, f01, f11, f20, f02)
+  v0 := math.Pow(x, y)
+  f1 := func() (float64, float64) {
+    f10 := math.Pow(x, y-1)*y
+    f01 := math.Pow(x, y-0)*math.Log(x)
+    return f10, f01
+  }
+  f2 := func() (float64, float64, float64) {
+    f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+    f20 := math.Pow(x, y-2)*(y - 1)*y
+    f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+    return f11, f20, f02
+  }
+  return c.dyadicLazy(a, k, v0, f1, f2)
 }
 
 func (c *Real) RealPow(a, k *Real) *Real {
   x := a.GetValue()
   y := k.GetValue()
-  f00 := math.Pow(x, y)
-  f10 := math.Pow(x, y-1)*y
-  f01 := math.Pow(x, y-0)*math.Log(x)
-  f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
-  f20 := math.Pow(x, y-2)*(y - 1)*y
-  f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-  return c.realDyadic(a, k, f00, f10, f01, f11, f20, f02)
+  v0 := math.Pow(x, y)
+  f1 := func() (float64, float64) {
+    f10 := math.Pow(x, y-1)*y
+    f01 := math.Pow(x, y-0)*math.Log(x)
+    return f10, f01
+  }
+  f2 := func() (float64, float64, float64) {
+    f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+    f20 := math.Pow(x, y-2)*(y - 1)*y
+    f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+    return f11, f20, f02
+  }
+  return c.realDyadicLazy(a, k, v0, f1, f2)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -326,110 +436,126 @@ func (c *Real) RealSqrt(a *Real) *Real {
 
 func (c *Real) Sin(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Sin(x)
-  f1 :=  math.Cos(x)
-  f2 := -math.Sin(x)
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Sin(x)
+  f1 := func() float64 { return  math.Cos(x) }
+  f2 := func() float64 { return -math.Sin(x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Sinh(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Sinh(x)
-  f1 :=  math.Cosh(x)
-  f2 :=  math.Sinh(x)
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Sinh(x)
+  f1 := func() float64 { return  math.Cosh(x) }
+  f2 := func() float64 { return  math.Sinh(x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Cos(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Cos(x)
-  f1 := -math.Sin(x)
-  f2 := -math.Cos(x)
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Cos(x)
+  f1 := func() float64 { return -math.Sin(x) }
+  f2 := func() float64 { return -math.Cos(x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Cosh(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Cosh(x)
-  f1 :=  math.Sinh(x)
-  f2 :=  math.Cosh(x)
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Cosh(x)
+  f1 := func() float64 { return  math.Sinh(x) }
+  f2 := func() float64 { return  math.Cosh(x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Tan(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Tan(x)
-  f1 :=  1.0+math.Pow(math.Tan(x), 2)
-  f2 :=  2.0*math.Tan(x)*f1
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Tan(x)
+  f1 := func() float64 { return  1.0+math.Pow(math.Tan(x), 2) }
+  f2 := func() float64 { return  2.0*math.Tan(x)*f1() }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Tanh(a Scalar) Scalar {
   x := a.GetValue()
   f0 :=  math.Tanh(x)
-  f1 :=  1.0-math.Pow(math.Tanh(x), 2)
-  f2 := -2.0*math.Tanh(x)*f1
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 { return  1.0-math.Pow(math.Tanh(x), 2) }
+  f2 := func() float64 { return -2.0*math.Tanh(x)*f1() }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Exp(a Scalar) Scalar {
   x := a.GetValue()
-  f0 :=  math.Exp(x)
-  f1 :=  f0
-  f2 :=  f0
-  return c.monadic(a, f0, f1, f2)
+  f0 := math.Exp(x)
+  f1 := func() float64 { return f0 }
+  f2 := func() float64 { return f0 }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Log(a Scalar) Scalar {
   x := a.GetValue()
   f0 :=  math.Log(x)
-  f1 :=  1/x
-  f2 := -1/(x*x)
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 { return  1/x }
+  f2 := func() float64 { return -1/(x*x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Log1p(a Scalar) Scalar {
   x := a.GetValue()
   f0 :=  math.Log1p(x)
-  f1 :=  1/ (1+x)
-  f2 := -1/((1+x)*(1+x))
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 { return  1/ (1+x) }
+  f2 := func() float64 { return -1/((1+x)*(1+x)) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Erf(a Scalar) Scalar {
   x := a.GetValue()
   f0 :=  math.Erf(x)
-  f1 :=  2.0/(math.Exp(x*x)*special.M_SQRTPI)
-  f2 := -4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 {
+    return  2.0/(math.Exp(x*x)*special.M_SQRTPI)
+  }
+  f2 := func() float64 {
+    return -4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
+  }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Erfc(a Scalar) Scalar {
   x := a.GetValue()
   f0 :=  math.Erf(x)
-  f1 := -2.0/(math.Exp(x*x)*special.M_SQRTPI)
-  f2 :=  4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 {
+    return -2.0/(math.Exp(x*x)*special.M_SQRTPI)
+  }
+  f2 := func() float64 {
+    return  4.0/(math.Exp(x*x)*special.M_SQRTPI)*x
+  }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) LogErfc(a Scalar) Scalar {
   x := a.GetValue()
   t := math.Erfc(x)
   f0 :=  special.LogErfc(x)
-  f1 := -2.0/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t)
-  f2 :=  4.0*(math.Exp(x*x)*special.M_SQRTPI*t*x - 1)/(math.Exp(2*x*x)*math.Pi*t*t)
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 {
+    return -2.0/(math.Exp(a.GetValue()*a.GetValue())*special.M_SQRTPI*t)
+  }
+  f2 := func() float64 {
+    return  4.0*(math.Exp(x*x)*special.M_SQRTPI*t*x - 1)/(math.Exp(2*x*x)*math.Pi*t*t)
+  }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Gamma(a Scalar) Scalar {
   x := a.GetValue()
-  v1 := math.Gamma(x)
-  v2 := special.Digamma(x)
-  v3 := special.Trigamma(x)
-  f0 := v1
-  f1 := v1*v2
-  f2 := v1*(v2*v2 + v3)
-  return c.monadic(a, f0, f1, f2)
+  v0 := math.Gamma(x)
+  f1 := func() float64 {
+    v1 := special.Digamma(x)
+    return v0*v1
+  }
+  f2 := func() float64 {
+    v1 := special.Digamma(x)
+    v2 := special.Trigamma(x)
+    return v0*(v1*v1 + v2)
+  }
+  return c.monadicLazy(a, v0, f1, f2)
 }
 
 func (c *Real) Lgamma(a Scalar) Scalar {
@@ -438,31 +564,41 @@ func (c *Real) Lgamma(a Scalar) Scalar {
   if s == -1 {
     f0 = math.NaN()
   }
-  f1 := special.Digamma(x)
-  f2 := special.Trigamma(x)
-  return c.monadic(a, f0, f1, f2)
+  f1 := func() float64 { return special.Digamma(x) }
+  f2 := func() float64 { return special.Trigamma(x) }
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) Mlgamma(a Scalar, k int) Scalar {
   x := a.GetValue()
   f0 := special.Mlgamma(x, k)
-  f1 := 0.0
-  f2 := 0.0
-  for j := 1; j <= k; j++ {
-    f1 += special.Digamma(x + float64(1-j)/2.0)
+  f1 := func() float64 {
+    s := 0.0
+    for j := 1; j <= k; j++ {
+      s += special.Digamma(x + float64(1-j)/2.0)
+    }
+    return s
   }
-  for j := 1; j <= k; j++ {
-    f2 += special.Trigamma(x + float64(1-j)/2.0)
+  f2 := func() float64 {
+    s := 0.0
+    for j := 1; j <= k; j++ {
+      s += special.Trigamma(x + float64(1-j)/2.0)
+    }
+    return s
   }
-  return c.monadic(a, f0, f1, f2)
+  return c.monadicLazy(a, f0, f1, f2)
 }
 
 func (c *Real) GammaP(a float64, b Scalar) Scalar {
   x := b.GetValue()
   f0 := special.GammaP(a, x)
-  f1 := special.GammaPfirstDerivative(a, x)
-  f2 := special.GammaPsecondDerivative(a, x)
-  return c.monadic(b, f0, f1, f2)
+  f1 := func() float64 {
+    return special.GammaPfirstDerivative(a, x)
+  }
+  f2 := func() float64 {
+    return special.GammaPsecondDerivative(a, x)
+  }
+  return c.monadicLazy(b, f0, f1, f2)
 }
 
 /* -------------------------------------------------------------------------- */
