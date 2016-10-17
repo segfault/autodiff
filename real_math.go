@@ -422,23 +422,14 @@ func (c *Real) LogErfc(a Scalar) Scalar {
 }
 
 func (c *Real) Gamma(a Scalar) Scalar {
-  c.AllocForOne(a)
-  // preevaluate some expressions
-  v1 := math.Gamma(a.GetValue())
-  if c.Order >= 1 {
-    v2 := special.Digamma(a.GetValue())
-    if c.Order >= 2 {
-      v3 := special.Trigamma(a.GetValue())
-      for i := 0; i < a.GetN(); i++ {
-        c.SetDerivative(2, i, v1*((v2*v2 + v3)*math.Pow(a.GetDerivative(1, i), 2.0) + v1*a.GetDerivative(2, i)))
-      }
-    }
-    for i := 0; i < a.GetN(); i++ {
-      c.SetDerivative(1, i, v1*v2*a.GetDerivative(1, i))
-    }
-  }
-  c.SetValue(v1)
-  return c
+  x := a.GetValue()
+  v1 := math.Gamma(x)
+  v2 := special.Digamma(x)
+  v3 := special.Trigamma(x)
+  f0 := v1
+  f1 := v1*v2
+  f2 := v1*(v2*v2 + v3)
+  return c.monadic(a, f0, f1, f2)
 }
 
 func (c *Real) Lgamma(a Scalar) Scalar {
