@@ -402,10 +402,17 @@ func (c *Real) Pow(a, k Scalar) Scalar {
     }
   }
   f2 := func() (float64, float64, float64) {
-    f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
-    f20 := math.Pow(x, y-2)*(y - 1)*y
-    f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
-    return f11, f20, f02
+    if k.GetOrder() >= 1 {
+      f11 := math.Pow(x, y-1)*(1 + y*math.Log(x))
+      f20 := math.Pow(x, y-2)*(y - 1)*y
+      f02 := math.Pow(x, y-0)*math.Log(x)*math.Log(x)
+      return f11, f20, f02
+    } else {
+      f11 := 0.0
+      f20 := math.Pow(x, y-2)*(y - 1)*y
+      f02 := 0.0
+      return f11, f20, f02
+    }
   }
   return c.dyadicLazy(a, k, v0, f1, f2)
 }
