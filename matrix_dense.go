@@ -264,7 +264,9 @@ func (matrix *DenseMatrix) Map(f func(Scalar) Scalar) {
   n, m := matrix.Dims()
   for i := 0; i < n; i++ {
     for j := 0; j < m; j++ {
-      matrix.Set(f(matrix.At(i, j)), i, j)
+      // set reference here to have identical behaviour to
+      // vectors
+      matrix.SetReference(f(matrix.At(i, j)), i, j)
     }
   }
 }
