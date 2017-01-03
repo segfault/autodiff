@@ -55,7 +55,7 @@ func TestBfgsMatyas(t *testing.T) {
     Hook{hook},
     Epsilon{1e-8})
   if err != nil {
-    panic(err)
+    t.Error(err)
   }
   if Vnorm(VsubV(xn, xr)).GetValue() > 1e-6 {
     t.Error("BFGS Matyas test failed!")
@@ -89,13 +89,13 @@ func TestBfgsRosenbrock(t *testing.T) {
     return false
   }
 
-  x0 := NewVector(RealType, []float64{-10,10})
-  xr := NewVector(RealType, []float64{  1, 1})
+  x0 := NewVector(RealType, []float64{-0.5, 2})
+  xr := NewVector(RealType, []float64{   1, 1})
   xn, err := Run(f, x0,
     Hook{hook},
     Epsilon{1e-10})
   if err != nil {
-    panic(err)
+    t.Error(err)
   }
   if Vnorm(VsubV(xn, xr)).GetValue() > 1e-8 {
     t.Error("BFGS Rosenbrock test failed!")

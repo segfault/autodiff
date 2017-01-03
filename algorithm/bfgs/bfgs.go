@@ -91,7 +91,7 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
   c1  := 1e-3
   rho := t2
   rho.Reset()
-  rho.SetValue(0.9)
+  rho.SetValue(0.5)
   // always begin with a = 1
   a1[0].SetValue(1.0)
   for {
@@ -160,13 +160,17 @@ func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Scalar, t3, t4 Vector
 }
 
 // update approximation of the inverse Hessian matrix
-func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) {
+func bfgs_updateH(g1, g2, p2 Vector, H0, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) bool {
   s := p2
   y := t3
   // y = Df(x2) - Df(x1)
   y.VsubV(g2, g1)
   // y^T s
   t1.VdotV(s, y)
+  // check if value is zero
+  if math.Abs(t1.GetValue()) == 0.0 {
+    return false
+  }
   // s y^T
   t5.Outer(s, y)
   // s y^T / (y^T s)
@@ -182,9 +186,10 @@ func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vec
   t5.MdivS(t5, t1)
   // [I - s y^T / (y^T s)] H1 [I - s y^T / (y^T s)] + s s^T / (y^T s)
   H2.MaddM(H2, t5)
+  return true
 }
 
-func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (Vector, error) {
+func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (Vector, error) {
 
   n := len(x0)
   t := x0.ElementType()
@@ -198,7 +203,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
   y2 := NullScalar(t)
   g1 := NullVector(t, n)
   g2 := NullVector(t, n)
-  H1 := B0.Clone()
+  H1 := H0.Clone()
   H2 := NullDenseMatrix(t, n, n)
   // some temporary variables
   t1 := NullScalar(t)
@@ -231,9 +236,11 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     if err := f.Differentiate(x2, y2, g2); err != nil {
       return x1, fmt.Errorf("invalid value: %s", err)
     }
-    
-    bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6)
-    
+    if ok := bfgs_updateH(g1, g2, p2, H0, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
+      // reset H to find a new direction
+      H2.Copy(H0)
+    }
+
     g1.Copy(g2)
     x1.Copy(x2)
     y1.Copy(y2)
