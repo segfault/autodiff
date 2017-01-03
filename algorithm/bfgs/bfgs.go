@@ -41,6 +41,10 @@ type Hook struct {
   Value func(gradient, x Vector, y Scalar) bool
 }
 
+type Constraints struct {
+  Value func(x Vector) bool
+}
+
 /* -------------------------------------------------------------------------- */
 
 type ObjectiveInSitu struct {
@@ -87,7 +91,7 @@ func bgfs_computeDirection(x Vector, y Scalar, g Vector, B Matrix, p Vector) {
   }
 }
 
-func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector, t1, t2 Scalar) bool {
+func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector, t1, t2 Scalar, constraints Constraints) bool {
   c1  := 1e-3
   rho := t2
   rho.Reset()
@@ -104,13 +108,16 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     if math.IsNaN(y2.GetValue()) {
       return false
     }
-    // check Wolfe conditions
-    t1.VdotV(p1, g1)
-    if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
-      break
+    // check if new value satisfies constraints
+    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2)) {
+      // check Wolfe conditions
+      t1.VdotV(p1, g1)
+      if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
+        break
+      }
     }
     a1[0].Mul(rho, a1[0])
-  }
+}
   return true
 }
 
@@ -189,7 +196,7 @@ func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vec
   return true
 }
 
-func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (Vector, error) {
+func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, constraints Constraints) (Vector, error) {
 
   n := len(x0)
   t := x0.ElementType()
@@ -218,10 +225,14 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (
   if err := f.Differentiate(x1, y1, g1); err != nil {
     return x1, fmt.Errorf("invalid initial value: %s", err)
   }
+  // execute hook if available
+  if hook.Value != nil && hook.Value(g1, x1, y1) {
+    return x1, nil
+  }
   for {
     bgfs_computeDirection(x1, y1, g1, H1, p1)
 
-    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2); !ok {
+    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2, constraints); !ok {
       return x1, fmt.Errorf("line search failed")
     }
     // execute hook if available
@@ -257,9 +268,10 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (
 
 func Run(f Objective, x0 Vector, args ...interface{}) (Vector, error) {
 
-  hessian := Hessian{ nil}
-  hook    := Hook   { nil}
-  epsilon := Epsilon{1e-8}
+  hessian     := Hessian{ nil}
+  hook        := Hook   { nil}
+  epsilon     := Epsilon{1e-8}
+  constraints := Constraints{ nil}
 
   n := len(x0)
 
@@ -271,6 +283,8 @@ func Run(f Objective, x0 Vector, args ...interface{}) (Vector, error) {
       hook = a
     case Epsilon:
       epsilon = a
+    case Constraints:
+      constraints = a
     default:
       panic("Bfgs(): Invalid optional argument!")
     }
@@ -287,5 +301,5 @@ func Run(f Objective, x0 Vector, args ...interface{}) (Vector, error) {
   if err != nil {
     return nil, err
   }
-  return bfgs(newObjectiveInSitu(f), x0, H, epsilon, hook)
+  return bfgs(newObjectiveInSitu(f), x0, H, epsilon, hook, constraints)
 }
