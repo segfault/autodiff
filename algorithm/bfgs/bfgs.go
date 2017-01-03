@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 Philipp Benner
+/* Copyright (C) 2016, 2017 Philipp Benner
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,73 +110,73 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
 }
 
 // update approximation of the Hessian matrix
-func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Vector, t3, t4 Matrix) {
+func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) {
   s := p2
-  y := t1
+  y := t3
   // y = Df(x2) - Df(x1)
   y.VsubV(g2, g1)
   // s.y
-  t6 := VdotV(s, y)
+  t2.VdotV(s, y)
   // check if value is zero
-  if math.Abs(t6.GetValue()) < 1e-16 {
+  if math.Abs(t2.GetValue()) < 1e-16 {
     B2.Copy(B1)
     return
   }
   // y s^T
-  t3.Outer(y, s)
+  t5.Outer(y, s)
   // B y s^T
-  t3.MdotM(B1, t3)
+  t5.MdotM(B1, t5)
   // s y^T B
-  t4.Outer(s, y)
+  t6.Outer(s, y)
   // s y^T B
-  t4.MdotM(t4, B1)
+  t6.MdotM(t6, B1)
   // B y s^T + s y^T B
-  t3.MaddM(t3, t4)
+  t5.MaddM(t5, t6)
   // (B y s^T + s y^T B) / (s.y)
-  t3.MdivS(t3, t6)
+  t5.MdivS(t5, t2)
   // save result
-  B2.MsubM(B1, t3)
+  B2.MsubM(B1, t5)
   // y.B
-  t2.VdotM(y, B1)
+  t4.VdotM(y, B1)
   // y.B.y
-  t5 := VdotV(t2, y)
+  t1.VdotV(t4, y)
   // s.y + y.B.y
-  t5.Add(t5, t6)
+  t1.Add(t1, t2)
   // (s.y)^2
-  t6.Mul(t6, t6)
+  t2.Mul(t2, t2)
   // (s.y + y.B.y)/(s.y)^2
-  t5.Div(t5, t6)
+  t1.Div(t1, t2)
   // s s^T
-  t3.Outer(s, s)
+  t5.Outer(s, s)
   // (s.y + y.B.y)/(s.y)^2 (s s^T)
-  t3.MmulS(t3, t5)
+  t5.MmulS(t5, t1)
   // save result
-  B2.MaddM(B2, t3)
+  B2.MaddM(B2, t5)
 }
 
 // update approximation of the inverse Hessian matrix
-func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Vector, t3, t4 Matrix) {
+func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) {
   s := p2
-  y := t1
+  y := t3
   // y = Df(x2) - Df(x1)
   y.VsubV(g2, g1)
   // y^T s
-  t5 := VdotV(s, y)
+  t1.VdotV(s, y)
   // s y^T
-  t3.Outer(s, y)
+  t5.Outer(s, y)
   // s y^T / (y^T s)
-  t3.MdivS(t3, t5)
+  t5.MdivS(t5, t1)
   // I - s y^T / (y^T s)
-  t3.MsubM(I, t3)
+  t5.MsubM(I, t5)
   // [I - s y^T / (y^T s)] H1 [I - s y^T / (y^T s)]
-  H2.MdotM(t3, H1)
-  H2.MdotM(H2, t3)
+  H2.MdotM(t5, H1)
+  H2.MdotM(H2, t5)
   // s s^T
-  t3.Outer(s, s)
+  t5.Outer(s, s)
   // s s^T / (y^T s)
-  t3.MdivS(t3, t5)
+  t5.MdivS(t5, t1)
   // [I - s y^T / (y^T s)] H1 [I - s y^T / (y^T s)] + s s^T / (y^T s)
-  H2.MaddM(H2, t3)
+  H2.MaddM(H2, t5)
 }
 
 func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (Vector, error) {
@@ -196,10 +196,12 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
   H1 := B0.Clone()
   H2 := NullDenseMatrix(t, n, n)
   // some temporary variables
-  t1 := NullVector(t, n)
-  t2 := NullVector(t, n)
-  t3 := NullDenseMatrix(t, n, n)
-  t4 := NullDenseMatrix(t, n, n)
+  t1 := NullScalar(t)
+  t2 := NullScalar(t)
+  t3 := NullVector(t, n)
+  t4 := NullVector(t, n)
+  t5 := NullDenseMatrix(t, n, n)
+  t6 := NullDenseMatrix(t, n, n)
   I  := IdentityMatrix(t, n)
 
   // evaluate objective function
@@ -225,7 +227,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
       return x1, fmt.Errorf("invalid value: %s", err)
     }
     
-    bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4)
+    bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6)
     
     g1.Copy(g2)
     x1.Copy(x2)
