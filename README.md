@@ -22,6 +22,9 @@ where *y.GetValue()* returns the function value and *y.Derivative()* the derivat
 
 Compare vanilla gradient descent with resilient backpropagation
 ```go
+  import "github.com/pbenner/autodiff/algorithm/gradientDescent"
+  import "github.com/pbenner/autodiff/algorithm/rprop"
+
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
     return Add(Sub(Pow(x[0], NewReal(4)), Mul(NewReal(3), Pow(x[0], NewReal(3)))), NewReal(2))
@@ -39,6 +42,8 @@ Compare vanilla gradient descent with resilient backpropagation
 
 Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb - I||*
 ```go
+  import "github.com/pbenner/autodiff/algorithm/rprop"
+
   m := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
   I := IdentityMatrix(matrix.Dims()[0])
@@ -58,6 +63,8 @@ Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb -
 Find the root of a function *f* with initial value *x0 = (1,1)*
 
 ```go
+  import "github.com/pbenner/autodiff/algorithm/newton"
+
   f := func(x Vector) Vector {
     if len(x) != 2 {
       panic("Invalid input vector!")
@@ -77,8 +84,11 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
 
 ### Minimize Rosenbrock's function using the BFGS algorithm
 
-```
-  f := func(x Vector) (Scalar, error) {
+```go
+ import   "github.com/pbenner/autodiff/algorithm/bfgs"
+
+
+ f := func(x Vector) (Scalar, error) {
     // f(x1, x2) = (a - x1)^2 + b(x2 - x1^2)^2
     // a = 1
     // b = 100
