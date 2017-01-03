@@ -14,6 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Reference:
+// Nocedal, Jorge, and Stephen Wright. Numerical optimization.
+// Springer Science & Business Media, 2006.
+
+/* -------------------------------------------------------------------------- */
+
 package bfgs
 
 /* -------------------------------------------------------------------------- */
