@@ -83,10 +83,11 @@ func bgfs_computeDirection(x Vector, y Scalar, g Vector, B Matrix, p Vector) {
   }
 }
 
-func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector) bool {
+func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector, t1, t2 Scalar) bool {
   c1  := 1e-3
-  rho := NewReal(0.9)
-  t1  := NullReal()
+  rho := t2
+  rho.Reset()
+  rho.SetValue(0.9)
   // always begin with a = 1
   a1[0].SetValue(1.0)
   for {
@@ -219,7 +220,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     }
     bgfs_computeDirection(x1, y1, g1, H1, p1)
 
-    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1); !ok {
+    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2); !ok {
       return x1, fmt.Errorf("line search failed")
     }
     // evaluate objective at new position
@@ -239,6 +240,9 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
 }
 
 /* -------------------------------------------------------------------------- */
+
+// x0: starting point
+// B0: initial approximation to the Hessian matrix
 
 func Run(f Objective, x0 Vector, B0 Matrix, args ...interface{}) (Vector, error) {
 
@@ -261,9 +265,9 @@ func Run(f Objective, x0 Vector, B0 Matrix, args ...interface{}) (Vector, error)
       panic("Bfgs(): Invalid optional argument!")
     }
   }
-  B, err := matrixInverse.Run(B0)
+  H, err := matrixInverse.Run(B0)
   if err != nil {
     return nil, err
   }
-  return bfgs(newObjectiveInSitu(f), x0, B, epsilon, hook)
+  return bfgs(newObjectiveInSitu(f), x0, H, epsilon, hook)
 }
