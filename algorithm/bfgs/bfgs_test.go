@@ -50,9 +50,8 @@ func TestBfgsMatyas(t *testing.T) {
   }
 
   x0 := NewVector(RealType, []float64{-2.5,2})
-  B0 := NewDenseMatrix(RealType, 2, 2, []float64{1.0, 0.0, 0.0, 1.0})
   xr := NewVector(RealType, []float64{0, 0})
-  xn, err := Run(f, x0, B0,
+  xn, err := Run(f, x0,
     Hook{hook},
     Epsilon{1e-8})
   if err != nil {
@@ -91,9 +90,8 @@ func TestBfgsRosenbrock(t *testing.T) {
   }
 
   x0 := NewVector(RealType, []float64{-10,10})
-  B0 := NewDenseMatrix(RealType, 2, 2, []float64{1.0, 0.0, 0.0, 1.0})
   xr := NewVector(RealType, []float64{  1, 1})
-  xn, err := Run(f, x0, B0,
+  xn, err := Run(f, x0,
     Hook{hook},
     Epsilon{1e-10})
   if err != nil {

@@ -29,6 +29,10 @@ import   "github.com/pbenner/autodiff/algorithm/matrixInverse"
 
 type Objective func(Vector) (Scalar, error)
 
+type Hessian struct {
+  Value Matrix
+}
+
 type Epsilon struct {
   Value float64
 }
@@ -244,19 +248,18 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
 // x0: starting point
 // B0: initial approximation to the Hessian matrix
 
-func Run(f Objective, x0 Vector, B0 Matrix, args ...interface{}) (Vector, error) {
+func Run(f Objective, x0 Vector, args ...interface{}) (Vector, error) {
 
+  hessian := Hessian{ nil}
   hook    := Hook   { nil}
   epsilon := Epsilon{1e-8}
 
   n := len(x0)
-  r, c := B0.Dims()
-  if n != r || n != c {
-    return nil, fmt.Errorf("argument dimensions do not match, i.e. x0 has length %s and B0 %dx%d\n", n, r, c)
-  }
 
   for _, arg := range args {
     switch a := arg.(type) {
+    case Hessian:
+      hessian = a
     case Hook:
       hook = a
     case Epsilon:
@@ -265,7 +268,15 @@ func Run(f Objective, x0 Vector, B0 Matrix, args ...interface{}) (Vector, error)
       panic("Bfgs(): Invalid optional argument!")
     }
   }
-  H, err := matrixInverse.Run(B0)
+  if hessian.Value == nil {
+    hessian.Value = IdentityMatrix(x0.ElementType(), n)
+  } else {
+    r, c := hessian.Value.Dims()
+    if n != r || n != c {
+      return nil, fmt.Errorf("argument dimensions do not match, i.e. x0 has length %s and B0 has dimension %dx%d\n", n, r, c)
+    }
+  }
+  H, err := matrixInverse.Run(hessian.Value)
   if err != nil {
     return nil, err
   }
