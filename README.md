@@ -100,7 +100,6 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
     return Add(s, t), nil
   }
   hook := func(gradient, x Vector, y Scalar) bool {
-    fmt.Fprintf(fp, "%s\n", x.Table())
     fmt.Println("gradient:", gradient)
     fmt.Println("x       :", x)
     fmt.Println("y       :", y)
