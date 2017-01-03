@@ -26,7 +26,7 @@ import . "github.com/pbenner/autodiff"
 
 /* -------------------------------------------------------------------------- */
 
-func TestBfgsExample(t *testing.T) {
+func TestBfgsMatyas(t *testing.T) {
 
   fp, err := os.Create("bfgs_test1.table")
   if err != nil {
@@ -54,12 +54,12 @@ func TestBfgsExample(t *testing.T) {
   xr := NewVector(RealType, []float64{0, 0})
   xn, err := Run(f, x0, B0,
     Hook{hook},
-    Epsilon{1e-5})
+    Epsilon{1e-8})
   if err != nil {
     panic(err)
   }
-  if Vnorm(VsubV(xn, xr)).GetValue() > 1e-8 {
-    t.Error("Rosenbrock test failed!")
+  if Vnorm(VsubV(xn, xr)).GetValue() > 1e-6 {
+    t.Error("BFGS Matyas test failed!")
   }
 }
 
@@ -100,6 +100,6 @@ func TestBfgsRosenbrock(t *testing.T) {
     panic(err)
   }
   if Vnorm(VsubV(xn, xr)).GetValue() > 1e-8 {
-    t.Error("Rosenbrock test failed!")
+    t.Error("BFGS Rosenbrock test failed!")
   }
 }

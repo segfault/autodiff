@@ -208,9 +208,6 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
   }
   for {
     // execute hook if available
-    fmt.Println("x1      :", x1)
-    fmt.Println("x2      :", x2)
-    fmt.Println("g1      :", g1)
     if hook.Value != nil && hook.Value(g1, x1, y1) {
       break
     }
@@ -219,7 +216,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
       break
     }
     bgfs_computeDirection(x1, y1, g1, H1, p1)
-    fmt.Println("line search...")
+
     if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1); !ok {
       return x1, fmt.Errorf("line search failed")
     }
@@ -228,21 +225,13 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
       return x1, fmt.Errorf("invalid value: %s", err)
     }
     
-    fmt.Println("x2:", x2)
-    fmt.Println("y2:", y2)
-    fmt.Println("g2:", g2)
-    fmt.Println("a1:", a1)
     bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4)
-    fmt.Println("H1:", H1)
-    fmt.Println("H2:", H2)
     
     g1.Copy(g2)
     x1.Copy(x2)
     y1.Copy(y2)
     p1.Copy(p2)
     H1.Copy(H2)
-    fmt.Println("iteration done...")
-    fmt.Println()
   }
   return x1, nil
 }
