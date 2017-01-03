@@ -19,12 +19,11 @@ package bfgs
 /* -------------------------------------------------------------------------- */
 
 import   "fmt"
+import   "math"
 
 import . "github.com/pbenner/autodiff"
 //import . "github.com/pbenner/autodiff/algorithm"
 import   "github.com/pbenner/autodiff/algorithm/matrixInverse"
-//import   "github.com/pbenner/autodiff/algorithm/gradientDescent"
-import   "github.com/pbenner/autodiff/algorithm/rprop"
 
 /* -------------------------------------------------------------------------- */
 
@@ -84,53 +83,29 @@ func bgfs_computeDirection(x Vector, y Scalar, g Vector, B Matrix, p Vector) {
   }
 }
 
-func bgfs_lineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector) {
-  c1 := 1e-3
-  c2 := 0.9
-  t1 := NullReal()
-  t2 := NullReal()
-  h := func(gradient, step []float64, variables Vector, y Scalar) bool {
-    fmt.Println("line search - gradient:", gradient)
-    fmt.Println("line search - step    :", step)
-    fmt.Println("line search - a       :", variables)
-    fmt.Println("line search - x1      :", x1)
-    fmt.Println("line search - x2      :", x2)
-    fmt.Println("line search - p1      :", p1)
-    fmt.Println("line search - p2      :", p2)
-    fmt.Println("line search - y       :", y)
-    fmt.Println()
-    a1 := a1.Clone()
-    x2 := x2.Clone()
-    y2 := y2.Clone()
-    g2 := g2.Clone()
-    // compute x2
-    a1[0].Copy(variables[0])
+func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1, p2 Vector, a1 Vector) bool {
+  c1  := 1e-3
+  rho := NewReal(0.9)
+  t1  := NullReal()
+  // always begin with a = 1
+  a1[0].SetValue(1.0)
+  for {
+    // compute x2 = f(x1 + a1 p1)
     p2.VmulS(p1, a1[0])
     x2.VaddV(x1, p2)
     // evaluate function at x2
     f.Differentiate(x2, y2, g2)
+    // check NaN
+    if math.IsNaN(y2.GetValue()) {
+      return false
+    }
     // check Wolfe conditions
     t1.VdotV(p1, g1)
     if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
-      t2.VdotV(p1, g2)
-      if t2.GetValue() >= c2*t1.GetValue() {
-        fmt.Println("CONDITIONS MET!")
-        return true
-      }
+      break
     }
-    return false
+    a1[0].Mul(rho, a1[0])
   }
-  g := func(variables Vector) (Scalar, error) {
-    a1[0].Copy(variables[0])
-    p2.VmulS(p1, a1[0])
-    x2.VaddV(x1, p2)
-    // evaluate objective function
-    if err := f.Eval(x2, y2); err != nil {
-      return nil, fmt.Errorf("invalid initial value: %s", err)
-    }
-    return y2, nil
-  }
-  rprop.Run(g, a1, 1e-6, []float64{1.2,0.8}, rprop.Hook{h}, rprop.Epsilon{1e-12})
   a1.ResetDerivatives()
   x1.ResetDerivatives()
   x2.ResetDerivatives()
@@ -140,6 +115,7 @@ func bgfs_lineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar, g1, g2, p1
   g2.ResetDerivatives()
   p1.ResetDerivatives()
   p2.ResetDerivatives()
+  return true
 }
 
 func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Vector, t3, t4 Matrix) {
@@ -149,6 +125,11 @@ func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Vector, t3, t4 Matrix
   y.VsubV(g2, g1)
   // s.y
   t6 := VdotV(s, y)
+  // check if value is zero
+  if math.Abs(t6.GetValue()) < 1e-16 {
+    B2.Copy(B1)
+    return
+  }
   // y s^T
   t3.Outer(y, s)
   // B y s^T
@@ -221,10 +202,15 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     }
     bgfs_computeDirection(x1, y1, g1, B1, p1)
     fmt.Println("line search...")
-    bgfs_lineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1)
+    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1); !ok {
+      return x1, fmt.Errorf("line search failed")
+    }
     // evaluate objective at new position
     if err := f.Differentiate(x2, y2, g2); err != nil {
-      return x1, fmt.Errorf("invalid initial value: %s", err)
+      return x1, fmt.Errorf("invalid value: %s", err)
+    }
+    if Vnorm(VsubV(x1, x2)).GetValue() < 1e-20 {
+      return x2, nil
     }
     
     fmt.Println("x2:", x2)
@@ -232,6 +218,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     fmt.Println("g2:", g2)
     fmt.Println("a1:", a1)
     bfgs_updateB(g1, g2, p2, B1, B2, t1, t2, t3, t4)
+    fmt.Println("B1:", B1)
     fmt.Println("B2:", B2)
     
     g1.Copy(g2)

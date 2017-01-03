@@ -35,16 +35,10 @@ func TestBfgsExample(t *testing.T) {
   defer fp.Close()
 
   f := func(x Vector) (Scalar, error) {
-    // f(x1, x2) = Exp(x1-1) + Exp(-x2+1) + (x1-x2)^2
-    // a = 1
-    // b = 100
-    // minimum: (x1,x2) = (a, a^2)
-    a := NewReal(1.0)
-    b := NewReal(2.0)
-    y1 := Exp(Sub(x[0], a))
-    y2 := Exp(Sub(a, x[1]))
-    y3 := Pow(Sub(x[0], x[1]), b)
-    y  := Add(Add(y1, y2), y3)
+    // f(x1, x2) = 0.26(x1^2 + x2^2) - 0.48 x1 x2
+    // minimum: f(x1,x2) = f(0, 0) = 0
+    y := Sub(Mul(NewReal(0.26), Add(Mul(x[0], x[0]), Mul(x[1], x[1]))),
+      Mul(NewReal(0.48), Mul(x[0], x[1])))
     return y, nil
   }
   hook := func(gradient, x Vector, y Scalar) bool {
@@ -55,9 +49,9 @@ func TestBfgsExample(t *testing.T) {
     return false
   }
 
-  x0 := NewVector(RealType, []float64{0,0})
+  x0 := NewVector(RealType, []float64{0,1.5})
   B0 := NewDenseMatrix(RealType, 2, 2, []float64{1.0, 0.0, 0.0, 1.0})
-  xr := NewVector(RealType, []float64{  1, 1})
+  xr := NewVector(RealType, []float64{0, 0})
   xn, err := Run(f, x0, B0,
     Hook{hook},
     Epsilon{1e-5})
