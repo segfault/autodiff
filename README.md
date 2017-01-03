@@ -9,6 +9,8 @@ The documentation of this package can be found [here](https://godoc.org/github.c
 Compute the derivative of a function *f* at *x = 9*
 
 ```go
+  import . "github.com/pbenner/autodiff"
+
   f := func(x Scalar) Scalar {
     return Add(Mul(NewReal(2), Pow(x, NewReal(3))), NewReal(4))
   }
@@ -22,8 +24,9 @@ where *y.GetValue()* returns the function value and *y.Derivative()* the derivat
 
 Compare vanilla gradient descent with resilient backpropagation
 ```go
-  import "github.com/pbenner/autodiff/algorithm/gradientDescent"
-  import "github.com/pbenner/autodiff/algorithm/rprop"
+  import . "github.com/pbenner/autodiff"
+  import   "github.com/pbenner/autodiff/algorithm/gradientDescent"
+  import   "github.com/pbenner/autodiff/algorithm/rprop"
 
   f := func(x Vector) Scalar {
     // x^4 - 3x^3 + 2
@@ -42,7 +45,8 @@ Compare vanilla gradient descent with resilient backpropagation
 
 Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb - I||*
 ```go
-  import "github.com/pbenner/autodiff/algorithm/rprop"
+  import . "github.com/pbenner/autodiff"
+  import   "github.com/pbenner/autodiff/algorithm/rprop"
 
   m := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
@@ -63,7 +67,8 @@ Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb -
 Find the root of a function *f* with initial value *x0 = (1,1)*
 
 ```go
-  import "github.com/pbenner/autodiff/algorithm/newton"
+  import . "github.com/pbenner/autodiff"
+  import   "github.com/pbenner/autodiff/algorithm/newton"
 
   f := func(x Vector) Vector {
     if len(x) != 2 {
@@ -85,30 +90,30 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
 ### Minimize Rosenbrock's function using the BFGS algorithm
 
 ```go
- import   "github.com/pbenner/autodiff/algorithm/bfgs"
+  import . "github.com/pbenner/autodiff"
+  import   "github.com/pbenner/autodiff/algorithm/bfgs"
 
+  f := func(x Vector) (Scalar, error) {
+     // f(x1, x2) = (a - x1)^2 + b(x2 - x1^2)^2
+     // a = 1
+     // b = 100
+     // minimum: (x1,x2) = (a, a^2)
+     a := NewReal(  1.0)
+     b := NewReal(100.0)
+     s := Pow(Sub(a, x[0]), NewReal(2.0))
+     t := Mul(b, Pow(Sub(x[1], Mul(x[0], x[0])), NewReal(2.0)))
+     return Add(s, t), nil
+   }
+   hook := func(gradient, x Vector, y Scalar) bool {
+     fmt.Println("gradient:", gradient)
+     fmt.Println("x       :", x)
+     fmt.Println("y       :", y)
+     return false
+   }
 
- f := func(x Vector) (Scalar, error) {
-    // f(x1, x2) = (a - x1)^2 + b(x2 - x1^2)^2
-    // a = 1
-    // b = 100
-    // minimum: (x1,x2) = (a, a^2)
-    a := NewReal(  1.0)
-    b := NewReal(100.0)
-    s := Pow(Sub(a, x[0]), NewReal(2.0))
-    t := Mul(b, Pow(Sub(x[1], Mul(x[0], x[0])), NewReal(2.0)))
-    return Add(s, t), nil
-  }
-  hook := func(gradient, x Vector, y Scalar) bool {
-    fmt.Println("gradient:", gradient)
-    fmt.Println("x       :", x)
-    fmt.Println("y       :", y)
-    return false
-  }
-
-  x0 := NewVector(RealType, []float64{-0.5, 2})
-  bfgs.Run(f, x0,
-    bfgs.Hook{hook},
-    bfgs.Epsilon{1e-10})
+   x0 := NewVector(RealType, []float64{-0.5, 2})
+   bfgs.Run(f, x0,
+     bfgs.Hook{hook},
+     bfgs.Epsilon{1e-10})
 ```
 ![Gradient descent](demo/rosenbrock/rosenbrock.png)
