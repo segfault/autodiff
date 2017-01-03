@@ -160,7 +160,7 @@ func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Scalar, t3, t4 Vector
 }
 
 // update approximation of the inverse Hessian matrix
-func bfgs_updateH(g1, g2, p2 Vector, H0, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) bool {
+func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vector, t5, t6 Matrix) bool {
   s := p2
   y := t3
   // y = Df(x2) - Df(x1)
@@ -236,7 +236,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (
     if err := f.Differentiate(x2, y2, g2); err != nil {
       return x1, fmt.Errorf("invalid value: %s", err)
     }
-    if ok := bfgs_updateH(g1, g2, p2, H0, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
+    if ok := bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
       // reset H to find a new direction
       H2.Copy(H0)
     }
