@@ -106,18 +106,10 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     }
     a1[0].Mul(rho, a1[0])
   }
-  a1.ResetDerivatives()
-  x1.ResetDerivatives()
-  x2.ResetDerivatives()
-  y1.ResetDerivatives()
-  y2.ResetDerivatives()
-  g1.ResetDerivatives()
-  g2.ResetDerivatives()
-  p1.ResetDerivatives()
-  p2.ResetDerivatives()
   return true
 }
 
+// update approximation of the Hessian matrix
 func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Vector, t3, t4 Matrix) {
   s := p2
   y := t1
@@ -162,6 +154,31 @@ func bfgs_updateB(g1, g2, p2 Vector, B1, B2 Matrix, t1, t2 Vector, t3, t4 Matrix
   B2.MaddM(B2, t3)
 }
 
+// update approximation of the inverse Hessian matrix
+func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Vector, t3, t4 Matrix) {
+  s := p2
+  y := t1
+  // y = Df(x2) - Df(x1)
+  y.VsubV(g2, g1)
+  // y^T s
+  t5 := VdotV(s, y)
+  // s y^T
+  t3.Outer(s, y)
+  // s y^T / (y^T s)
+  t3.MdivS(t3, t5)
+  // I - s y^T / (y^T s)
+  t3.MsubM(I, t3)
+  // [I - s y^T / (y^T s)] H1 [I - s y^T / (y^T s)]
+  H2.MdotM(t3, H1)
+  H2.MdotM(H2, t3)
+  // s s^T
+  t3.Outer(s, s)
+  // s s^T / (y^T s)
+  t3.MdivS(t3, t5)
+  // [I - s y^T / (y^T s)] H1 [I - s y^T / (y^T s)] + s s^T / (y^T s)
+  H2.MaddM(H2, t3)
+}
+
 func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (Vector, error) {
 
   n := len(x0)
@@ -176,13 +193,14 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
   y2 := NullScalar(t)
   g1 := NullVector(t, n)
   g2 := NullVector(t, n)
-  B1 := B0.Clone()
-  B2 := NullDenseMatrix(t, n, n)
+  H1 := B0.Clone()
+  H2 := NullDenseMatrix(t, n, n)
   // some temporary variables
   t1 := NullVector(t, n)
   t2 := NullVector(t, n)
   t3 := NullDenseMatrix(t, n, n)
   t4 := NullDenseMatrix(t, n, n)
+  I  := IdentityMatrix(t, n)
 
   // evaluate objective function
   if err := f.Differentiate(x1, y1, g1); err != nil {
@@ -200,7 +218,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     if Vnorm(g1).GetValue() < epsilon.Value {
       break
     }
-    bgfs_computeDirection(x1, y1, g1, B1, p1)
+    bgfs_computeDirection(x1, y1, g1, H1, p1)
     fmt.Println("line search...")
     if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1); !ok {
       return x1, fmt.Errorf("line search failed")
@@ -209,23 +227,20 @@ func bfgs(f ObjectiveInSitu, x0 Vector, B0 Matrix, epsilon Epsilon, hook Hook) (
     if err := f.Differentiate(x2, y2, g2); err != nil {
       return x1, fmt.Errorf("invalid value: %s", err)
     }
-    if Vnorm(VsubV(x1, x2)).GetValue() < 1e-20 {
-      return x2, nil
-    }
     
     fmt.Println("x2:", x2)
     fmt.Println("y2:", y2)
     fmt.Println("g2:", g2)
     fmt.Println("a1:", a1)
-    bfgs_updateB(g1, g2, p2, B1, B2, t1, t2, t3, t4)
-    fmt.Println("B1:", B1)
-    fmt.Println("B2:", B2)
+    bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4)
+    fmt.Println("H1:", H1)
+    fmt.Println("H2:", H2)
     
     g1.Copy(g2)
     x1.Copy(x2)
     y1.Copy(y2)
     p1.Copy(p2)
-    B1.Copy(B2)
+    H1.Copy(H2)
     fmt.Println("iteration done...")
     fmt.Println()
   }
