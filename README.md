@@ -50,7 +50,7 @@ Compute the inverse *r* of a matrix *m* by minimizing the Frobenius norm *||mb -
 
   m := NewMatrix(RealType, 2, 2, []float64{1,2,3,4})
 
-  I := IdentityMatrix(matrix.Dims()[0])
+  I := IdentityMatrix(2)
   r := matrix.Clone()
   // objective function
   f := func(x Vector) Scalar {
