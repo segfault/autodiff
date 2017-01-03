@@ -219,18 +219,18 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook) (
     return x1, fmt.Errorf("invalid initial value: %s", err)
   }
   for {
-    // execute hook if available
-    if hook.Value != nil && hook.Value(g1, x1, y1) {
-      break
-    }
-    // evaluate stop criterion
-    if Vnorm(g1).GetValue() < epsilon.Value {
-      break
-    }
     bgfs_computeDirection(x1, y1, g1, H1, p1)
 
     if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2); !ok {
       return x1, fmt.Errorf("line search failed")
+    }
+    // execute hook if available
+    if hook.Value != nil && hook.Value(g2, x2, y2) {
+      break
+    }
+    // evaluate stop criterion
+    if Vnorm(g2).GetValue() < epsilon.Value {
+      break
     }
     // evaluate objective at new position
     if err := f.Differentiate(x2, y2, g2); err != nil {
