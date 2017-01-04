@@ -104,9 +104,9 @@ Find the root of a function *f* with initial value *x0 = (1,1)*
      t := Mul(b, Pow(Sub(x[1], Mul(x[0], x[0])), NewReal(2.0)))
      return Add(s, t), nil
    }
-   hook := func(gradient, x Vector, y Scalar) bool {
-     fmt.Println("gradient:", gradient)
+   hook := func(x, gradient Vector, y Scalar) bool {
      fmt.Println("x       :", x)
+     fmt.Println("gradient:", gradient)
      fmt.Println("y       :", y)
      return false
    }
