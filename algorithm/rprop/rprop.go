@@ -35,6 +35,10 @@ type Hook struct {
   Value func([]float64, []float64, Vector, Scalar) bool
 }
 
+type Constraints struct {
+  Value func(x Vector, y Scalar) bool
+}
+
 /* -------------------------------------------------------------------------- */
 
 /* Resilient Backpropagation:
@@ -42,8 +46,10 @@ type Hook struct {
  * Proceedings of the International Symposium on Computer and Information Science VII, 1992
  */
 
-func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []float64, epsilon float64,
-  hook func([]float64, []float64, Vector, Scalar) bool) (Vector, error) {
+func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []float64,
+  epsilon Epsilon,
+  hook Hook,
+  constraints Constraints) (Vector, error) {
 
   n := len(x0)
   t := x0.ElementType()
@@ -73,7 +79,8 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
   }
   // evaluate objective function
   s, err := f(x1)
-  if err != nil || gradient_is_nan(s) {
+  if err != nil || gradient_is_nan(s) ||
+    (constraints.Value != nil && !constraints.Value(x1, s)) {
     return x1, fmt.Errorf("invalid initial value: %v", x1)
   }
   for {
@@ -86,11 +93,11 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       gradient_new[i] = s.GetDerivative(1, i)
     }
     // execute hook if available
-    if hook != nil && hook(gradient_new, step, x1, s) {
+    if hook.Value != nil && hook.Value(gradient_new, step, x1, s) {
       break;
     }
     // evaluate stop criterion
-    if (Norm(gradient_new) < epsilon) {
+    if (Norm(gradient_new) < epsilon.Value) {
       break;
     }
     // update step size
@@ -120,7 +127,8 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       }
       // evaluate objective function
       s, err = f(x2)
-      if err != nil || gradient_is_nan(s) {
+      if err != nil || gradient_is_nan(s) ||
+        (constraints.Value != nil && !constraints.Value(x2, s)) {
         // if the updated is invalid reduce step size
         for i, _ := range x1 {
           if gradient_new[i] != 0.0 {
@@ -141,8 +149,9 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
 
 func Run(f func(Vector) (Scalar, error), x0 Vector, step_init float64, eta []float64, args ...interface{}) (Vector, error) {
 
-  hook    := Hook   { nil}.Value
-  epsilon := Epsilon{1e-8}.Value
+  hook        := Hook       { nil}
+  epsilon     := Epsilon    {1e-8}
+  constraints := Constraints{ nil}
 
   if len(eta) != 2 {
     panic("Rprop(): Argument eta must have length two!")
@@ -151,12 +160,14 @@ func Run(f func(Vector) (Scalar, error), x0 Vector, step_init float64, eta []flo
   for _, arg := range args {
     switch a := arg.(type) {
     case Hook:
-      hook = a.Value
+      hook = a
     case Epsilon:
-      epsilon = a.Value
+      epsilon = a
+    case Constraints:
+      constraints = a
     default:
       panic("Rprop(): Invalid optional argument!")
     }
   }
-  return rprop(f, x0, step_init, eta, epsilon, hook)
+  return rprop(f, x0, step_init, eta, epsilon, hook, constraints)
 }
