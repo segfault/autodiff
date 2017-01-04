@@ -112,6 +112,10 @@ func (a *BasicState) GetN() int {
   return a.N
 }
 
+func (a *BasicState) SetN(n int) {
+  a.Alloc(n)
+}
+
 /* write access
  * -------------------------------------------------------------------------- */
 

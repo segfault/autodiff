@@ -40,6 +40,8 @@ type ScalarState interface {
   GetLogValue     ()             float64
   GetDerivative   (int, int)     float64
   GetN            ()             int
+  // same as alloc
+  SetN            (int)
   // set value and derivatives to zero
   Reset           ()
   ResetDerivatives()

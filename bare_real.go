@@ -104,6 +104,9 @@ func (a *BareReal) GetN() int {
   return 0
 }
 
+func (a *BareReal) SetN(n int) {
+}
+
 /* write access
  * -------------------------------------------------------------------------- */
 
