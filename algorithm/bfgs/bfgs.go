@@ -54,28 +54,31 @@ type Constraints struct {
 /* -------------------------------------------------------------------------- */
 
 type ObjectiveInSitu struct {
-  Eval func(x Vector, y Scalar) error
+  Eval func(x, g Vector, y Scalar) error
 }
 
 func newObjectiveInSitu(f Objective) ObjectiveInSitu {
-  g := func(x Vector, y Scalar) error {
+  g := func(x, g Vector, y Scalar) error {
     z, err := f(x)
     if err != nil {
       return err
     }
+    // copy value
     y.Copy(z)
+    // copy gradient
+    for i := 0; i < z.GetN(); i++ {
+      g[i].SetValue(z.GetDerivative(1, i))
+    }
     return nil
   }
   return ObjectiveInSitu{g}
 }
 
-func (f ObjectiveInSitu) Differentiate(x Vector, y Scalar, g Vector) error {
-  x.Variables(1)  
-  if err := f.Eval(x, y); err != nil {
+func (f ObjectiveInSitu) Differentiate(x, g Vector, y Scalar) error {
+  x.Variables(1)
+  if err := f.Eval(x, g, y); err != nil {
     return err
   }
-  copyGradient(y, g)
-  x.ResetDerivatives()
   return nil
 }
 
@@ -83,12 +86,6 @@ func (f ObjectiveInSitu) Differentiate(x Vector, y Scalar, g Vector) error {
 
 /* Broyden–Fletcher–Goldfarb–Shanno (BFGS) algorithm:
  */
-
-func copyGradient(y Scalar, g Vector) {
-  for i := 0; i < y.GetN(); i++ {
-    g[i].SetValue(y.GetDerivative(1, i))
-  }
-}
 
 func bgfs_computeDirection(x Vector, y Scalar, g Vector, B Matrix, p Vector) {
   p.MdotV(B, g)
@@ -111,7 +108,7 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     // check if new value satisfies constraints
     if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2)) {
       // evaluate function at x2
-      f.Differentiate(x2, y2, g2)
+      f.Differentiate(x2, g2, y2)
       // check NaN
       if math.IsNaN(y2.GetValue()) {
         return false
@@ -205,13 +202,13 @@ func bfgs_updateH(g1, g2, p2 Vector, H1, H2, I Matrix, t1, t2 Scalar, t3, t4 Vec
 func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, constraints Constraints) (Vector, error) {
 
   n := len(x0)
-  t := x0.ElementType()
+  t := BareRealType
 
   a1 := NewVector(t, []float64{1e-8})
   p1 := NullVector(t, n)
   p2 := NullVector(t, n)
   x1 := x0.Clone()
-  x2 := NullVector(t, n)
+  x2 := x1.Clone()
   y1 := NullScalar(t)
   y2 := NullScalar(t)
   g1 := NullVector(t, n)
@@ -232,7 +229,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
     return x1, fmt.Errorf("invalid initial value: %v", x1)
   }
   // evaluate objective function
-  if err := f.Differentiate(x1, y1, g1); err != nil {
+  if err := f.Differentiate(x1, g1, y1); err != nil {
     return x1, fmt.Errorf("invalid initial value: %s", err)
   }
   // execute hook if available
@@ -254,7 +251,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
       break
     }
     // evaluate objective at new position
-    if err := f.Differentiate(x2, y2, g2); err != nil {
+    if err := f.Differentiate(x2, g2, y2); err != nil {
       return x1, fmt.Errorf("invalid value: %s", err)
     }
     if ok := bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
