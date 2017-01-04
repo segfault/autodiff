@@ -106,7 +106,7 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     p2.VmulS(p1, a1[0])
     x2.VaddV(x1, p2)
     // check if new value satisfies constraints
-    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2)) {
+    if constraints.Value == nil || constraints.Value(x2) {
       // evaluate function at x2
       f.Differentiate(x2, g2, y2)
       // check NaN
