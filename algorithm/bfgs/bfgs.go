@@ -44,7 +44,7 @@ type Epsilon struct {
 }
 
 type Hook struct {
-  Value func(gradient, x Vector, y Scalar) bool
+  Value func(x, gradient Vector, y Scalar) bool
 }
 
 type Constraints struct {
@@ -236,7 +236,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
     return x1, fmt.Errorf("invalid initial value: %s", err)
   }
   // execute hook if available
-  if hook.Value != nil && hook.Value(g1, x1, y1) {
+  if hook.Value != nil && hook.Value(x1, g1, y1) {
     return x1, nil
   }
   for {
@@ -246,7 +246,7 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
       return x1, fmt.Errorf("line search failed")
     }
     // execute hook if available
-    if hook.Value != nil && hook.Value(g2, x2, y2) {
+    if hook.Value != nil && hook.Value(x2, g2, y2) {
       break
     }
     // evaluate stop criterion
