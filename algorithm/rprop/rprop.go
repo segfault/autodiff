@@ -36,7 +36,7 @@ type Hook struct {
 }
 
 type Constraints struct {
-  Value func(x Vector, y Scalar) bool
+  Value func(x Vector) bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -77,10 +77,13 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
     }
     return false
   }
+  // check initial value
+  if constraints.Value != nil && !constraints.Value(x1) {
+    return x1, fmt.Errorf("invalid initial value: %v", x1)
+  }
   // evaluate objective function
   s, err := f(x1)
-  if err != nil || gradient_is_nan(s) ||
-    (constraints.Value != nil && !constraints.Value(x1, s)) {
+  if err != nil || gradient_is_nan(s) {
     return x1, fmt.Errorf("invalid initial value: %v", x1)
   }
   for {
@@ -128,7 +131,7 @@ func rprop(f func(Vector) (Scalar, error), x0 Vector, step_init float64 , eta []
       // evaluate objective function
       s, err = f(x2)
       if err != nil || gradient_is_nan(s) ||
-        (constraints.Value != nil && !constraints.Value(x2, s)) {
+        (constraints.Value != nil && !constraints.Value(x2)) {
         // if the updated is invalid reduce step size
         for i, _ := range x1 {
           if gradient_new[i] != 0.0 {

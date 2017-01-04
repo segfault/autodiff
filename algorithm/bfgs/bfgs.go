@@ -48,7 +48,7 @@ type Hook struct {
 }
 
 type Constraints struct {
-  Value func(x Vector, y Scalar) bool
+  Value func(x Vector) bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -108,14 +108,14 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     // compute x2 = f(x1 + a1 p1)
     p2.VmulS(p1, a1[0])
     x2.VaddV(x1, p2)
-    // evaluate function at x2
-    f.Differentiate(x2, y2, g2)
-    // check NaN
-    if math.IsNaN(y2.GetValue()) {
-      return false
-    }
     // check if new value satisfies constraints
-    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2, y2)) {
+    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2)) {
+      // evaluate function at x2
+      f.Differentiate(x2, y2, g2)
+      // check NaN
+      if math.IsNaN(y2.GetValue()) {
+        return false
+      }
       // check Wolfe conditions
       t1.VdotV(p1, g1)
       if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
@@ -227,6 +227,10 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
   t6 := NullDenseMatrix(t, n, n)
   I  := IdentityMatrix(t, n)
 
+  // check initial value
+  if constraints.Value != nil && !constraints.Value(x1) {
+    return x1, fmt.Errorf("invalid initial value: %v", x1)
+  }
   // evaluate objective function
   if err := f.Differentiate(x1, y1, g1); err != nil {
     return x1, fmt.Errorf("invalid initial value: %s", err)
