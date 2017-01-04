@@ -116,7 +116,11 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
       // check Wolfe conditions
       t1.VdotV(p1, g1)
       if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
-        break
+        // in very rare cases the gradient information may be inaccurate due to
+        // numerical errors, check that the function value actually decreased
+        if y2.GetValue() <= y1.GetValue() {
+          break
+        }
       }
     }
     a1[0].Mul(rho, a1[0])
