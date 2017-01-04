@@ -48,7 +48,7 @@ type Hook struct {
 }
 
 type Constraints struct {
-  Value func(x Vector) bool
+  Value func(x Vector, y Scalar) bool
 }
 
 /* -------------------------------------------------------------------------- */
@@ -115,7 +115,7 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
       return false
     }
     // check if new value satisfies constraints
-    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2)) {
+    if constraints.Value == nil || (constraints.Value != nil && constraints.Value(x2, y2)) {
       // check Wolfe conditions
       t1.VdotV(p1, g1)
       if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
