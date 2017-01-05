@@ -245,6 +245,10 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
   if err := f.Differentiate(x1, g1, y1); err != nil {
     return x1, fmt.Errorf("invalid initial value: %s", err)
   }
+  // evaluate stop criterion
+  if Vnorm(g1).GetValue() < epsilon.Value {
+    return x1, fmt.Errorf("initial value satisfies stop criterium")
+  }
   // execute hook if available
   if hook.Value != nil && hook.Value(x1, g1, y1) {
     return x1, nil
@@ -268,13 +272,13 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
       if hook.Value != nil && hook.Value(x2, g2, y2) {
         break
       }
-      // evaluate stop criterion
-      if Vnorm(g2).GetValue() < epsilon.Value {
-        break
-      }
       // evaluate objective at new position
       if err := f.Differentiate(x2, g2, y2); err != nil {
         return x1, fmt.Errorf("invalid value: %s", err)
+      }
+      // evaluate stop criterion
+      if Vnorm(g2).GetValue() < epsilon.Value {
+        break
       }
       if ok := bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
         // reset H to find a new direction
