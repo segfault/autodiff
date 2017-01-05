@@ -102,6 +102,11 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
   // always begin with a = 1
   a1[0].SetValue(1.0)
   for {
+    if a1[0].GetValue() < 1e-20 {
+      y2.Set(y1)
+      // numerical precision reached, terminate
+      return false
+    }
     // compute x2 = f(x1 + a1 p1)
     p2.VmulS(p1, a1[0])
     x2.VaddV(x1, p2)
@@ -109,10 +114,6 @@ func bgfs_backtrackingLineSearch(f ObjectiveInSitu, x1, x2 Vector, y1, y2 Scalar
     if constraints.Value == nil || constraints.Value(x2) {
       // evaluate function at x2
       f.Differentiate(x2, g2, y2)
-      // check NaN
-      if math.IsNaN(y2.GetValue()) {
-        return false
-      }
       // check Wolfe conditions
       t1.VdotV(p1, g1)
       if y2.GetValue() <= y1.GetValue() + c1*a1[0].GetValue()*t1.GetValue() {
@@ -228,6 +229,14 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
   t6 := NullDenseMatrix(t, n, n)
   I  := IdentityMatrix(t, n)
 
+  equals := func(x1, x2 Vector) bool {
+    for i := 0; i < len(x1); i++ {
+      if x1[i].GetValue() != x2[i].GetValue() {
+        return false
+      }
+    }
+    return true
+  }
   // check initial value
   if constraints.Value != nil && !constraints.Value(x1) {
     return x1, fmt.Errorf("invalid initial value: %v", x1)
@@ -240,27 +249,40 @@ func bfgs(f ObjectiveInSitu, x0 Vector, H0 Matrix, epsilon Epsilon, hook Hook, c
   if hook.Value != nil && hook.Value(x1, g1, y1) {
     return x1, nil
   }
+  // keep track of whether H has been updated before
+  first_update := true
   for {
     bgfs_computeDirection(x1, y1, g1, H1, p1)
 
-    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2, constraints); !ok {
-      return x1, fmt.Errorf("line search failed")
-    }
-    // execute hook if available
-    if hook.Value != nil && hook.Value(x2, g2, y2) {
-      break
-    }
-    // evaluate stop criterion
-    if Vnorm(g2).GetValue() < epsilon.Value {
-      break
-    }
-    // evaluate objective at new position
-    if err := f.Differentiate(x2, g2, y2); err != nil {
-      return x1, fmt.Errorf("invalid value: %s", err)
-    }
-    if ok := bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
+    if ok := bgfs_backtrackingLineSearch(f, x1, x2, y1, y2, g1, g2, p1, p2, a1, t1, t2, constraints); !ok || equals(x1, x2) {
       // reset H to find a new direction
-      H2.Copy(H0)
+      if first_update {
+        // the initial matrix H seems invalid, stop optimization here
+        return x1, fmt.Errorf("line search failed: invalid search direction")
+      } else {
+        first_update = true
+        H2.Copy(H0)
+      }
+    } else {
+      // execute hook if available
+      if hook.Value != nil && hook.Value(x2, g2, y2) {
+        break
+      }
+      // evaluate stop criterion
+      if Vnorm(g2).GetValue() < epsilon.Value {
+        break
+      }
+      // evaluate objective at new position
+      if err := f.Differentiate(x2, g2, y2); err != nil {
+        return x1, fmt.Errorf("invalid value: %s", err)
+      }
+      if ok := bfgs_updateH(g1, g2, p2, H1, H2, I, t1, t2, t3, t4, t5, t6); !ok {
+        // reset H to find a new direction
+        first_update = true
+        H2.Copy(H0)
+      } else {
+        first_update = false
+      }
     }
 
     g1.Copy(g2)
